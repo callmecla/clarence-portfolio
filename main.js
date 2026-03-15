@@ -1,359 +1,252 @@
 /* ============================================================
    PORTFOLIO — main.js
    ============================================================ */
-
 'use strict';
 
 /* ============================================================
-   1. THEME TOGGLE  (persisted to localStorage)
+   1. THEME TOGGLE
+   Theme is already set by inline <script> in <head>.
+   This just wires the button.
    ============================================================ */
-const html        = document.documentElement;
-const themeToggle = document.getElementById('theme-toggle');
-
-// Theme is already applied by the inline <script> in <head>.
-// This just wires up the toggle button.
-themeToggle?.addEventListener('click', () => {
+const html = document.documentElement;
+document.getElementById('theme-toggle')?.addEventListener('click', () => {
   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-
-  // Add transitioning class so CSS can animate the switch
-  html.classList.add('theme-transitioning');
   html.setAttribute('data-theme', next);
   localStorage.setItem('portfolio-theme', next);
-
-  setTimeout(() => html.classList.remove('theme-transitioning'), 500);
 });
 
 /* ============================================================
-   2. ANIMATED CANVAS BACKGROUND  (floating particles)
+   2. CANVAS BACKGROUND — floating particles + lines
    ============================================================ */
-(function initCanvas() {
+(function () {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
-  let W, H, particles = [], animId;
-
-  const COUNT = window.innerWidth < 600 ? 40 : 80;
+  let W, H, pts = [], raf;
+  const N = window.innerWidth < 600 ? 35 : 70;
 
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
   }
-
-  function randomParticle() {
-    return {
-      x:    Math.random() * W,
-      y:    Math.random() * H,
-      r:    Math.random() * 1.5 + 0.4,
-      vx:   (Math.random() - .5) * .35,
-      vy:   (Math.random() - .5) * .35,
-      life: Math.random(),
-    };
+  function mkPt() {
+    return { x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, life:Math.random() };
   }
-
-  function init() {
-    particles = Array.from({ length: COUNT }, randomParticle);
+  function accent() {
+    return html.getAttribute('data-theme') === 'light' ? '61,122,0,' : '200,244,104,';
   }
-
-  function getAccentColor() {
-    const theme = html.getAttribute('data-theme');
-    return theme === 'light'
-      ? 'rgba(90,158,0,'
-      : 'rgba(200,244,104,';
-  }
-
   function draw() {
-    ctx.clearRect(0, 0, W, H);
-    const base = getAccentColor();
-
-    particles.forEach(p => {
-      p.x  += p.vx;
-      p.y  += p.vy;
-      p.life = (p.life + .003) % 1;
-
-      const alpha = Math.sin(p.life * Math.PI) * .55;
-
-      // Wrap edges
-      if (p.x < -2)  p.x = W + 2;
-      if (p.x > W+2) p.x = -2;
-      if (p.y < -2)  p.y = H + 2;
-      if (p.y > H+2) p.y = -2;
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = base + alpha + ')';
-      ctx.fill();
+    ctx.clearRect(0,0,W,H);
+    const a = accent();
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.life = (p.life + .002) % 1;
+      if (p.x < -2) p.x = W+2; if (p.x > W+2) p.x = -2;
+      if (p.y < -2) p.y = H+2; if (p.y > H+2) p.y = -2;
+      const al = Math.sin(p.life * Math.PI) * .5;
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.random()*.5+.8,0,Math.PI*2);
+      ctx.fillStyle = `rgba(${a}${al})`; ctx.fill();
     });
-
-    // Draw faint connection lines between nearby particles
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          const alpha = (1 - dist / 120) * .08;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = base + alpha + ')';
-          ctx.lineWidth = .6;
-          ctx.stroke();
-        }
+    for (let i=0;i<pts.length;i++) for (let j=i+1;j<pts.length;j++) {
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if (d<110) {
+        ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(${a}${(1-d/110)*.07})`; ctx.lineWidth=.5; ctx.stroke();
       }
     }
-
-    animId = requestAnimationFrame(draw);
+    raf = requestAnimationFrame(draw);
   }
-
   resize();
-  init();
+  pts = Array.from({length:N},mkPt);
   draw();
-
-  window.addEventListener('resize', () => {
-    cancelAnimationFrame(animId);
-    resize();
-    init();
-    draw();
-  });
+  window.addEventListener('resize',()=>{ cancelAnimationFrame(raf); resize(); pts=Array.from({length:N},mkPt); draw(); });
 })();
 
 /* ============================================================
-   3. CUSTOM CURSOR  (desktop only)
+   3. CUSTOM CURSOR — only activates on real pointer devices
    ============================================================ */
-(function initCursor() {
+(function () {
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;
 
-  // Only activate on real pointer devices
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    dot.style.display  = 'none';
-    ring.style.display = 'none';
-    return;
-  }
+  // Only activate on desktop hover devices
+  if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
 
-  let mx = -200, my = -200;  // start offscreen
-  let rx = -200, ry = -200;
-  let visible = false;
+  let mx=-999, my=-999, rx=-999, ry=-999, ready=false;
 
-  // Position dot instantly on first move
   document.addEventListener('mousemove', e => {
-    mx = e.clientX;
-    my = e.clientY;
-
-    // Snap ring to cursor on first move so it doesn't sweep from corner
-    if (!visible) {
-      rx = mx;
-      ry = my;
-      visible = true;
+    mx = e.clientX; my = e.clientY;
+    if (!ready) {
+      // Snap both to cursor position on first move — no sweep from corner
+      rx = mx; ry = my;
+      ready = true;
+      document.body.classList.add('has-cursor');
     }
+    dot.style.left = mx+'px'; dot.style.top = my+'px';
+  }, {passive:true});
 
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
-  }, { passive: true });
+  document.addEventListener('mouseleave', () => { dot.style.opacity='0'; ring.style.opacity='0'; });
+  document.addEventListener('mouseenter', () => {
+    if (ready) { dot.style.opacity='1'; ring.style.opacity='.55'; }
+  });
 
-  // Smooth ring follow via RAF
   (function loop() {
-    rx += (mx - rx) * .13;
-    ry += (my - ry) * .13;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
+    rx += (mx-rx)*.13; ry += (my-ry)*.13;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
     requestAnimationFrame(loop);
   })();
 
-  // Hide when mouse leaves window
-  document.addEventListener('mouseleave', () => {
-    dot.style.opacity  = '0';
-    ring.style.opacity = '0';
-  });
-  document.addEventListener('mouseenter', () => {
-    dot.style.opacity  = '1';
-    ring.style.opacity = '.55';
-  });
-
-  // Hover expand state
-  const hoverSel = 'a, button, label, [data-tilt], .pill, .tag, .badge, .cert-card, .project-card, .stat-card, .social-link, .timeline-item';
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
-  });
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
-  });
+  const hov = 'a,button,label,[data-tilt],.pill,.tag,.badge,.cert-card,.proj-card,.stat-card,.soc-link,.tl-item';
+  document.addEventListener('mouseover',  e => { if (e.target.closest(hov)) document.body.classList.add('cur-hover'); });
+  document.addEventListener('mouseout',   e => { if (e.target.closest(hov)) document.body.classList.remove('cur-hover'); });
 })();
 
 /* ============================================================
-   4. NAV — scroll style + active link highlight
+   4. NAV — scrolled state + active link
    ============================================================ */
-(function initNav() {
-  const nav     = document.getElementById('nav');
-  const navLinks = document.querySelectorAll('.nav-link');
+(function () {
+  const nav = document.getElementById('nav');
+  const links = document.querySelectorAll('.nav-link');
 
-  // Scrolled class
-  const onScroll = () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
+  nav.classList.toggle('scrolled', window.scrollY > 40);
 
-  // Active section highlight
-  const sections = document.querySelectorAll('section[id]');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navLinks.forEach(a => {
-          a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
-        });
-      }
+  const secs = document.querySelectorAll('section[id]');
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id));
     });
-  }, { rootMargin: '-40% 0px -55% 0px' });
-
-  sections.forEach(s => observer.observe(s));
+  }, {rootMargin:'-40% 0px -55% 0px'}).observe
+  ; // intentionally no-op end
+  // Use forEach instead:
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id));
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s => io.observe(s));
 })();
 
 /* ============================================================
    5. MOBILE NAV
    ============================================================ */
-(function initMobileNav() {
-  const hamburger     = document.getElementById('hamburger');
-  const overlay       = document.getElementById('mobile-overlay');
-  const navLinksEl    = document.getElementById('nav-links');
-  if (!hamburger || !overlay) return;
+(function () {
+  const ham = document.getElementById('hamburger');
+  const ov  = document.getElementById('mob-overlay');
+  if (!ham || !ov) return;
 
-  // Clone nav links into overlay
-  const links = document.querySelectorAll('.nav-links .nav-link');
-  links.forEach(link => {
-    const clone = link.cloneNode(true);
-    clone.style.cssText = 'font-size:1.1rem;letter-spacing:.18em;';
-    overlay.appendChild(clone);
+  // Clone desktop nav links into overlay
+  document.querySelectorAll('#nav-links .nav-link').forEach(l => {
+    const c = l.cloneNode(true);
+    c.style.fontSize = '1.05rem';
+    c.style.letterSpacing = '.18em';
+    ov.appendChild(c);
   });
 
-  const toggle = (open) => {
-    hamburger.classList.toggle('open', open);
-    hamburger.setAttribute('aria-expanded', open);
-    overlay.classList.toggle('open', open);
+  const toggle = open => {
+    ham.classList.toggle('open', open);
+    ham.setAttribute('aria-expanded', open);
+    ov.classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
   };
 
-  hamburger.addEventListener('click', () => {
-    toggle(!overlay.classList.contains('open'));
-  });
-
-  // Close on link click
-  overlay.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => toggle(false));
-  });
-
-  // Close on outside click
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) toggle(false);
-  });
-
-  // Close on Escape
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') toggle(false);
-  });
+  ham.addEventListener('click', () => toggle(!ov.classList.contains('open')));
+  ov.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggle(false)));
+  ov.addEventListener('click', e => { if (e.target===ov) toggle(false); });
+  document.addEventListener('keydown', e => { if (e.key==='Escape') toggle(false); });
 })();
 
 /* ============================================================
    6. SCROLL REVEAL
+   Uses a "safe" approach:
+   — Adds body.js-ready ONLY after confirming IntersectionObserver works
+   — Falls back gracefully: elements stay visible if anything fails
    ============================================================ */
-(function initReveal() {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+(function () {
+  try {
+    const els = document.querySelectorAll('.rv');
+    if (!els.length) return;
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    // Mark body so CSS can now use opacity:0 on .rv
+    document.body.classList.add('js-ready');
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    els.forEach(el => io.observe(el));
+
+    // Safety net: after 2s, force ALL reveals visible
+    // (handles edge cases where IntersectionObserver doesn't fire)
+    setTimeout(() => {
+      document.querySelectorAll('.rv:not(.in)').forEach(el => el.classList.add('in'));
+    }, 2000);
+
+  } catch (err) {
+    // If anything fails, remove js-ready so elements stay visible
+    document.body.classList.remove('js-ready');
+    console.warn('[Reveal] Fallback activated:', err);
+  }
 })();
 
 /* ============================================================
-   7. ANIMATED COUNTERS  (About stats)
+   7. ANIMATED COUNTERS
    ============================================================ */
-(function initCounters() {
-  const counters = document.querySelectorAll('.stat-num[data-target]');
-  if (!counters.length) return;
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el     = entry.target;
-      const target = +el.dataset.target;
-      const dur    = 1400;
-      const start  = performance.now();
-
-      const tick = (now) => {
-        const p = Math.min((now - start) / dur, 1);
-        // Ease out quart
-        const ease = 1 - Math.pow(1 - p, 4);
-        el.textContent = Math.round(ease * target);
+(function () {
+  const els = document.querySelectorAll('.stat-n[data-target]');
+  if (!els.length) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target, target = +el.dataset.target, dur = 1400, t0 = performance.now();
+      const tick = now => {
+        const p = Math.min((now-t0)/dur, 1);
+        el.textContent = Math.round((1-Math.pow(1-p,4)) * target);
         if (p < 1) requestAnimationFrame(tick);
       };
-
       requestAnimationFrame(tick);
-      observer.unobserve(el);
+      io.unobserve(el);
     });
-  }, { threshold: 0.5 });
-
-  counters.forEach(c => observer.observe(c));
+  }, {threshold:.5});
+  els.forEach(el => io.observe(el));
 })();
 
 /* ============================================================
    8. SKILL BARS
    ============================================================ */
-(function initSkillBars() {
-  const skillSection = document.getElementById('skills');
-  if (!skillSection) return;
-
-  const fills = skillSection.querySelectorAll('.skill-fill[data-w]');
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      fills.forEach((fill, i) => {
-        setTimeout(() => {
-          fill.style.width = fill.dataset.w + '%';
-        }, i * 80);
-      });
-      observer.unobserve(entry.target);
+(function () {
+  const sec = document.getElementById('skills');
+  if (!sec) return;
+  const fills = sec.querySelectorAll('.sk-fill[data-w]');
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      fills.forEach((f,i) => setTimeout(() => { f.style.width = f.dataset.w+'%'; }, i*70));
     });
-  }, { threshold: 0.25 });
-
-  observer.observe(skillSection);
+  }, {threshold:.2}).observe(sec);
 })();
 
 /* ============================================================
-   9. PROJECT CARD 3-D TILT + GLOW
+   9. PROJECT CARD TILT + GLOW
    ============================================================ */
-(function initTilt() {
-  if (!window.matchMedia('(hover: hover)').matches) return;
-
+(function () {
+  if (!window.matchMedia('(hover:hover)').matches) return;
   document.querySelectorAll('[data-tilt]').forEach(card => {
-    const glow = card.querySelector('.project-glow');
-
+    const glow = card.querySelector('.proj-glow');
     card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const cx   = (e.clientX - rect.left) / rect.width;
-      const cy   = (e.clientY - rect.top)  / rect.height;
-      const rx   = (cy - .5) * -10;
-      const ry   = (cx - .5) *  10;
-
-      card.style.transform        = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(4px)`;
-      card.style.transition       = 'transform .1s linear';
-
-      if (glow) {
-        glow.style.setProperty('--mx', (cx * 100) + '%');
-        glow.style.setProperty('--my', (cy * 100) + '%');
-      }
+      const r=card.getBoundingClientRect(), cx=(e.clientX-r.left)/r.width, cy=(e.clientY-r.top)/r.height;
+      card.style.transform = `perspective(700px) rotateX(${(cy-.5)*-8}deg) rotateY(${(cx-.5)*8}deg) translateZ(4px)`;
+      card.style.transition = 'transform .1s linear';
+      if (glow) { glow.style.setProperty('--mx',(cx*100)+'%'); glow.style.setProperty('--my',(cy*100)+'%'); }
     });
-
     card.addEventListener('mouseleave', () => {
-      card.style.transform  = '';
+      card.style.transform = '';
       card.style.transition = 'transform .6s cubic-bezier(.16,1,.3,1)';
     });
   });
@@ -362,172 +255,98 @@ themeToggle?.addEventListener('click', () => {
 /* ============================================================
    10. PROFILE PHOTO UPLOAD
    ============================================================ */
-(function initPhotoUpload() {
+(function () {
   const input = document.getElementById('photo-upload');
   const img   = document.getElementById('profile-img');
   if (!input || !img) return;
-
   input.addEventListener('change', e => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
-
+    const f = e.target.files?.[0];
+    if (!f || !f.type.startsWith('image/')) return;
     const reader = new FileReader();
-    reader.onload = ev => {
-      img.src = ev.target.result;
-      img.style.animation = 'fadeIn .5s ease forwards';
-    };
-    reader.readAsDataURL(file);
+    reader.onload = ev => { img.src = ev.target.result; };
+    reader.readAsDataURL(f);
   });
 })();
 
 /* ============================================================
    11. CONTACT FORM — EmailJS
    ─────────────────────────────────────────────────────────────
-   SETUP STEPS (takes ~5 min — all free):
-   1. Go to https://www.emailjs.com and create a free account.
-   2. Dashboard → "Email Services" → Add Service (Gmail / Outlook / etc.)
-      Copy your  SERVICE_ID  (looks like "service_xxxxxxx")
-   3. Dashboard → "Email Templates" → Create Template.
-      Use these exact variable names in your template body:
-        {{from_name}}   — sender's name
-        {{from_email}}  — sender's email
-        {{subject}}     — subject line
-        {{message}}     — message body
-        {{to_name}}     — your name (auto-filled below)
-      Save and copy your  TEMPLATE_ID  (looks like "template_xxxxxxx")
-   4. Dashboard → Account → General → copy your  PUBLIC_KEY
-   5. Paste the three values into the CONFIG block below.
-   ─────────────────────────────────────────────────────────────
-   NOTE: Free tier = 200 emails/month. No credit card needed.
+   SETUP (free, ~5 min):
+   1. https://www.emailjs.com → sign up
+   2. Email Services → Add Service → copy SERVICE_ID
+   3. Email Templates → Create Template, use variables:
+        {{from_name}} {{from_email}} {{subject}} {{message}} {{to_name}}
+      → copy TEMPLATE_ID
+   4. Account → General → copy PUBLIC_KEY
+   5. Paste the 3 values below
    ============================================================ */
-(function initForm() {
+(function () {
+  const PUBLIC_KEY   = 'YOUR_PUBLIC_KEY';    // e.g. 'abc123XYZ'
+  const SERVICE_ID   = 'YOUR_SERVICE_ID';    // e.g. 'service_abc123'
+  const TEMPLATE_ID  = 'YOUR_TEMPLATE_ID';   // e.g. 'template_abc123'
+  const YOUR_NAME    = 'Your Name';
 
-  /* ── CONFIG — paste your EmailJS credentials here ── */
-  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';      // e.g. 'abc123XYZdef'
-  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';      // e.g. 'service_abc123'
-  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';     // e.g. 'template_abc123'
-  const YOUR_NAME           = 'Your Name';             // shown as {{to_name}} in template
-  /* ── END CONFIG ── */
+  if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: PUBLIC_KEY });
 
-  // Initialise EmailJS with your public key
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-  }
-
-  const form    = document.getElementById('contact-form');
-  const btn     = document.getElementById('form-submit');
-  const btnLabel= document.getElementById('form-btn-label');
-  const success = document.getElementById('form-success');
-  const error   = document.getElementById('form-error');
+  const form = document.getElementById('contact-form');
   if (!form) return;
 
-  // ── helpers ──
-  const setLoading = (on) => {
-    btn.classList.toggle('loading', on);
+  const btn   = document.getElementById('cf-btn');
+  const lbl   = document.getElementById('cf-btn-lbl');
+  const spin  = document.getElementById('cf-spin');
+  const okMsg = document.getElementById('cf-ok');
+  const errMsg= document.getElementById('cf-err');
+
+  const setLoading = on => {
     btn.disabled = on;
-    if (btnLabel) btnLabel.textContent = on ? 'Sending…' : 'Send Message';
+    lbl.textContent = on ? 'Sending…' : 'Send Message';
+    if (spin) spin.style.display = on ? 'block' : 'none';
+  };
+  const showMsg = (el, ms=6000) => {
+    el.style.display='block';
+    setTimeout(() => el.style.display='none', ms);
+  };
+  const hide = () => { okMsg.style.display='none'; errMsg.style.display='none'; };
+
+  const shake = el => {
+    el.style.animation='none'; el.getBoundingClientRect();
+    el.style.animation='shake .4s ease'; el.focus();
+    el.addEventListener('animationend',()=>el.style.animation='',{once:true});
   };
 
-  const showMsg = (el, duration = 6000) => {
-    el.classList.add('visible');
-    setTimeout(() => el.classList.remove('visible'), duration);
-  };
+  form.addEventListener('submit', async e => {
+    e.preventDefault(); hide();
+    const name = form.querySelector('#cf-name').value.trim();
+    const email= form.querySelector('#cf-email').value.trim();
+    const msg  = form.querySelector('#cf-msg').value.trim();
+    const re   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name)          { shake(form.querySelector('#cf-name'));  return; }
+    if (!re.test(email)){ shake(form.querySelector('#cf-email')); return; }
+    if (!msg)           { shake(form.querySelector('#cf-msg'));   return; }
 
-  const hideAll = () => {
-    success.classList.remove('visible');
-    error.classList.remove('visible');
-  };
-
-  // ── inline validation ──
-  const validate = () => {
-    const name    = form.querySelector('#cf-name').value.trim();
-    const email   = form.querySelector('#cf-email').value.trim();
-    const message = form.querySelector('#cf-msg').value.trim();
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!name)              { shake(form.querySelector('#cf-name'));  return false; }
-    if (!emailRe.test(email)){ shake(form.querySelector('#cf-email')); return false; }
-    if (!message)           { shake(form.querySelector('#cf-msg'));   return false; }
-    return { name, email, message };
-  };
-
-  const shake = (el) => {
-    el.style.animation = 'none';
-    el.getBoundingClientRect(); // reflow
-    el.style.animation = 'shakeField .4s var(--ease)';
-    el.addEventListener('animationend', () => el.style.animation = '', { once: true });
-    el.focus();
-  };
-
-  // ── submit ──
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideAll();
-
-    const data = validate();
-    if (!data) return;
-
-    // Guard: if keys haven't been filled in, warn developer in console
-    if (
-      EMAILJS_PUBLIC_KEY  === 'YOUR_PUBLIC_KEY'  ||
-      EMAILJS_SERVICE_ID  === 'YOUR_SERVICE_ID'  ||
-      EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID'
-    ) {
-      console.warn(
-        '%c[EmailJS] Fill in your credentials in main.js (search "CONFIG")',
-        'background:#ff6b6b;color:#fff;padding:4px 8px;border-radius:4px;'
-      );
-      // Show success anyway in dev so you can test the UI flow
+    // Dev mode: credentials not yet filled in
+    if (PUBLIC_KEY==='YOUR_PUBLIC_KEY' || SERVICE_ID==='YOUR_SERVICE_ID') {
+      console.warn('%c[EmailJS] Add your credentials in main.js line ~220','background:#ff6b6b;color:#fff;padding:3px 8px;border-radius:3px');
       setLoading(true);
-      await new Promise(r => setTimeout(r, 1200));
-      setLoading(false);
-      form.reset();
-      showMsg(success);
+      await new Promise(r=>setTimeout(r,1200));
+      setLoading(false); form.reset(); showMsg(okMsg);
       return;
     }
 
     setLoading(true);
-
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          to_name:    YOUR_NAME,
-          from_name:  data.name,
-          from_email: data.email,
-          subject:    form.querySelector('#cf-subject').value.trim() || '(no subject)',
-          message:    data.message,
-          reply_to:   data.email,
-        }
-      );
-
-      setLoading(false);
-      form.reset();
-      showMsg(success);
-
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+        to_name:   YOUR_NAME,
+        from_name: name,
+        from_email:email,
+        subject:   form.querySelector('#cf-subject').value.trim() || '(no subject)',
+        message:   msg,
+        reply_to:  email,
+      });
+      setLoading(false); form.reset(); showMsg(okMsg);
     } catch (err) {
-      console.error('[EmailJS] Send failed:', err);
-      setLoading(false);
-      showMsg(error);
+      console.error('[EmailJS]', err);
+      setLoading(false); showMsg(errMsg);
     }
   });
-
-})();
-
-/* ============================================================
-   12. SMOOTH PARALLAX on hero orbs  (subtle, desktop only)
-   ============================================================ */
-(function initParallax() {
-  if (!window.matchMedia('(hover: hover)').matches) return;
-  const hero = document.getElementById('hero');
-  if (!hero) return;
-
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    const ring1 = hero.querySelector('.hero-profile-ring');
-    const ring2 = hero.querySelector('.hero-profile-ring--2');
-    if (ring1) ring1.style.transform = `scale(${1 + y * .0003})`;
-    if (ring2) ring2.style.transform = `scale(${1 + y * .0005})`;
-  }, { passive: true });
 })();
