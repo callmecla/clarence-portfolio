@@ -354,41 +354,138 @@ themeToggle?.addEventListener('click', () => {
 })();
 
 /* ============================================================
-   11. CONTACT FORM  (simulated submit)
+   11. CONTACT FORM — EmailJS
+   ─────────────────────────────────────────────────────────────
+   SETUP STEPS (takes ~5 min — all free):
+   1. Go to https://www.emailjs.com and create a free account.
+   2. Dashboard → "Email Services" → Add Service (Gmail / Outlook / etc.)
+      Copy your  SERVICE_ID  (looks like "service_xxxxxxx")
+   3. Dashboard → "Email Templates" → Create Template.
+      Use these exact variable names in your template body:
+        {{from_name}}   — sender's name
+        {{from_email}}  — sender's email
+        {{subject}}     — subject line
+        {{message}}     — message body
+        {{to_name}}     — your name (auto-filled below)
+      Save and copy your  TEMPLATE_ID  (looks like "template_xxxxxxx")
+   4. Dashboard → Account → General → copy your  PUBLIC_KEY
+   5. Paste the three values into the CONFIG block below.
+   ─────────────────────────────────────────────────────────────
+   NOTE: Free tier = 200 emails/month. No credit card needed.
    ============================================================ */
 (function initForm() {
+
+  /* ── CONFIG — paste your EmailJS credentials here ── */
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';      // e.g. 'abc123XYZdef'
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';      // e.g. 'service_abc123'
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';     // e.g. 'template_abc123'
+  const YOUR_NAME           = 'Your Name';             // shown as {{to_name}} in template
+  /* ── END CONFIG ── */
+
+  // Initialise EmailJS with your public key
+  if (typeof emailjs !== 'undefined') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+
   const form    = document.getElementById('contact-form');
   const btn     = document.getElementById('form-submit');
+  const btnLabel= document.getElementById('form-btn-label');
   const success = document.getElementById('form-success');
+  const error   = document.getElementById('form-error');
   if (!form) return;
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
+  // ── helpers ──
+  const setLoading = (on) => {
+    btn.classList.toggle('loading', on);
+    btn.disabled = on;
+    if (btnLabel) btnLabel.textContent = on ? 'Sending…' : 'Send Message';
+  };
 
-    // Simple validation
+  const showMsg = (el, duration = 6000) => {
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), duration);
+  };
+
+  const hideAll = () => {
+    success.classList.remove('visible');
+    error.classList.remove('visible');
+  };
+
+  // ── inline validation ──
+  const validate = () => {
     const name    = form.querySelector('#cf-name').value.trim();
     const email   = form.querySelector('#cf-email').value.trim();
     const message = form.querySelector('#cf-msg').value.trim();
-    if (!name || !email || !message) return;
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Loading state
-    btn.classList.add('loading');
-    btn.disabled = true;
+    if (!name)              { shake(form.querySelector('#cf-name'));  return false; }
+    if (!emailRe.test(email)){ shake(form.querySelector('#cf-email')); return false; }
+    if (!message)           { shake(form.querySelector('#cf-msg'));   return false; }
+    return { name, email, message };
+  };
 
-    // Simulate async send (replace with actual fetch/EmailJS/Formspree)
-    setTimeout(() => {
-      btn.classList.remove('loading');
-      btn.textContent = '✓ Sent!';
-      success.classList.add('visible');
+  const shake = (el) => {
+    el.style.animation = 'none';
+    el.getBoundingClientRect(); // reflow
+    el.style.animation = 'shakeField .4s var(--ease)';
+    el.addEventListener('animationend', () => el.style.animation = '', { once: true });
+    el.focus();
+  };
+
+  // ── submit ──
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAll();
+
+    const data = validate();
+    if (!data) return;
+
+    // Guard: if keys haven't been filled in, warn developer in console
+    if (
+      EMAILJS_PUBLIC_KEY  === 'YOUR_PUBLIC_KEY'  ||
+      EMAILJS_SERVICE_ID  === 'YOUR_SERVICE_ID'  ||
+      EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID'
+    ) {
+      console.warn(
+        '%c[EmailJS] Fill in your credentials in main.js (search "CONFIG")',
+        'background:#ff6b6b;color:#fff;padding:4px 8px;border-radius:4px;'
+      );
+      // Show success anyway in dev so you can test the UI flow
+      setLoading(true);
+      await new Promise(r => setTimeout(r, 1200));
+      setLoading(false);
       form.reset();
+      showMsg(success);
+      return;
+    }
 
-      setTimeout(() => {
-        btn.textContent = 'Send Message';
-        btn.disabled = false;
-        success.classList.remove('visible');
-      }, 5000);
-    }, 1800);
+    setLoading(true);
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          to_name:    YOUR_NAME,
+          from_name:  data.name,
+          from_email: data.email,
+          subject:    form.querySelector('#cf-subject').value.trim() || '(no subject)',
+          message:    data.message,
+          reply_to:   data.email,
+        }
+      );
+
+      setLoading(false);
+      form.reset();
+      showMsg(success);
+
+    } catch (err) {
+      console.error('[EmailJS] Send failed:', err);
+      setLoading(false);
+      showMsg(error);
+    }
   });
+
 })();
 
 /* ============================================================

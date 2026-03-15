@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -508,11 +510,11 @@
         <div class="contact-left reveal reveal-d1">
           <p class="contact-tagline">Have a project in mind, or just want to say hello? My inbox is always open.</p>
           <div class="contact-socials">
-            <a href="mailto:hello@yourname.com" class="social-link">
+            <a href="/cdn-cgi/l/email-protection#a0c8c5cccccfe0d9cfd5d2cec1cdc58ec3cfcd" class="social-link">
               <span class="social-icon">✉</span>
               <span class="social-text">
                 <span class="social-label">Email</span>
-                <span class="social-val">hello@yourname.com</span>
+                <span class="social-val"><span class="__cf_email__" data-cfemail="771f121b1b18370e18020519161a125914181a">[email&#160;protected]</span></span>
               </span>
             </a>
             <a href="https://linkedin.com/in/yourname" target="_blank" rel="noopener" class="social-link">
@@ -559,10 +561,11 @@
             <textarea id="cf-msg" name="message" rows="5" placeholder="Tell me about your project…" required></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-full" id="form-submit">
-            Send Message
+            <span id="form-btn-label">Send Message</span>
             <svg class="btn-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
           </button>
           <p class="form-success" id="form-success" aria-live="polite">✓ Message sent! I'll be in touch soon.</p>
+          <p class="form-error"   id="form-error"   aria-live="polite">✗ Something went wrong. Please try again or email me directly.</p>
         </form>
       </div>
     </div>
@@ -573,11 +576,4 @@
     <div class="footer-inner">
       <p class="footer-copy">© 2025 <strong>Your Name</strong>. Designed &amp; built with ☕</p>
       <a href="#hero" class="footer-top" aria-label="Back to top">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
-      </a>
-    </div>
-  </footer>
-
-  <script src="main.js"></script>
-</body>
-</html>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width

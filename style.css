@@ -56,26 +56,91 @@
    2. LIGHT MODE OVERRIDES
    ============================================================ */
 [data-theme="light"] {
-  --bg:           #f5f5f0;
-  --bg-alt:       #edeee8;
+  --bg:           #f7f6f1;
+  --bg-alt:       #eeede6;
   --surface:      #ffffff;
-  --surface-2:    #f0f0eb;
-  --border:       rgba(0,0,0,.08);
-  --border-hover: rgba(0,0,0,.16);
-  --text:         #1a1a2a;
-  --text-2:       #555568;
-  --text-3:       #9898b0;
+  --surface-2:    #f2f1ea;
+  --border:       rgba(0,0,0,.09);
+  --border-hover: rgba(0,0,0,.18);
+  --text:         #17172a;
+  --text-2:       #4e4e65;
+  --text-3:       #9494aa;
 
-  --accent:       #5a9e00;
-  --accent-glow:  rgba(90,158,0,.14);
-  --accent-dim:   rgba(90,158,0,.08);
-  --accent2:      #e03e3e;
-  --accent3:      #0d9488;
+  --accent:       #4a8c00;
+  --accent-glow:  rgba(74,140,0,.16);
+  --accent-dim:   rgba(74,140,0,.09);
+  --accent2:      #d63030;
+  --accent3:      #0c8a7e;
 
-  --shadow-sm:    0 1px 4px rgba(0,0,0,.1);
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.08);
   --shadow-md:    0 4px 24px rgba(0,0,0,.1);
-  --shadow-lg:    0 12px 48px rgba(0,0,0,.12);
+  --shadow-lg:    0 12px 48px rgba(0,0,0,.13);
 }
+
+/* Light mode — targeted element fixes */
+[data-theme="light"] nav.scrolled {
+  background: rgba(247,246,241,.92);
+  border-bottom-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .hero-profile-img-wrap {
+  box-shadow: 0 0 0 6px var(--accent-dim), 0 12px 48px rgba(0,0,0,.12);
+}
+[data-theme="light"] .project-card,
+[data-theme="light"] .cert-card,
+[data-theme="light"] .skill-group,
+[data-theme="light"] .stat-card {
+  background: #ffffff;
+}
+[data-theme="light"] .project-card:hover,
+[data-theme="light"] .cert-card:hover {
+  background: #f7f6f1;
+}
+[data-theme="light"] .skill-group:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+[data-theme="light"] .projects-grid,
+[data-theme="light"] .cert-grid {
+  background: rgba(0,0,0,.07);
+  border-color: rgba(0,0,0,.07);
+}
+[data-theme="light"] .project-ext {
+  background: var(--bg);
+}
+[data-theme="light"] .ptag {
+  background: var(--bg);
+  color: var(--text-3);
+}
+[data-theme="light"] .tag  { background: var(--bg-alt); }
+[data-theme="light"] .pill { background: #ffffff; }
+[data-theme="light"] .pill:hover { background: var(--accent-dim); }
+
+[data-theme="light"] .timeline::before {
+  opacity: .5;
+}
+[data-theme="light"] .timeline-marker {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.1);
+}
+[data-theme="light"] .exp-item { border-color: rgba(0,0,0,.08); }
+
+[data-theme="light"] .form-field input,
+[data-theme="light"] .form-field textarea {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.12);
+  color: var(--text);
+}
+[data-theme="light"] .form-field input:focus,
+[data-theme="light"] .form-field textarea:focus {
+  background: #ffffff;
+  border-color: var(--accent);
+}
+[data-theme="light"] .mobile-overlay {
+  background: rgba(247,246,241,.97);
+}
+[data-theme="light"] .footer-top { background: #ffffff; }
+[data-theme="light"] #cursor-dot  { background: var(--accent); }
+[data-theme="light"] #cursor-ring { border-color: var(--accent); }
 
 /* ============================================================
    3. RESET & BASE
@@ -1211,18 +1276,27 @@ nav.scrolled {
 }
 .form-field textarea { min-height: 130px; }
 
-.form-success {
+.form-success,
+.form-error {
   display: none;
   font-family: var(--font-mono);
   font-size: .72rem;
   letter-spacing: .1em;
+  padding: .75rem 1rem;
+  border-radius: var(--radius-sm);
+}
+.form-success {
   color: var(--accent);
   background: var(--accent-dim);
   border: 1px solid var(--accent-glow);
-  padding: .7rem 1rem;
-  border-radius: var(--radius-sm);
 }
-.form-success.visible { display: block; }
+.form-error {
+  color: #ff6b6b;
+  background: rgba(255,107,107,.07);
+  border: 1px solid rgba(255,107,107,.2);
+}
+.form-success.visible,
+.form-error.visible { display: block; }
 
 /* ============================================================
    17. FOOTER
@@ -1278,6 +1352,13 @@ footer {
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+@keyframes shakeField {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
 }
 
 /* ============================================================
