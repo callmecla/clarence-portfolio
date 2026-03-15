@@ -68,21 +68,42 @@ body {
 
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
-button { background: none; border: none; font: inherit; cursor: pointer; }
+button { background: none; border: none; font: inherit; cursor: pointer; } /* cursor overridden below for desktop */
 input, textarea { font: inherit; }
 
 ::selection { background: var(--acc); color: #000; }
 
-/* Smooth theme colour transitions */
-*, *::before, *::after {
-  transition: background-color .35s ease, border-color .35s ease, color .35s ease;
-}
-/* But NOT layout/transform transitions globally */
+/* Theme colour transitions — scoped to specific elements only
+   (a global * transition rule breaks cursor, toggle, and animations) */
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--acc); }
+
+/* ── Scoped theme colour transitions (NOT global — that breaks cursor & toggle) ── */
+body, nav, footer,
+.sec, .sec-alt,
+.stat-card, .proj-card, .cert-card, .skill-group,
+.tl-marker, .exp-item, .soc-link,
+.cf-field input, .cf-field textarea,
+.pill, .tag, .badge, .ptag, .plink,
+.nav-link, .nav-logo, .ft-top,
+.mob-overlay, .hero-eyebrow, .hero-sub, .hero-bio,
+.about-txt, .exp-desc, .proj-desc, .tl-desc, .cert-date {
+  transition: background-color .4s ease, border-color .4s ease, color .4s ease;
+}
+
+/* ── cursor:none on desktop — must beat button { cursor:pointer } ── */
+@media (hover: hover) and (pointer: fine) {
+  body.has-cursor { cursor: none !important; }
+  body.has-cursor a,
+  body.has-cursor button,
+  body.has-cursor input,
+  body.has-cursor textarea,
+  body.has-cursor label,
+  body.has-cursor [data-tilt] { cursor: none !important; }
+}
 
 /* ============================================================
    3. CANVAS
@@ -107,23 +128,44 @@ input, textarea { font: inherit; }
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
+  /* isolated from global transitions */
+  transition: none;
+  will-change: left, top;
+  /* hidden until JS activates */
   opacity: 0;
-  transition: opacity .3s ease, width .3s var(--ease), height .3s var(--ease), border-color .3s ease !important;
+  /* start offscreen */
+  top: -999px;
+  left: -999px;
 }
 #cursor-dot {
-  width: 7px; height: 7px;
+  width: 7px;
+  height: 7px;
   background: var(--acc);
-  top: -999px; left: -999px;
+  /* fast opacity only */
+  transition: opacity .2s ease !important;
 }
 #cursor-ring {
-  width: 34px; height: 34px;
+  width: 34px;
+  height: 34px;
   border: 1.5px solid var(--acc);
-  top: -999px; left: -999px;
+  background: transparent;
+  /* smooth resize + colour, but NOT left/top (handled by JS RAF) */
+  transition: opacity .2s ease, width .3s cubic-bezier(.16,1,.3,1), height .3s cubic-bezier(.16,1,.3,1), border-color .3s ease !important;
 }
+/* Shown after first mousemove */
 body.has-cursor #cursor-dot  { opacity: 1; }
-body.has-cursor #cursor-ring { opacity: .55; }
-body.cur-hover  #cursor-ring { width: 50px; height: 50px; border-color: var(--acc2); opacity: .9; }
+body.has-cursor #cursor-ring { opacity: .6; }
+/* Hover expand */
+body.cur-hover #cursor-ring {
+  width: 52px;
+  height: 52px;
+  border-color: var(--acc2);
+  opacity: .9;
+}
+/* Colour update on theme change */
+[data-theme="light"] #cursor-dot  { background: var(--acc); }
+[data-theme="light"] #cursor-ring { border-color: var(--acc); }
 
 /* cursor:none only on desktop hover devices */
 @media (hover: hover) and (pointer: fine) {
@@ -222,11 +264,12 @@ nav.scrolled {
   width: 14px; height: 14px;
   border-radius: 50%;
   background: var(--acc);
-  transition: transform .35s cubic-bezier(.34,1.56,.64,1), background .35s;
+  /* !important beats the scoped transition list above */
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1) !important, background .35s !important;
   box-shadow: 0 1px 4px rgba(0,0,0,.3);
 }
 [data-theme="light"] .tt-thumb {
-  transform: translateX(16px);
+  transform: translateX(16px) !important;
   background: #f59e0b;
 }
 
@@ -239,15 +282,16 @@ nav.scrolled {
   gap: .1rem;
 }
 .tt-moon, .tt-sun {
-  transition: opacity .3s, transform .3s;
+  transition: opacity .3s ease !important, transform .3s ease !important;
   display: block;
+  line-height: 1;
 }
 /* dark mode: show moon, hide sun */
-.tt-moon { opacity: 1; transform: scale(1); }
-.tt-sun  { opacity: .35; transform: scale(.8); }
+.tt-moon { opacity: 1 !important; transform: scale(1) !important; }
+.tt-sun  { opacity: .3 !important; transform: scale(.75) !important; }
 /* light mode: show sun, hide moon */
-[data-theme="light"] .tt-moon { opacity: .35; transform: scale(.8); }
-[data-theme="light"] .tt-sun  { opacity: 1;   transform: scale(1); }
+[data-theme="light"] .tt-moon { opacity: .3 !important; transform: scale(.75) !important; }
+[data-theme="light"] .tt-sun  { opacity: 1 !important;  transform: scale(1) !important; }
 
 .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; padding: 4px; }
 .hamburger span { display: block; height: 1.5px; background: var(--tx); border-radius: 2px; transition: transform .3s var(--ease), opacity .25s !important; }

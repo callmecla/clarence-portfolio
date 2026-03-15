@@ -82,36 +82,66 @@ const html = document.documentElement;
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;
 
-  // Only activate on desktop hover devices
-  if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  // Only activate on true desktop pointer (not touch, not stylus-only)
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    dot.style.display  = 'none';
+    ring.style.display = 'none';
+    return;
+  }
 
-  let mx=-999, my=-999, rx=-999, ry=-999, ready=false;
+  let mx = -999, my = -999;  // dot  — instant
+  let rx = -999, ry = -999;  // ring — lagged
+  let active = false;
+
+  // Disable CSS left/top transitions on cursor elements so JS RAF is smooth
+  dot.style.transition  = 'opacity .2s ease';
+  ring.style.transition = 'opacity .2s ease, width .3s cubic-bezier(.16,1,.3,1), height .3s cubic-bezier(.16,1,.3,1), border-color .3s ease';
 
   document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    if (!ready) {
-      // Snap both to cursor position on first move — no sweep from corner
+    mx = e.clientX;
+    my = e.clientY;
+
+    if (!active) {
+      // First move: snap ring to cursor so it doesn't sweep from corner
       rx = mx; ry = my;
-      ready = true;
+      active = true;
       document.body.classList.add('has-cursor');
     }
-    dot.style.left = mx+'px'; dot.style.top = my+'px';
-  }, {passive:true});
 
-  document.addEventListener('mouseleave', () => { dot.style.opacity='0'; ring.style.opacity='0'; });
+    // Move dot instantly
+    dot.style.left = mx + 'px';
+    dot.style.top  = my + 'px';
+  }, { passive: true });
+
+  // Hide when pointer leaves window
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity  = '0';
+    ring.style.opacity = '0';
+  });
   document.addEventListener('mouseenter', () => {
-    if (ready) { dot.style.opacity='1'; ring.style.opacity='.55'; }
+    if (active) {
+      dot.style.opacity  = '1';
+      ring.style.opacity = '.6';
+    }
   });
 
+  // Smooth ring via RAF (lerp)
   (function loop() {
-    rx += (mx-rx)*.13; ry += (my-ry)*.13;
-    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    rx += (mx - rx) * .12;
+    ry += (my - ry) * .12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
     requestAnimationFrame(loop);
   })();
 
-  const hov = 'a,button,label,[data-tilt],.pill,.tag,.badge,.cert-card,.proj-card,.stat-card,.soc-link,.tl-item';
-  document.addEventListener('mouseover',  e => { if (e.target.closest(hov)) document.body.classList.add('cur-hover'); });
-  document.addEventListener('mouseout',   e => { if (e.target.closest(hov)) document.body.classList.remove('cur-hover'); });
+  // Hover expand
+  const hov = 'a, button, label, [data-tilt], .pill, .tag, .badge, .cert-card, .proj-card, .stat-card, .soc-link, .tl-item, .theme-toggle';
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest(hov)) document.body.classList.add('cur-hover');
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest(hov)) document.body.classList.remove('cur-hover');
+  });
 })();
 
 /* ============================================================
