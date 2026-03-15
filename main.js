@@ -9,11 +9,23 @@
    This just wires the button.
    ============================================================ */
 const html = document.documentElement;
-document.getElementById('theme-toggle')?.addEventListener('click', () => {
-  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('portfolio-theme', next);
-});
+(function initTheme() {
+  // Already applied by inline <script> in <head> — just wire the button
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    const next   = isDark ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('portfolio-theme', next);
+    btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  });
+
+  // Set initial aria-label
+  const cur = html.getAttribute('data-theme') || 'dark';
+  btn.setAttribute('aria-label', cur === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+})();
 
 /* ============================================================
    2. CANVAS BACKGROUND — floating particles + lines
