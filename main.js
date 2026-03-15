@@ -7,18 +7,20 @@
 /* ============================================================
    1. THEME TOGGLE  (persisted to localStorage)
    ============================================================ */
-const html         = document.documentElement;
-const themeToggle  = document.getElementById('theme-toggle');
+const html        = document.documentElement;
+const themeToggle = document.getElementById('theme-toggle');
 
-// Restore saved theme
-const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
-html.setAttribute('data-theme', savedTheme);
-
+// Theme is already applied by the inline <script> in <head>.
+// This just wires up the toggle button.
 themeToggle?.addEventListener('click', () => {
-  const current = html.getAttribute('data-theme');
-  const next    = current === 'dark' ? 'light' : 'dark';
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+
+  // Add transitioning class so CSS can animate the switch
+  html.classList.add('theme-transitioning');
   html.setAttribute('data-theme', next);
   localStorage.setItem('portfolio-theme', next);
+
+  setTimeout(() => html.classList.remove('theme-transitioning'), 500);
 });
 
 /* ============================================================
@@ -124,19 +126,34 @@ themeToggle?.addEventListener('click', () => {
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;
 
-  // Skip on touch devices
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  // Only activate on real pointer devices
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    dot.style.display  = 'none';
+    ring.style.display = 'none';
+    return;
+  }
 
-  let mx = 0, my = 0, rx = 0, ry = 0;
+  let mx = -200, my = -200;  // start offscreen
+  let rx = -200, ry = -200;
+  let visible = false;
 
+  // Position dot instantly on first move
   document.addEventListener('mousemove', e => {
     mx = e.clientX;
     my = e.clientY;
+
+    // Snap ring to cursor on first move so it doesn't sweep from corner
+    if (!visible) {
+      rx = mx;
+      ry = my;
+      visible = true;
+    }
+
     dot.style.left = mx + 'px';
     dot.style.top  = my + 'px';
-  });
+  }, { passive: true });
 
-  // Smooth ring follow
+  // Smooth ring follow via RAF
   (function loop() {
     rx += (mx - rx) * .13;
     ry += (my - ry) * .13;
@@ -145,13 +162,23 @@ themeToggle?.addEventListener('click', () => {
     requestAnimationFrame(loop);
   })();
 
-  // Hover state
-  const hoverEls = 'a, button, [data-tilt], .pill, .tag, .badge, .cert-card, .project-card, .stat-card';
+  // Hide when mouse leaves window
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity  = '0';
+    ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.style.opacity  = '1';
+    ring.style.opacity = '.55';
+  });
+
+  // Hover expand state
+  const hoverSel = 'a, button, label, [data-tilt], .pill, .tag, .badge, .cert-card, .project-card, .stat-card, .social-link, .timeline-item';
   document.addEventListener('mouseover', e => {
-    if (e.target.closest(hoverEls)) document.body.classList.add('cursor-hover');
+    if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
   });
   document.addEventListener('mouseout', e => {
-    if (e.target.closest(hoverEls)) document.body.classList.remove('cursor-hover');
+    if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
   });
 })();
 
