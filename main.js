@@ -323,10 +323,10 @@ const html = document.documentElement;
    5. Paste the 3 values below
    ============================================================ */
 (function () {
-  const PUBLIC_KEY   = 'YOUR_PUBLIC_KEY';    // e.g. 'abc123XYZ'
-  const SERVICE_ID   = 'YOUR_SERVICE_ID';    // e.g. 'service_abc123'
-  const TEMPLATE_ID  = 'YOUR_TEMPLATE_ID';   // e.g. 'template_abc123'
-  const YOUR_NAME    = 'Your Name';
+  const PUBLIC_KEY   = 'alg84AK46Bvk1Yx4b';    // e.g. 'abc123XYZ'
+  const SERVICE_ID   = 'service_ysq4klk';    // e.g. 'service_abc123'
+  const TEMPLATE_ID  = 'template_0oafehi';   // e.g. 'template_abc123'
+  const YOUR_NAME    = 'Clarence Flores';
 
   if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: PUBLIC_KEY });
 
