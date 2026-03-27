@@ -1,404 +1,137 @@
-/* ============================================================
-   PORTFOLIO — main.js
-   ============================================================ */
 'use strict';
+var H=document.documentElement;
 
-const html = document.documentElement;
-
-/* ============================================================
-   1. THEME  — toggle wired here, initial value set in <head>
-   ============================================================ */
-document.getElementById('theme-toggle')?.addEventListener('click', function () {
-  var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('portfolio-theme', next);
+/* ── THEME ── */
+document.getElementById('tg').addEventListener('click',function(){
+  var n=H.getAttribute('data-theme')==='dark'?'light':'dark';
+  H.setAttribute('data-theme',n);
+  localStorage.setItem('pt',n);
 });
 
-/* ============================================================
-   2. CANVAS — particles + connecting lines
-   ============================================================ */
-(function () {
-  var canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var W, H, pts = [], raf;
-  var N = window.innerWidth < 600 ? 35 : 70;
+/* ── CANVAS ── */
+(function(){
+  var c=document.getElementById('cv'),x=c.getContext('2d'),W,H2,pts=[],raf,N=window.innerWidth<600?35:70;
+  function rs(){W=c.width=window.innerWidth;H2=c.height=window.innerHeight;}
+  function mk(){return{x:Math.random()*W,y:Math.random()*H2,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,l:Math.random()};}
+  function cl(){return H.getAttribute('data-theme')==='light'?'61,122,0,':'200,244,104,';}
+  function dr(){
+    x.clearRect(0,0,W,H2);var c2=cl();
+    for(var i=0;i<pts.length;i++){var p=pts[i];p.x+=p.vx;p.y+=p.vy;p.l=(p.l+.002)%1;
+      if(p.x<-2)p.x=W+2;if(p.x>W+2)p.x=-2;if(p.y<-2)p.y=H2+2;if(p.y>H2+2)p.y=-2;
+      x.beginPath();x.arc(p.x,p.y,.9,0,Math.PI*2);x.fillStyle='rgba('+c2+(Math.sin(p.l*Math.PI)*.5)+')';x.fill();}
+    for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){
+      var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<110){x.beginPath();x.moveTo(pts[i].x,pts[i].y);x.lineTo(pts[j].x,pts[j].y);
+        x.strokeStyle='rgba('+c2+((1-d/110)*.07)+')';x.lineWidth=.5;x.stroke();}}
+    raf=requestAnimationFrame(dr);}
+  rs();for(var i=0;i<N;i++)pts.push(mk());dr();
+  window.addEventListener('resize',function(){cancelAnimationFrame(raf);rs();pts=[];for(var i=0;i<N;i++)pts.push(mk());dr();});
+})();
 
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  function mkPt()   { return { x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, life:Math.random() }; }
-  function color()  { return html.getAttribute('data-theme')==='light' ? '61,122,0,' : '200,244,104,'; }
+/* ── CURSOR ── */
+(function(){
+  var dot=document.getElementById('cd'),ring=document.getElementById('cr');
+  if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches){dot.style.display='none';ring.style.display='none';return;}
+  var mx=0,my=0,rx=0,ry=0,on=false;
+  dot.style.transition='opacity .15s';
+  ring.style.transition='width .3s cubic-bezier(.16,1,.3,1),height .3s cubic-bezier(.16,1,.3,1),border-color .3s,opacity .15s';
+  document.addEventListener('mousemove',function(e){
+    mx=e.clientX;my=e.clientY;
+    if(!on){rx=mx;ry=my;on=true;document.body.classList.add('hc');dot.style.opacity='1';ring.style.opacity='.6';}
+    dot.style.left=mx+'px';dot.style.top=my+'px';
+  });
+  document.addEventListener('mouseleave',function(){dot.style.opacity='0';ring.style.opacity='0';});
+  document.addEventListener('mouseenter',function(){if(on){dot.style.opacity='1';ring.style.opacity='.6';}});
+  (function lp(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(lp);})();
+  var S='a,button,label,[data-tilt],.pill,.tag,.badge,.cc,.pc,.sc2,.sl3,.tt';
+  document.addEventListener('mouseover',function(e){if(e.target.closest(S)){ring.style.width='52px';ring.style.height='52px';ring.style.borderColor='var(--a2)';ring.style.opacity='.9';}});
+  document.addEventListener('mouseout',function(e){if(e.target.closest(S)){ring.style.width='34px';ring.style.height='34px';ring.style.borderColor='var(--ac)';ring.style.opacity='.6';}});
+})();
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    var c = color();
-    for (var i = 0; i < pts.length; i++) {
-      var p = pts[i];
-      p.x += p.vx; p.y += p.vy;
-      p.life = (p.life + .002) % 1;
-      if (p.x < -2) p.x = W+2; if (p.x > W+2) p.x = -2;
-      if (p.y < -2) p.y = H+2; if (p.y > H+2) p.y = -2;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, .9, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(' + c + (Math.sin(p.life * Math.PI) * .5) + ')';
-      ctx.fill();
-    }
-    for (var i = 0; i < pts.length; i++) {
-      for (var j = i+1; j < pts.length; j++) {
-        var dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
-        var d  = Math.sqrt(dx*dx + dy*dy);
-        if (d < 110) {
-          ctx.beginPath();
-          ctx.moveTo(pts[i].x, pts[i].y);
-          ctx.lineTo(pts[j].x, pts[j].y);
-          ctx.strokeStyle = 'rgba(' + c + ((1 - d/110) * .07) + ')';
-          ctx.lineWidth   = .5;
-          ctx.stroke();
-        }
-      }
-    }
-    raf = requestAnimationFrame(draw);
-  }
+/* ── NAV ── */
+(function(){
+  var nv=document.getElementById('nv'),links=document.querySelectorAll('.na');
+  window.addEventListener('scroll',function(){nv.classList.toggle('sc',window.scrollY>40);},{passive:true});
+  nv.classList.toggle('sc',window.scrollY>40);
+  var io=new IntersectionObserver(function(e){e.forEach(function(e){if(e.isIntersecting)links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id);});});},{rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('section[id]').forEach(function(s){io.observe(s);});
+})();
 
-  resize();
-  for (var i = 0; i < N; i++) pts.push(mkPt());
-  draw();
-  window.addEventListener('resize', function () {
-    cancelAnimationFrame(raf);
-    resize();
-    pts = [];
-    for (var i = 0; i < N; i++) pts.push(mkPt());
-    draw();
+/* ── MOBILE NAV ── */
+(function(){
+  var hb=document.getElementById('hb'),mo=document.getElementById('mo');
+  document.querySelectorAll('#nls .na').forEach(function(l){var c=l.cloneNode(true);c.style.fontSize='1rem';mo.appendChild(c);});
+  function tg(o){hb.classList.toggle('op',o);hb.setAttribute('aria-expanded',o);mo.classList.toggle('op',o);document.body.style.overflow=o?'hidden':'';}
+  hb.addEventListener('click',function(){tg(!mo.classList.contains('op'));});
+  mo.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){tg(false);});});
+  mo.addEventListener('click',function(e){if(e.target===mo)tg(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')tg(false);});
+})();
+
+/* ── REVEAL ── */
+(function(){
+  try{
+    var els=document.querySelectorAll('.rv');
+    document.body.classList.add('jr');
+    var io=new IntersectionObserver(function(e){e.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(el){io.observe(el);});
+    setTimeout(function(){document.querySelectorAll('.rv:not(.in)').forEach(function(el){el.classList.add('in');});},1500);
+  }catch(e){document.body.classList.remove('jr');}
+})();
+
+/* ── COUNTERS ── */
+(function(){
+  var els=document.querySelectorAll('.sn2[data-t]');
+  var io=new IntersectionObserver(function(e){e.forEach(function(e){if(!e.isIntersecting)return;var el=e.target,t=+el.dataset.t,d=1400,t0=performance.now();(function tk(n){var p=Math.min((n-t0)/d,1);el.textContent=Math.round((1-Math.pow(1-p,4))*t);if(p<1)requestAnimationFrame(tk);}(performance.now()));io.unobserve(el);});},{threshold:.5});
+  els.forEach(function(el){io.observe(el);});
+})();
+
+/* ── SKILL BARS ── */
+(function(){
+  var sec=document.getElementById('skills');
+  var fills=sec.querySelectorAll('.skf[data-w]');
+  new IntersectionObserver(function(e){e.forEach(function(e){if(!e.isIntersecting)return;fills.forEach(function(f,i){setTimeout(function(){f.style.width=f.dataset.w+'%';},i*70);});});},{threshold:.2}).observe(sec);
+})();
+
+/* ── TILT ── */
+(function(){
+  if(!window.matchMedia('(hover:hover)').matches)return;
+  document.querySelectorAll('[data-tilt]').forEach(function(c){
+    var g=c.querySelector('.pg2');
+    c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect(),cx=(e.clientX-r.left)/r.width,cy=(e.clientY-r.top)/r.height;c.style.transform='perspective(700px) rotateX('+((cy-.5)*-8)+'deg) rotateY('+((cx-.5)*8)+'deg) translateZ(4px)';c.style.transition='transform .1s linear';if(g){g.style.setProperty('--mx2',(cx*100)+'%');g.style.setProperty('--my',(cy*100)+'%');}});
+    c.addEventListener('mouseleave',function(){c.style.transform='';c.style.transition='transform .6s cubic-bezier(.16,1,.3,1)';});
   });
 })();
 
-/* ============================================================
-   3. CURSOR — dot follows instantly, ring lerps behind
-      Only on real desktop pointer devices.
-   ============================================================ */
-(function () {
-  var dot  = document.getElementById('cursor-dot');
-  var ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
+/* ── PHOTO UPLOAD ── */
+(function(){
+  var inp=document.getElementById('phu'),img=document.getElementById('pi');
+  inp.addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f||!f.type.startsWith('image/'))return;var r=new FileReader();r.onload=function(ev){img.src=ev.target.result;};r.readAsDataURL(f);});
+})();
 
-  /* bail out on touch / stylus-only screens */
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    dot.style.display  = 'none';
-    ring.style.display = 'none';
-    return;
-  }
-
-  var mx = 0, my = 0;   /* dot — tracks mouse exactly */
-  var rx = 0, ry = 0;   /* ring — lerps behind */
-  var started = false;
-
-  /* Make cursor elements visible once we know we're on desktop */
-  dot.style.opacity  = '0';
-  ring.style.opacity = '0';
-
-  document.addEventListener('mousemove', function (e) {
-    mx = e.clientX;
-    my = e.clientY;
-
-    /* First move: place everything at the real position so no sweep */
-    if (!started) {
-      rx = mx; ry = my;
-      started = true;
-      document.body.classList.add('has-cursor');
-      dot.style.opacity  = '1';
-      ring.style.opacity = '.6';
-    }
-
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
+/* ── EMAILJS CONTACT FORM ──
+   Setup: https://emailjs.com
+   1. Create account → Add Email Service → copy SERVICE_ID
+   2. Create Template with: {{from_name}} {{from_email}} {{subject}} {{message}} {{to_name}}
+      → copy TEMPLATE_ID
+   3. Account → General → copy PUBLIC_KEY
+   4. Paste below ↓
+*/
+(function(){
+  var PK='YOUR_PUBLIC_KEY', SI='YOUR_SERVICE_ID', TI='YOUR_TEMPLATE_ID', YN='Clarence Flores';
+  if(typeof emailjs!=='undefined')emailjs.init({publicKey:PK});
+  var form=document.getElementById('cf'),btn=document.getElementById('cfb'),lbl=document.getElementById('cbl'),spin=document.getElementById('cs'),ok=document.getElementById('cok'),err=document.getElementById('cer');
+  function load(on){btn.disabled=on;lbl.textContent=on?'Sending…':'Send Message';spin.style.display=on?'inline-block':'none';}
+  function show(el){el.style.display='block';setTimeout(function(){el.style.display='none';},6000);}
+  function shake(el){el.style.animation='none';el.getBoundingClientRect();el.style.animation='shake .4s ease';el.addEventListener('animationend',function(){el.style.animation='';},{once:true});el.focus();}
+  form.addEventListener('submit',function(e){
+    e.preventDefault();ok.style.display='none';err.style.display='none';
+    var n=form.querySelector('#cfn').value.trim(),em=form.querySelector('#cfe').value.trim(),m=form.querySelector('#cfm').value.trim(),re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!n){shake(form.querySelector('#cfn'));return;}
+    if(!re.test(em)){shake(form.querySelector('#cfe'));return;}
+    if(!m){shake(form.querySelector('#cfm'));return;}
+    if(PK==='YOUR_PUBLIC_KEY'){load(true);setTimeout(function(){load(false);form.reset();show(ok);},1200);return;}
+    load(true);
+    emailjs.send(SI,TI,{to_name:YN,from_name:n,from_email:em,subject:form.querySelector('#cfs').value.trim()||'(no subject)',message:m,reply_to:em}).then(function(){load(false);form.reset();show(ok);},function(e2){console.error(e2);load(false);show(err);});
   });
-
-  document.addEventListener('mouseleave', function () {
-    dot.style.opacity  = '0';
-    ring.style.opacity = '0';
-  });
-  document.addEventListener('mouseenter', function () {
-    if (started) {
-      dot.style.opacity  = '1';
-      ring.style.opacity = '.6';
-    }
-  });
-
-  /* RAF loop — moves ring with smooth lerp, no CSS transition needed */
-  (function loop() {
-    rx += (mx - rx) * .12;
-    ry += (my - ry) * .12;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-    requestAnimationFrame(loop);
-  }());
-
-  /* Grow ring on interactive elements */
-  var SEL = 'a, button, label, [data-tilt], .pill, .tag, .badge, ' +
-            '.cert-card, .proj-card, .stat-card, .soc-link, .tl-item, .theme-toggle';
-
-  document.addEventListener('mouseover', function (e) {
-    if (e.target.closest(SEL)) {
-      ring.style.width       = '52px';
-      ring.style.height      = '52px';
-      ring.style.borderColor = 'var(--acc2)';
-      ring.style.opacity     = '.9';
-    }
-  });
-  document.addEventListener('mouseout', function (e) {
-    if (e.target.closest(SEL)) {
-      ring.style.width       = '34px';
-      ring.style.height      = '34px';
-      ring.style.borderColor = 'var(--acc)';
-      ring.style.opacity     = '.6';
-    }
-  });
-}());
-
-/* ============================================================
-   4. NAV — add .scrolled on scroll, highlight active section
-   ============================================================ */
-(function () {
-  var nav   = document.getElementById('nav');
-  var links = document.querySelectorAll('.nav-link');
-
-  function onScroll() { nav.classList.toggle('scrolled', window.scrollY > 40); }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) {
-        links.forEach(function (a) {
-          a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id);
-        });
-      }
-    });
-  }, { rootMargin: '-40% 0px -55% 0px' });
-
-  document.querySelectorAll('section[id]').forEach(function (s) { io.observe(s); });
-}());
-
-/* ============================================================
-   5. MOBILE NAV
-   ============================================================ */
-(function () {
-  var ham = document.getElementById('hamburger');
-  var ov  = document.getElementById('mob-overlay');
-  if (!ham || !ov) return;
-
-  document.querySelectorAll('#nav-links .nav-link').forEach(function (l) {
-    var c = l.cloneNode(true);
-    c.style.fontSize     = '1.05rem';
-    c.style.letterSpacing = '.18em';
-    ov.appendChild(c);
-  });
-
-  function toggle(open) {
-    ham.classList.toggle('open', open);
-    ham.setAttribute('aria-expanded', open);
-    ov.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-  }
-
-  ham.addEventListener('click', function () { toggle(!ov.classList.contains('open')); });
-  ov.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
-  ov.addEventListener('click', function (e) { if (e.target === ov) toggle(false); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
-}());
-
-/* ============================================================
-   6. SCROLL REVEAL
-   Elements are visible by default (no opacity:0 in HTML).
-   JS-ready class is added ONLY after confirming IO works,
-   then a 1.5s safety net forces everything visible anyway.
-   ============================================================ */
-(function () {
-  try {
-    var els = document.querySelectorAll('.rv');
-    if (!els.length) return;
-
-    document.body.classList.add('js-ready');
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('in');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-
-    els.forEach(function (el) { io.observe(el); });
-
-    /* Safety net */
-    setTimeout(function () {
-      document.querySelectorAll('.rv:not(.in)').forEach(function (el) { el.classList.add('in'); });
-    }, 1500);
-
-  } catch (err) {
-    document.body.classList.remove('js-ready');
-  }
-}());
-
-/* ============================================================
-   7. COUNTERS
-   ============================================================ */
-(function () {
-  var els = document.querySelectorAll('.stat-n[data-target]');
-  if (!els.length) return;
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      var el = e.target, target = +el.dataset.target, dur = 1400, t0 = performance.now();
-      (function tick(now) {
-        var p = Math.min((now - t0) / dur, 1);
-        el.textContent = Math.round((1 - Math.pow(1-p, 4)) * target);
-        if (p < 1) requestAnimationFrame(tick);
-      }(performance.now()));
-      io.unobserve(el);
-    });
-  }, { threshold: .5 });
-  els.forEach(function (el) { io.observe(el); });
-}());
-
-/* ============================================================
-   8. SKILL BARS
-   ============================================================ */
-(function () {
-  var sec = document.getElementById('skills');
-  if (!sec) return;
-  var fills = sec.querySelectorAll('.sk-fill[data-w]');
-  new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      fills.forEach(function (f, i) {
-        setTimeout(function () { f.style.width = f.dataset.w + '%'; }, i * 70);
-      });
-    });
-  }, { threshold: .2 }).observe(sec);
-}());
-
-/* ============================================================
-   9. CARD TILT + GLOW
-   ============================================================ */
-(function () {
-  if (!window.matchMedia('(hover: hover)').matches) return;
-  document.querySelectorAll('[data-tilt]').forEach(function (card) {
-    var glow = card.querySelector('.proj-glow');
-    card.addEventListener('mousemove', function (e) {
-      var r  = card.getBoundingClientRect();
-      var cx = (e.clientX - r.left) / r.width;
-      var cy = (e.clientY - r.top)  / r.height;
-      card.style.transform  = 'perspective(700px) rotateX(' + ((cy-.5)*-8) + 'deg) rotateY(' + ((cx-.5)*8) + 'deg) translateZ(4px)';
-      card.style.transition = 'transform .1s linear';
-      if (glow) { glow.style.setProperty('--mx', (cx*100)+'%'); glow.style.setProperty('--my', (cy*100)+'%'); }
-    });
-    card.addEventListener('mouseleave', function () {
-      card.style.transform  = '';
-      card.style.transition = 'transform .6s cubic-bezier(.16,1,.3,1)';
-    });
-  });
-}());
-
-/* ============================================================
-   10. PHOTO UPLOAD
-   ============================================================ */
-(function () {
-  var input = document.getElementById('photo-upload');
-  var img   = document.getElementById('profile-img');
-  if (!input || !img) return;
-  input.addEventListener('change', function (e) {
-    var f = e.target.files && e.target.files[0];
-    if (!f || !f.type.startsWith('image/')) return;
-    var reader = new FileReader();
-    reader.onload = function (ev) { img.src = ev.target.result; };
-    reader.readAsDataURL(f);
-  });
-}());
-
-/* ============================================================
-   11. CONTACT FORM — EmailJS
-   ─────────────────────────────────────────────────────────
-   HOW TO SET UP (free, 5 min):
-   1. Sign up at https://www.emailjs.com
-   2. Add an Email Service  → copy your SERVICE_ID
-   3. Create an Email Template using these variables:
-        {{from_name}}  {{from_email}}  {{subject}}  {{message}}  {{to_name}}
-      → copy your TEMPLATE_ID
-   4. Account → General → copy your PUBLIC_KEY
-   5. Paste all three values below ↓
-   ─────────────────────────────────────────────────────────
-   ============================================================ */
-(function () {
-  var PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
-  var SERVICE_ID  = 'YOUR_SERVICE_ID';
-  var TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-  var YOUR_NAME   = 'Your Name';
-
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init({ publicKey: PUBLIC_KEY });
-  }
-
-  var form   = document.getElementById('contact-form');
-  if (!form) return;
-  var btn    = document.getElementById('cf-btn');
-  var lbl    = document.getElementById('cf-btn-lbl');
-  var spin   = document.getElementById('cf-spin');
-  var okMsg  = document.getElementById('cf-ok');
-  var errMsg = document.getElementById('cf-err');
-
-  function setLoading(on) {
-    btn.disabled    = on;
-    lbl.textContent = on ? 'Sending…' : 'Send Message';
-    if (spin) spin.style.display = on ? 'inline-block' : 'none';
-  }
-  function showEl(el) {
-    el.style.display = 'block';
-    setTimeout(function () { el.style.display = 'none'; }, 6000);
-  }
-  function shake(el) {
-    el.style.animation = 'none';
-    el.getBoundingClientRect();
-    el.style.animation = 'shake .4s ease';
-    el.addEventListener('animationend', function () { el.style.animation = ''; }, { once: true });
-    el.focus();
-  }
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    okMsg.style.display  = 'none';
-    errMsg.style.display = 'none';
-
-    var name  = form.querySelector('#cf-name').value.trim();
-    var email = form.querySelector('#cf-email').value.trim();
-    var msg   = form.querySelector('#cf-msg').value.trim();
-    var re    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!name)           { shake(form.querySelector('#cf-name'));  return; }
-    if (!re.test(email)) { shake(form.querySelector('#cf-email')); return; }
-    if (!msg)            { shake(form.querySelector('#cf-msg'));   return; }
-
-    /* Dev guard */
-    if (PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
-      console.warn('[EmailJS] Paste your credentials into main.js');
-      setLoading(true);
-      setTimeout(function () { setLoading(false); form.reset(); showEl(okMsg); }, 1200);
-      return;
-    }
-
-    setLoading(true);
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, {
-      to_name:    YOUR_NAME,
-      from_name:  name,
-      from_email: email,
-      subject:    form.querySelector('#cf-subject').value.trim() || '(no subject)',
-      message:    msg,
-      reply_to:   email
-    }).then(function () {
-      setLoading(false); form.reset(); showEl(okMsg);
-    }, function (err) {
-      console.error('[EmailJS]', err);
-      setLoading(false); showEl(errMsg);
-    });
-  });
-}());
+})();
