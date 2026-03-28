@@ -1,187 +1,373 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Clarence Flores — Portfolio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script>document.documentElement.setAttribute('data-theme',localStorage.getItem('pt')||'dark')</script>
-
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clarence Flores — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <!-- Apply saved theme before first paint to prevent flash -->
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pt') || 'dark')</script>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<div id="cd"></div>
-<div id="cr"></div>
-<canvas id="cv"></canvas>
+  <!-- Custom cursor -->
+  <div id="cd"></div>
+  <div id="cr"></div>
 
-<nav id="nv">
-  <a href="#hero" class="nl">CF<span class="ld">.</span></a>
-  <button class="hb" id="hb" aria-label="Menu"><span></span><span></span><span></span></button>
-  <ul class="nls" id="nls">
-    <li><a href="#about" class="na">About</a></li>
-    <li><a href="#education" class="na">Education</a></li>
-    <li><a href="#experience" class="na">Experience</a></li>
-    <li><a href="#projects" class="na">Projects</a></li>
-    <li><a href="#skills" class="na">Skills</a></li>
-    <li><a href="#certifications" class="na">Certs</a></li>
-    <li><a href="#contact" class="na">Contact</a></li>
-  </ul>
-  <button class="tt" id="tg" aria-label="Toggle theme">
-    <span class="ttr"><span class="tth"></span></span>
-    <span class="tti"><span class="tm">🌙</span><span class="ts">☀️</span></span>
-  </button>
-</nav>
+  <!-- Particle canvas -->
+  <canvas id="cv"></canvas>
 
-<div class="mo" id="mo"></div>
+  <!-- ═══ NAV ═══ -->
+  <nav id="nv">
+    <a href="#hero" class="nl">CF<span class="ld">.</span></a>
 
-<section id="hero">
-  <div class="hi">
-    <div class="pw">
-      <div class="pr"></div><div class="pr r2"></div>
-      <div class="pf">
-        <img id="pi" src="https://api.dicebear.com/8.x/lorelei/svg?seed=Clarence&backgroundColor=0d0d18" alt="Clarence Flores"/>
-        <label class="pu" for="phu" title="Upload photo"><input type="file" id="phu" accept="image/*"/><span>📷</span></label>
-      </div>
-    </div>
-    <div class="ht">
-      <p class="he"><span class="bd"></span> Available for opportunities</p>
-      <h1 class="hn"><span class="h1">Clarence</span><span class="h2">Flores.</span></h1>
-      <p class="hs">IT Student &amp; Full-Stack Developer</p>
-      <p class="hb2">I craft beautiful, fast &amp; accessible digital experiences — from pixel-perfect UIs to robust backend systems.</p>
-      <div class="hbs">
-        <a href="#projects" class="btn bp">View Work ↓</a>
-        <a href="#contact" class="btn bg">Get in Touch</a>
-        <a href="#" class="btn bi" download><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CV</a>
-      </div>
-    </div>
-  </div>
-  <div class="sh"><div class="st"><div class="sth"></div></div><span class="sl">scroll</span></div>
-</section>
+    <button class="hb" id="hb" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-<section id="about" class="sec">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">01</span><h2 class="st2">About Me</h2></div>
-    <div class="ag">
-      <div class="at rv d1">
-        <p>Hi! I'm a <strong>passionate IT student and problem-solver</strong> who builds things for the web and beyond. I love crafting elegant interfaces with a sharp focus on <strong>performance and user experience</strong>.</p>
-        <p>With a background in both <strong>design and engineering</strong>, I bridge the gap between beautiful aesthetics and robust code.</p>
-        <p>When I'm not coding, you'll find me exploring generative art, contributing to open-source, or hunting for the perfect cup of coffee ☕</p>
-      </div>
-      <div class="sg rv d2">
-        <div class="sc2"><span class="sn2" data-t="3">0</span><span class="su2c">+</span><span class="sl2">Years Experience</span></div>
-        <div class="sc2"><span class="sn2" data-t="24">0</span><span class="sl2">Projects Shipped</span></div>
-        <div class="sc2"><span class="sn2" data-t="12">0</span><span class="sl2">Happy Clients</span></div>
-        <div class="sc2"><span class="sn2" data-t="8">0</span><span class="sl2">Certifications</span></div>
-      </div>
-    </div>
-  </div>
-</section>
+    <ul class="nls" id="nls">
+      <li><a href="#about"          class="na">About</a></li>
+      <li><a href="#education"      class="na">Education</a></li>
+      <li><a href="#experience"     class="na">Experience</a></li>
+      <li><a href="#projects"       class="na">Projects</a></li>
+      <li><a href="#skills"         class="na">Skills</a></li>
+      <li><a href="#certifications" class="na">Certs</a></li>
+      <li><a href="#contact"        class="na">Contact</a></li>
+    </ul>
 
-<section id="education" class="sec sa">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">02</span><h2 class="st2">Education</h2></div>
-    <div class="tl">
-      <div class="ti rv d1"><div class="tm2">🎓</div><div><span class="tp">2022 — Present</span><h3 class="tt2">B.S. Information Technology</h3><p class="to">Quezon City University · GPA 1.75</p><p class="td">Majoring in IT with a focus on software development and web applications.</p><div class="tr"><span class="badge">Dean's List</span></div></div></div>
-      <div class="ti rv d2"><div class="tm2">📚</div><div><span class="tp">2020 — 2022</span><h3 class="tt2">Science, Technology, Engineering &amp; Mathematics</h3><p class="to">Our Lady of Fatima University · Dean's List</p><p class="td">Completed foundational STEM courses, maintaining a strong academic record.</p><div class="tr"><span class="badge">Honors</span></div></div></div>
-      <div class="ti rv d3"><div class="tm2">🎨</div><div><span class="tp">Summer 2022</span><h3 class="tt2">UX Design Bootcamp</h3><p class="to">Design Academy Online · Certificate</p><p class="td">12-week program covering UX research, Figma prototyping, and usability testing.</p><div class="tr"><span class="badge">Certificate</span></div></div></div>
-    </div>
-  </div>
-</section>
+    <button class="tt" id="tg" aria-label="Toggle light/dark mode">
+      <span class="ttr"><span class="tth"></span></span>
+      <span class="tti"><span class="tm">🌙</span><span class="ts">☀️</span></span>
+    </button>
+  </nav>
 
-<section id="experience" class="sec">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">03</span><h2 class="st2">Experience</h2></div>
-    <div class="el">
-      <div class="ei rv d1"><div class="em"><span class="ep">Jan 2024 – Present</span><span class="ec">TechCorp</span><span class="et">Full-time</span></div><div><h3 class="er">Senior Frontend Engineer</h3><p class="ed">Led redesign of flagship SaaS dashboard, reducing load time by 62%. Mentored 3 junior developers and established the component library used across 5 products.</p><div class="tr"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">GraphQL</span><span class="tag">Figma</span></div></div></div>
-      <div class="ei rv d2"><div class="em"><span class="ep">Jun 2022 – Dec 2023</span><span class="ec">StartupXYZ</span><span class="et">Full-time</span></div><div><h3 class="er">Full-Stack Developer</h3><p class="ed">Built entire customer-facing web app from scratch for a Series A fintech startup. Integrated 3 payment APIs and real-time notifications via WebSockets.</p><div class="tr"><span class="tag">Next.js</span><span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">AWS</span></div></div></div>
-      <div class="ei rv d3"><div class="em"><span class="ep">Sep 2021 – May 2022</span><span class="ec">Agency Co.</span><span class="et">Full-time</span></div><div><h3 class="er">Junior Web Developer</h3><p class="ed">Developed 12+ client websites, implemented responsive layouts, and automated deployment pipelines using CI/CD.</p><div class="tr"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">WordPress</span></div></div></div>
-    </div>
-  </div>
-</section>
+  <!-- Mobile overlay (links injected by JS) -->
+  <div class="mo" id="mo"></div>
 
-<section id="projects" class="sec sa">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">04</span><h2 class="st2">Projects</h2></div>
-    <div class="pg">
-      <article class="pc rv d1" data-tilt><div class="pg2"></div><div class="pt"><span class="pi">🚀</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div><h3 class="pn">LaunchPad</h3><p class="pd">No-code landing page builder with drag-and-drop blocks, live preview, and one-click Vercel deploy. 1,200+ beta users.</p><div class="ptgs"><span class="ptg">React</span><span class="ptg">Node</span><span class="ptg">Vercel</span></div></article>
-      <article class="pc rv d2" data-tilt><div class="pg2"></div><div class="pt"><span class="pi">🧠</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div><h3 class="pn">MindMap AI</h3><p class="pd">AI-powered knowledge graph connecting concepts from notes using embeddings and a force-directed graph UI.</p><div class="ptgs"><span class="ptg">Python</span><span class="ptg">D3.js</span><span class="ptg">OpenAI</span></div></article>
-      <article class="pc rv d3" data-tilt><div class="pg2"></div><div class="pt"><span class="pi">📊</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div><h3 class="pn">DataPulse</h3><p class="pd">Real-time analytics dashboard ingesting 50k+ events/sec via Kafka, visualized with custom WebGL charts.</p><div class="ptgs"><span class="ptg">Kafka</span><span class="ptg">WebGL</span><span class="ptg">Go</span></div></article>
-      <article class="pc rv d1" data-tilt><div class="pg2"></div><div class="pt"><span class="pi">🎨</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div><h3 class="pn">Pixel Studio</h3><p class="pd">Collaborative pixel art editor with real-time multiplayer via WebRTC. Featured on Product Hunt.</p><div class="ptgs"><span class="ptg">WebRTC</span><span class="ptg">Canvas</span><span class="ptg">OT</span></div></article>
-      <article class="pc rv d2" data-tilt><div class="pg2"></div><div class="pt"><span class="pi">🔐</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div><h3 class="pn">VaultPass</h3><p class="pd">E2E encrypted password manager with zero-knowledge architecture, TOTP support, and browser extension.</p><div class="ptgs"><span class="ptg">Crypto</span><span class="ptg">Extension</span><span class="ptg">Rust</span></div></article>
-      <article class="pc rv d3" data-tilt><div class="pg2"></div><div class="pt"><span class="pi">🌍</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div><h3 class="pn">EcoTrack</h3><p class="pd">Carbon footprint tracker with gamification. Won 1st place at a climate-tech hackathon.</p><div class="ptgs"><span class="ptg">Vue</span><span class="ptg">Firebase</span><span class="ptg">Maps</span></div></article>
-    </div>
-  </div>
-</section>
-
-<section id="skills" class="sec">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">05</span><h2 class="st2">Skills</h2></div>
-    <div class="skg">
-      <div class="sg2 rv d1"><h3 class="sgt">⚛️ Frontend</h3><div class="skl"><div><div class="ski"><span>React / Next.js</span><span class="skp">95%</span></div><div class="skb"><div class="skf" data-w="95"></div></div></div><div><div class="ski"><span>TypeScript</span><span class="skp">90%</span></div><div class="skb"><div class="skf" data-w="90"></div></div></div><div><div class="ski"><span>CSS / Tailwind</span><span class="skp">92%</span></div><div class="skb"><div class="skf" data-w="92"></div></div></div><div><div class="ski"><span>Three.js / WebGL</span><span class="skp">70%</span></div><div class="skb"><div class="skf" data-w="70"></div></div></div></div></div>
-      <div class="sg2 rv d2"><h3 class="sgt">⚙️ Backend</h3><div class="skl"><div><div class="ski"><span>Node.js</span><span class="skp">88%</span></div><div class="skb"><div class="skf" data-w="88"></div></div></div><div><div class="ski"><span>Python / FastAPI</span><span class="skp">82%</span></div><div class="skb"><div class="skf" data-w="82"></div></div></div><div><div class="ski"><span>PostgreSQL</span><span class="skp">85%</span></div><div class="skb"><div class="skf" data-w="85"></div></div></div><div><div class="ski"><span>Redis</span><span class="skp">75%</span></div><div class="skb"><div class="skf" data-w="75"></div></div></div></div></div>
-      <div class="sg2 rv d3"><h3 class="sgt">☁️ DevOps &amp; Tools</h3><div class="skl"><div><div class="ski"><span>AWS / GCP</span><span class="skp">78%</span></div><div class="skb"><div class="skf" data-w="78"></div></div></div><div><div class="ski"><span>Docker / K8s</span><span class="skp">72%</span></div><div class="skb"><div class="skf" data-w="72"></div></div></div><div><div class="ski"><span>Git / CI/CD</span><span class="skp">93%</span></div><div class="skb"><div class="skf" data-w="93"></div></div></div><div><div class="ski"><span>Figma / Design</span><span class="skp">80%</span></div><div class="skb"><div class="skf" data-w="80"></div></div></div></div></div>
-    </div>
-    <div class="pc2 rv d2">
-      <span class="pill">JavaScript</span><span class="pill">React</span><span class="pill">Next.js</span><span class="pill">TypeScript</span><span class="pill">Node.js</span><span class="pill">Python</span><span class="pill">GraphQL</span><span class="pill">REST APIs</span><span class="pill">PostgreSQL</span><span class="pill">MongoDB</span><span class="pill">Redis</span><span class="pill">Docker</span><span class="pill">AWS</span><span class="pill">Figma</span><span class="pill">Git</span><span class="pill">Tailwind</span><span class="pill">Three.js</span>
-    </div>
-  </div>
-</section>
-
-<section id="certifications" class="sec sa">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">06</span><h2 class="st2">Certifications</h2></div>
-    <div class="cg">
-      <div class="cc rv d1"><div class="ct"><div class="ci co">☁️</div><span class="cv">✓ Verified</span></div><h3 class="cn">AWS Solutions Architect – Associate</h3><p class="cis">Amazon Web Services</p><p class="cd">Issued March 2024</p></div>
-      <div class="cc rv d2"><div class="ct"><div class="ci cb">🔷</div><span class="cv">✓ Verified</span></div><h3 class="cn">Google Professional Cloud Developer</h3><p class="cis">Google Cloud</p><p class="cd">Issued November 2023</p></div>
-      <div class="cc rv d3"><div class="ct"><div class="ci cte">⚛️</div><span class="cv">✓ Verified</span></div><h3 class="cn">Meta Frontend Developer Professional</h3><p class="cis">Meta / Coursera</p><p class="cd">Issued June 2023</p></div>
-      <div class="cc rv d1"><div class="ct"><div class="ci cg2">🛡️</div><span class="cv">✓ Verified</span></div><h3 class="cn">CompTIA Security+</h3><p class="cis">CompTIA</p><p class="cd">Issued January 2023</p></div>
-      <div class="cc rv d2"><div class="ct"><div class="ci cr">🐍</div><span class="cv">✓ Verified</span></div><h3 class="cn">Python for Data Science</h3><p class="cis">IBM / Coursera</p><p class="cd">Issued August 2022</p></div>
-      <div class="cc rv d3"><div class="ct"><div class="ci csk">🎓</div><span class="cv">✓ Verified</span></div><h3 class="cn">MongoDB Developer Certification</h3><p class="cis">MongoDB University</p><p class="cd">Issued April 2022</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="contact" class="sec">
-  <div class="si">
-    <div class="sh2 rv"><span class="sn">07</span><h2 class="st2">Let's Talk</h2></div>
-    <div class="cog">
-      <div class="rv d1">
-        <p class="cotg">Have a project in mind, or just want to say hello? My inbox is always open.</p>
-        <div class="socs">
-          <a href="mailto:hello@clarenceflores.dev" class="sl3"><span class="soi">✉</span><span class="sot"><span class="sol">Email</span><span class="sov">hello@clarenceflores.dev</span></span></a>
-          <a href="https://linkedin.com/in/yourname" target="_blank" class="sl3"><span class="soi">in</span><span class="sot"><span class="sol">LinkedIn</span><span class="sov">linkedin.com/in/yourname</span></span></a>
-          <a href="https://github.com/yourname" target="_blank" class="sl3"><span class="soi">⌥</span><span class="sot"><span class="sol">GitHub</span><span class="sov">github.com/yourname</span></span></a>
-          <a href="https://twitter.com/yourname" target="_blank" class="sl3"><span class="soi">𝕏</span><span class="sot"><span class="sol">Twitter / X</span><span class="sov">@yourname</span></span></a>
+  <!-- ═══ HERO ═══ -->
+  <section id="hero">
+    <div class="hi">
+      <!-- Profile picture -->
+      <div class="pw">
+        <div class="pr"></div>
+        <div class="pr r2"></div>
+        <div class="pf">
+          <img id="pi"
+            src="https://api.dicebear.com/8.x/lorelei/svg?seed=Clarence&backgroundColor=0d0d18"
+            alt="Clarence Flores"/>
+          <label class="pu" for="phu" title="Click to upload your photo">
+            <input type="file" id="phu" accept="image/*"/>
+            <span>📷</span>
+          </label>
         </div>
       </div>
-      <form id="cf" class="cf2 rv d2" novalidate>
-        <div class="cfr">
-          <div class="cff"><label for="cfn">Name</label><input type="text" id="cfn" placeholder="Jane Smith" required/></div>
-          <div class="cff"><label for="cfe">Email</label><input type="email" id="cfe" placeholder="jane@example.com" required/></div>
+
+      <!-- Hero text -->
+      <div class="ht">
+        <p class="he"><span class="bd"></span> Available for opportunities</p>
+        <h1 class="hn">
+          <span class="h1">Clarence</span>
+          <span class="h2">Flores.</span>
+        </h1>
+        <p class="hs">IT Student &amp; Full-Stack Developer</p>
+        <p class="hb2">I craft beautiful, fast &amp; accessible digital experiences — from pixel-perfect UIs to robust backend systems.</p>
+        <div class="hbs">
+          <a href="#projects" class="btn bp">View Work ↓</a>
+          <a href="#contact"  class="btn bg">Get in Touch</a>
+          <a href="#"         class="btn bi" download>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            CV
+          </a>
         </div>
-        <div class="cff"><label for="cfs">Subject</label><input type="text" id="cfs" placeholder="Project inquiry…"/></div>
-        <div class="cff"><label for="cfm">Message</label><textarea id="cfm" rows="5" placeholder="Tell me about your project…" required></textarea></div>
-        <button type="submit" class="btn bp bw" id="cfb">
-          <span id="cbl">Send Message</span>
-          <svg id="cs" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        </button>
-        <p class="cok" id="cok" style="display:none">✓ Message sent! I'll be in touch soon.</p>
-        <p class="cer" id="cer" style="display:none">✗ Something went wrong. Please try again.</p>
-      </form>
+      </div>
     </div>
-  </div>
-</section>
+    <div class="sh">
+      <div class="st"><div class="sth"></div></div>
+      <span class="sl">scroll</span>
+    </div>
+  </section>
 
-<footer>
-  <div class="fi">
-    <p class="fc">© 2025 <strong>Clarence Flores</strong>. Built with ☕</p>
-    <a href="#hero" class="ftp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></a>
-  </div>
-</footer>
+  <!-- ═══ ABOUT ═══ -->
+  <section id="about" class="sec">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">01</span><h2 class="st2">About Me</h2></div>
+      <div class="ag">
+        <div class="at rv d1">
+          <p>Hi! I'm a <strong>passionate IT student and problem-solver</strong> who builds things for the web and beyond. I love crafting elegant interfaces with a sharp focus on <strong>performance and user experience</strong>.</p>
+          <p>With a background in both <strong>design and engineering</strong>, I bridge the gap between beautiful aesthetics and robust code.</p>
+          <p>When I'm not coding, you'll find me exploring generative art, contributing to open-source, or hunting for the perfect cup of coffee ☕</p>
+        </div>
+        <div class="sg rv d2">
+          <div class="sc2"><span class="sn2" data-t="3">0</span><span class="su2c">+</span><span class="sl2">Years Experience</span></div>
+          <div class="sc2"><span class="sn2" data-t="24">0</span><span class="sl2">Projects Shipped</span></div>
+          <div class="sc2"><span class="sn2" data-t="12">0</span><span class="sl2">Happy Clients</span></div>
+          <div class="sc2"><span class="sn2" data-t="8">0</span><span class="sl2">Certifications</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <!-- ═══ EDUCATION ═══ -->
+  <section id="education" class="sec sa">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">02</span><h2 class="st2">Education</h2></div>
+      <div class="tl">
+        <div class="ti rv d1">
+          <div class="tm2">🎓</div>
+          <div>
+            <span class="tp">2022 — Present</span>
+            <h3 class="tt2">B.S. Information Technology</h3>
+            <p class="to">Quezon City University · GPA 1.75</p>
+            <p class="td">Majoring in IT with a focus on software development and web applications.</p>
+            <div class="tr"><span class="badge">Dean's List</span></div>
+          </div>
+        </div>
+        <div class="ti rv d2">
+          <div class="tm2">📚</div>
+          <div>
+            <span class="tp">2020 — 2022</span>
+            <h3 class="tt2">Science, Technology, Engineering &amp; Mathematics</h3>
+            <p class="to">Our Lady of Fatima University · Dean's List</p>
+            <p class="td">Completed foundational STEM courses maintaining a strong academic record.</p>
+            <div class="tr"><span class="badge">Honors</span></div>
+          </div>
+        </div>
+        <div class="ti rv d3">
+          <div class="tm2">🎨</div>
+          <div>
+            <span class="tp">Summer 2022</span>
+            <h3 class="tt2">UX Design Bootcamp</h3>
+            <p class="to">Design Academy Online · Certificate</p>
+            <p class="td">12-week program covering UX research, Figma prototyping, and usability testing.</p>
+            <div class="tr"><span class="badge">Certificate</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- ═══ EXPERIENCE ═══ -->
+  <section id="experience" class="sec">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">03</span><h2 class="st2">Experience</h2></div>
+      <div class="el">
+        <div class="ei rv d1">
+          <div class="em">
+            <span class="ep">Jan 2024 – Present</span>
+            <span class="ec">TechCorp</span>
+            <span class="et">Full-time</span>
+          </div>
+          <div>
+            <h3 class="er">Senior Frontend Engineer</h3>
+            <p class="ed">Led redesign of flagship SaaS dashboard, reducing load time by 62%. Mentored 3 junior developers and established the component library used across 5 products.</p>
+            <div class="tr"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">GraphQL</span><span class="tag">Figma</span></div>
+          </div>
+        </div>
+        <div class="ei rv d2">
+          <div class="em">
+            <span class="ep">Jun 2022 – Dec 2023</span>
+            <span class="ec">StartupXYZ</span>
+            <span class="et">Full-time</span>
+          </div>
+          <div>
+            <h3 class="er">Full-Stack Developer</h3>
+            <p class="ed">Built the entire customer-facing app from scratch for a Series A fintech startup. Integrated 3 payment APIs and real-time notifications via WebSockets.</p>
+            <div class="tr"><span class="tag">Next.js</span><span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">AWS</span></div>
+          </div>
+        </div>
+        <div class="ei rv d3">
+          <div class="em">
+            <span class="ep">Sep 2021 – May 2022</span>
+            <span class="ec">Agency Co.</span>
+            <span class="et">Full-time</span>
+          </div>
+          <div>
+            <h3 class="er">Junior Web Developer</h3>
+            <p class="ed">Developed 12+ client websites, implemented pixel-perfect responsive layouts, and automated deployment pipelines using CI/CD.</p>
+            <div class="tr"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">WordPress</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PROJECTS ═══ -->
+  <section id="projects" class="sec sa">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">04</span><h2 class="st2">Projects</h2></div>
+      <div class="pg">
+        <article class="pc rv d1" data-tilt>
+          <div class="pg2"></div>
+          <div class="pt"><span class="pi">🚀</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div>
+          <h3 class="pn">LaunchPad</h3>
+          <p class="pd">No-code landing page builder with drag-and-drop blocks, live preview, and one-click Vercel deploy. 1,200+ beta users.</p>
+          <div class="ptgs"><span class="ptg">React</span><span class="ptg">Node</span><span class="ptg">Vercel</span></div>
+        </article>
+        <article class="pc rv d2" data-tilt>
+          <div class="pg2"></div>
+          <div class="pt"><span class="pi">🧠</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div>
+          <h3 class="pn">MindMap AI</h3>
+          <p class="pd">AI-powered knowledge graph connecting concepts from your notes using embeddings and a force-directed graph UI.</p>
+          <div class="ptgs"><span class="ptg">Python</span><span class="ptg">D3.js</span><span class="ptg">OpenAI</span></div>
+        </article>
+        <article class="pc rv d3" data-tilt>
+          <div class="pg2"></div>
+          <div class="pt"><span class="pi">📊</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div>
+          <h3 class="pn">DataPulse</h3>
+          <p class="pd">Real-time analytics dashboard ingesting 50k+ events/sec via Kafka, visualized with custom WebGL charts.</p>
+          <div class="ptgs"><span class="ptg">Kafka</span><span class="ptg">WebGL</span><span class="ptg">Go</span></div>
+        </article>
+        <article class="pc rv d1" data-tilt>
+          <div class="pg2"></div>
+          <div class="pt"><span class="pi">🎨</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div>
+          <h3 class="pn">Pixel Studio</h3>
+          <p class="pd">Collaborative pixel art editor with real-time multiplayer via WebRTC. Featured on Product Hunt.</p>
+          <div class="ptgs"><span class="ptg">WebRTC</span><span class="ptg">Canvas</span><span class="ptg">OT</span></div>
+        </article>
+        <article class="pc rv d2" data-tilt>
+          <div class="pg2"></div>
+          <div class="pt"><span class="pi">🔐</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div>
+          <h3 class="pn">VaultPass</h3>
+          <p class="pd">E2E encrypted password manager with zero-knowledge architecture, TOTP support, and browser extension.</p>
+          <div class="ptgs"><span class="ptg">Crypto</span><span class="ptg">Extension</span><span class="ptg">Rust</span></div>
+        </article>
+        <article class="pc rv d3" data-tilt>
+          <div class="pg2"></div>
+          <div class="pt"><span class="pi">🌍</span><div class="pl"><a href="#" class="plk">GH</a><a href="#" class="plk">↗</a></div></div>
+          <h3 class="pn">EcoTrack</h3>
+          <p class="pd">Carbon footprint tracker with gamification mechanics. Won 1st place at a climate-tech hackathon.</p>
+          <div class="ptgs"><span class="ptg">Vue</span><span class="ptg">Firebase</span><span class="ptg">Maps</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SKILLS ═══ -->
+  <section id="skills" class="sec">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">05</span><h2 class="st2">Skills</h2></div>
+      <div class="skg">
+        <div class="sg2 rv d1">
+          <h3 class="sgt">⚛️ Frontend</h3>
+          <div class="skl">
+            <div><div class="ski"><span>React / Next.js</span><span class="skp">95%</span></div><div class="skb"><div class="skf" data-w="95"></div></div></div>
+            <div><div class="ski"><span>TypeScript</span><span class="skp">90%</span></div><div class="skb"><div class="skf" data-w="90"></div></div></div>
+            <div><div class="ski"><span>CSS / Tailwind</span><span class="skp">92%</span></div><div class="skb"><div class="skf" data-w="92"></div></div></div>
+            <div><div class="ski"><span>Three.js / WebGL</span><span class="skp">70%</span></div><div class="skb"><div class="skf" data-w="70"></div></div></div>
+          </div>
+        </div>
+        <div class="sg2 rv d2">
+          <h3 class="sgt">⚙️ Backend</h3>
+          <div class="skl">
+            <div><div class="ski"><span>Node.js</span><span class="skp">88%</span></div><div class="skb"><div class="skf" data-w="88"></div></div></div>
+            <div><div class="ski"><span>Python / FastAPI</span><span class="skp">82%</span></div><div class="skb"><div class="skf" data-w="82"></div></div></div>
+            <div><div class="ski"><span>PostgreSQL</span><span class="skp">85%</span></div><div class="skb"><div class="skf" data-w="85"></div></div></div>
+            <div><div class="ski"><span>Redis</span><span class="skp">75%</span></div><div class="skb"><div class="skf" data-w="75"></div></div></div>
+          </div>
+        </div>
+        <div class="sg2 rv d3">
+          <h3 class="sgt">☁️ DevOps &amp; Tools</h3>
+          <div class="skl">
+            <div><div class="ski"><span>AWS / GCP</span><span class="skp">78%</span></div><div class="skb"><div class="skf" data-w="78"></div></div></div>
+            <div><div class="ski"><span>Docker / K8s</span><span class="skp">72%</span></div><div class="skb"><div class="skf" data-w="72"></div></div></div>
+            <div><div class="ski"><span>Git / CI/CD</span><span class="skp">93%</span></div><div class="skb"><div class="skf" data-w="93"></div></div></div>
+            <div><div class="ski"><span>Figma / Design</span><span class="skp">80%</span></div><div class="skb"><div class="skf" data-w="80"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="pc2 rv d2">
+        <span class="pill">JavaScript</span><span class="pill">React</span><span class="pill">Next.js</span>
+        <span class="pill">TypeScript</span><span class="pill">Node.js</span><span class="pill">Python</span>
+        <span class="pill">GraphQL</span><span class="pill">REST APIs</span><span class="pill">PostgreSQL</span>
+        <span class="pill">MongoDB</span><span class="pill">Redis</span><span class="pill">Docker</span>
+        <span class="pill">AWS</span><span class="pill">Figma</span><span class="pill">Git</span>
+        <span class="pill">Tailwind</span><span class="pill">Three.js</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CERTIFICATIONS ═══ -->
+  <section id="certifications" class="sec sa">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">06</span><h2 class="st2">Certifications</h2></div>
+      <div class="cg">
+        <div class="cc rv d1"><div class="ct"><div class="ci co">☁️</div><span class="cv">✓ Verified</span></div><h3 class="cn">AWS Solutions Architect – Associate</h3><p class="cis">Amazon Web Services</p><p class="cd">Issued March 2024</p></div>
+        <div class="cc rv d2"><div class="ct"><div class="ci cb">🔷</div><span class="cv">✓ Verified</span></div><h3 class="cn">Google Professional Cloud Developer</h3><p class="cis">Google Cloud</p><p class="cd">Issued November 2023</p></div>
+        <div class="cc rv d3"><div class="ct"><div class="ci cte">⚛️</div><span class="cv">✓ Verified</span></div><h3 class="cn">Meta Frontend Developer Professional</h3><p class="cis">Meta / Coursera</p><p class="cd">Issued June 2023</p></div>
+        <div class="cc rv d1"><div class="ct"><div class="ci cg2">🛡️</div><span class="cv">✓ Verified</span></div><h3 class="cn">CompTIA Security+</h3><p class="cis">CompTIA</p><p class="cd">Issued January 2023</p></div>
+        <div class="cc rv d2"><div class="ct"><div class="ci cr">🐍</div><span class="cv">✓ Verified</span></div><h3 class="cn">Python for Data Science</h3><p class="cis">IBM / Coursera</p><p class="cd">Issued August 2022</p></div>
+        <div class="cc rv d3"><div class="ct"><div class="ci csk">🎓</div><span class="cv">✓ Verified</span></div><h3 class="cn">MongoDB Developer Certification</h3><p class="cis">MongoDB University</p><p class="cd">Issued April 2022</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTACT ═══ -->
+  <section id="contact" class="sec">
+    <div class="si">
+      <div class="sh2 rv"><span class="sn">07</span><h2 class="st2">Let's Talk</h2></div>
+      <div class="cog">
+        <div class="rv d1">
+          <p class="cotg">Have a project in mind, or just want to say hello? My inbox is always open.</p>
+          <div class="socs">
+            <a href="mailto:hello@clarenceflores.dev" class="sl3">
+              <span class="soi">✉</span>
+              <span class="sot"><span class="sol">Email</span><span class="sov">hello@clarenceflores.dev</span></span>
+            </a>
+            <a href="https://linkedin.com/in/yourname" target="_blank" class="sl3">
+              <span class="soi">in</span>
+              <span class="sot"><span class="sol">LinkedIn</span><span class="sov">linkedin.com/in/yourname</span></span>
+            </a>
+            <a href="https://github.com/yourname" target="_blank" class="sl3">
+              <span class="soi">⌥</span>
+              <span class="sot"><span class="sol">GitHub</span><span class="sov">github.com/yourname</span></span>
+            </a>
+            <a href="https://twitter.com/yourname" target="_blank" class="sl3">
+              <span class="soi">𝕏</span>
+              <span class="sot"><span class="sol">Twitter / X</span><span class="sov">@yourname</span></span>
+            </a>
+          </div>
+        </div>
+
+        <form id="cf" class="cf2 rv d2" novalidate>
+          <div class="cfr">
+            <div class="cff"><label for="cfn">Name</label><input type="text" id="cfn" placeholder="Jane Smith" required/></div>
+            <div class="cff"><label for="cfe">Email</label><input type="email" id="cfe" placeholder="jane@example.com" required/></div>
+          </div>
+          <div class="cff"><label for="cfs">Subject</label><input type="text" id="cfs" placeholder="Project inquiry…"/></div>
+          <div class="cff"><label for="cfm">Message</label><textarea id="cfm" rows="5" placeholder="Tell me about your project…" required></textarea></div>
+          <button type="submit" class="btn bp bw" id="cfb">
+            <span id="cbl">Send Message</span>
+            <svg id="cs" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </button>
+          <p class="cok" id="cok" style="display:none">✓ Message sent! I'll be in touch soon.</p>
+          <p class="cer" id="cer" style="display:none">✗ Something went wrong. Please try again.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="fi">
+      <p class="fc">© 2025 <strong>Clarence Flores</strong>. Built with ☕</p>
+      <a href="#hero" class="ftp" aria-label="Back to top">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
