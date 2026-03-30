@@ -1,31 +1,38 @@
 /* ============================================================
    main.js — Clarence Flores Portfolio
-   All features: loader, scroll progress, typewriter, cursor,
-   theme toggle, canvas, nav, mobile menu, reveal, counters,
-   skill bars, tilt, photo upload, copy email, toast, EmailJS
    ============================================================ */
 'use strict';
 
-var H = document.documentElement;
+var ROOT = document.documentElement;
 
-/* ─────────────────────────────────────────────
-   1. PAGE LOADER
-   ───────────────────────────────────────────── */
+/* ── Helpers ── */
+function $(id) { return document.getElementById(id); }
+function toast(msg, type, dur) {
+  var wrap = $('toast-wrap');
+  if (!wrap) return;
+  var t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
+  wrap.appendChild(t);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('show'); }); });
+  setTimeout(function () {
+    t.classList.remove('show');
+    setTimeout(function () { t.remove(); }, 400);
+  }, dur || 3500);
+}
+
+/* ── 1. PAGE LOADER ── */
 (function () {
-  var loader = document.getElementById('loader');
+  var loader = $('loader');
   if (!loader) return;
-  window.addEventListener('load', function () {
-    setTimeout(function () { loader.classList.add('done'); }, 700);
-  });
-  // Fallback — remove after 2.5s regardless
-  setTimeout(function () { loader.classList.add('done'); }, 2500);
+  function done() { loader.classList.add('done'); }
+  window.addEventListener('load', function () { setTimeout(done, 600); });
+  setTimeout(done, 2200); /* fallback */
 }());
 
-/* ─────────────────────────────────────────────
-   2. SCROLL PROGRESS BAR
-   ───────────────────────────────────────────── */
+/* ── 2. SCROLL PROGRESS BAR ── */
 (function () {
-  var bar = document.getElementById('spb');
+  var bar = $('spb');
   if (!bar) return;
   window.addEventListener('scroll', function () {
     var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
@@ -33,254 +40,245 @@ var H = document.documentElement;
   }, { passive: true });
 }());
 
-/* ─────────────────────────────────────────────
-   3. BACK TO TOP BUTTON
-   ───────────────────────────────────────────── */
+/* ── 3. BACK TO TOP ── */
 (function () {
-  var btn = document.getElementById('btt');
+  var btn = $('btt');
   if (!btn) return;
   window.addEventListener('scroll', function () {
     btn.classList.toggle('show', window.scrollY > 400);
   }, { passive: true });
-  btn.addEventListener('click', function () {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 }());
 
-/* ─────────────────────────────────────────────
-   4. TOAST NOTIFICATIONS
-   ───────────────────────────────────────────── */
-function toast(msg, type, dur) {
-  var container = document.getElementById('toast-container');
-  if (!container) return;
-  var t = document.createElement('div');
-  t.className = 'toast' + (type ? ' ' + type : '');
-  t.textContent = msg;
-  container.appendChild(t);
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () { t.classList.add('show'); });
-  });
-  setTimeout(function () {
-    t.classList.remove('show');
-    setTimeout(function () { t.remove(); }, 450);
-  }, dur || 4000);
-}
+/* ── 4. THEME TOGGLE ── */
+$('tg').addEventListener('click', function () {
+  var next = ROOT.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  ROOT.setAttribute('data-theme', next);
+  localStorage.setItem('pt', next);
+  toast(next === 'light' ? '☀️ Light mode' : '🌙 Dark mode', '', 2000);
+});
 
-/* ─────────────────────────────────────────────
-   5. THEME TOGGLE
-   ───────────────────────────────────────────── */
+/* ── 5. TYPEWRITER ── */
 (function () {
-  var btn = document.getElementById('tg');
-  if (!btn) return;
-  btn.addEventListener('click', function () {
-    var next = H.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    H.setAttribute('data-theme', next);
-    localStorage.setItem('pt', next);
-    toast(next === 'light' ? '☀️ Light mode on' : '🌙 Dark mode on', '', 2000);
-  });
-}());
-
-/* ─────────────────────────────────────────────
-   6. TYPEWRITER EFFECT
-   ───────────────────────────────────────────── */
-(function () {
-  var el = document.getElementById('tw');
+  var el = $('tw');
   if (!el) return;
-  var words = ['Full-Stack Developer', 'UI/UX Enthusiast', 'Problem Solver', 'IT Student', 'Open-Source Contributor'];
-  var wi = 0, ci = 0, deleting = false;
-
-  // Respect reduced motion
+  /* Skip animation if user prefers reduced motion */
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    el.textContent = words[0]; return;
+    el.textContent = 'Full-Stack Developer'; return;
   }
-
+  var words = ['Full-Stack Developer', 'UI/UX Enthusiast', 'Problem Solver', 'IT Student', 'Open-Source Contributor'];
+  var w = 0, c = 0, del = false;
   function tick() {
-    var word = words[wi];
-    el.textContent = deleting ? word.slice(0, ci--) : word.slice(0, ci++);
-    var wait = deleting ? 55 : 100;
-    if (!deleting && ci > word.length) { wait = 1800; deleting = true; }
-    else if (deleting && ci < 0)       { deleting = false; wi = (wi + 1) % words.length; ci = 0; wait = 350; }
+    var word = words[w];
+    el.textContent = del ? word.slice(0, c--) : word.slice(0, c++);
+    var wait = del ? 50 : 95;
+    if (!del && c > word.length)  { wait = 1800; del = true; }
+    else if (del && c < 0)        { del = false; w = (w + 1) % words.length; c = 0; wait = 350; }
     setTimeout(tick, wait);
   }
-  setTimeout(tick, 1400);
+  setTimeout(tick, 1300);
 }());
 
-/* ─────────────────────────────────────────────
-   7. CANVAS BACKGROUND — particles + lines
-   ───────────────────────────────────────────── */
+/* ── 6. CANVAS PARTICLES ── */
 (function () {
-  var c = document.getElementById('cv');
-  if (!c) return;
-  var x = c.getContext('2d'), W, H2, pts = [], raf;
-  var N = window.innerWidth < 600 ? 35 : 70;
+  var canvas = $('cv');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H, pts = [], raf;
+  var N = window.innerWidth < 600 ? 30 : 65;
 
-  function rs() { W = c.width = window.innerWidth; H2 = c.height = window.innerHeight; }
-  function mk() { return { x: Math.random()*W, y: Math.random()*H2, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3, l: Math.random() }; }
-  function cl() { return H.getAttribute('data-theme') === 'light' ? '61,122,0,' : '200,244,104,'; }
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function mkPt()   { return { x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3, l: Math.random() }; }
+  function color()  { return ROOT.getAttribute('data-theme') === 'light' ? '61,122,0,' : '200,244,104,'; }
 
-  function dr() {
-    x.clearRect(0, 0, W, H2);
-    var c2 = cl();
-    for (var i = 0; i < pts.length; i++) {
-      var p = pts[i];
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    var c = color();
+    var i, j, p, dx, dy, d;
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
       p.x += p.vx; p.y += p.vy; p.l = (p.l + .002) % 1;
       if (p.x < -2) p.x = W+2; if (p.x > W+2) p.x = -2;
-      if (p.y < -2) p.y = H2+2; if (p.y > H2+2) p.y = -2;
-      x.beginPath(); x.arc(p.x, p.y, .9, 0, Math.PI*2);
-      x.fillStyle = 'rgba(' + c2 + (Math.sin(p.l*Math.PI)*.5) + ')'; x.fill();
+      if (p.y < -2) p.y = H+2; if (p.y > H+2) p.y = -2;
+      ctx.beginPath(); ctx.arc(p.x, p.y, .9, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(' + c + (Math.sin(p.l*Math.PI)*.5) + ')'; ctx.fill();
     }
-    for (var i = 0; i < pts.length; i++) {
-      for (var j = i+1; j < pts.length; j++) {
-        var dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y, d = Math.sqrt(dx*dx+dy*dy);
+    for (i = 0; i < pts.length; i++) {
+      for (j = i+1; j < pts.length; j++) {
+        dx = pts[i].x-pts[j].x; dy = pts[i].y-pts[j].y; d = Math.sqrt(dx*dx+dy*dy);
         if (d < 110) {
-          x.beginPath(); x.moveTo(pts[i].x, pts[i].y); x.lineTo(pts[j].x, pts[j].y);
-          x.strokeStyle = 'rgba(' + c2 + ((1-d/110)*.07) + ')'; x.lineWidth = .5; x.stroke();
+          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = 'rgba(' + c + ((1-d/110)*.07) + ')'; ctx.lineWidth = .5; ctx.stroke();
         }
       }
     }
-    raf = requestAnimationFrame(dr);
+    raf = requestAnimationFrame(draw);
   }
-  rs(); for (var i = 0; i < N; i++) pts.push(mk()); dr();
-  window.addEventListener('resize', function () { cancelAnimationFrame(raf); rs(); pts = []; for (var i = 0; i < N; i++) pts.push(mk()); dr(); });
+
+  resize(); for (var i = 0; i < N; i++) pts.push(mkPt()); draw();
+  window.addEventListener('resize', function () {
+    cancelAnimationFrame(raf); resize(); pts = [];
+    for (var i = 0; i < N; i++) pts.push(mkPt()); draw();
+  });
 }());
 
-/* ─────────────────────────────────────────────
-   8. CUSTOM CURSOR
-   ───────────────────────────────────────────── */
+/* ── 7. CUSTOM CURSOR (desktop only) ── */
 (function () {
-  var dot  = document.getElementById('cd');
-  var ring = document.getElementById('cr');
+  var dot  = $('cd');
+  var ring = $('cr');
   if (!dot || !ring) return;
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    dot.style.display = ring.style.display = 'none'; return;
-  }
-  var mx = 0, my = 0, rx = 0, ry = 0, on = false;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  var mx = 0, my = 0, rx = 0, ry = 0, active = false;
   dot.style.transition  = 'opacity .15s';
-  ring.style.transition = 'width .3s cubic-bezier(.16,1,.3,1),height .3s cubic-bezier(.16,1,.3,1),border-color .3s,opacity .15s';
+  ring.style.transition = 'width .3s cubic-bezier(.16,1,.3,1), height .3s cubic-bezier(.16,1,.3,1), border-color .3s, opacity .15s';
 
   document.addEventListener('mousemove', function (e) {
     mx = e.clientX; my = e.clientY;
-    if (!on) { rx = mx; ry = my; on = true; document.body.classList.add('hc'); dot.style.opacity = '1'; ring.style.opacity = '.6'; }
+    if (!active) {
+      rx = mx; ry = my; active = true;
+      document.body.classList.add('has-cursor');
+      dot.style.opacity = '1'; ring.style.opacity = '.6';
+    }
     dot.style.left = mx + 'px'; dot.style.top = my + 'px';
-  });
+  }, { passive: true });
+
   document.addEventListener('mouseleave', function () { dot.style.opacity = ring.style.opacity = '0'; });
-  document.addEventListener('mouseenter', function () { if (on) { dot.style.opacity = '1'; ring.style.opacity = '.6'; } });
+  document.addEventListener('mouseenter', function () { if (active) { dot.style.opacity = '1'; ring.style.opacity = '.6'; } });
 
-  (function loop() { rx += (mx-rx)*.12; ry += (my-ry)*.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(loop); }());
+  (function loop() {
+    rx += (mx-rx) * .12; ry += (my-ry) * .12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(loop);
+  }());
 
-  var SEL = 'a,button,label,[data-tilt],.pill,.tag,.badge,.cc,.pc,.sc2,.sl3,.tt,.copy-btn';
+  var SEL = 'a, button, label, [data-tilt], .pill, .tag, .badge, .cert, .proj, .stat, .social, .tt, .copy-btn';
   document.addEventListener('mouseover', function (e) {
-    if (e.target.closest(SEL)) { ring.style.width = '52px'; ring.style.height = '52px'; ring.style.borderColor = 'var(--a2)'; ring.style.opacity = '.9'; }
+    if (e.target.closest(SEL)) { ring.style.width = '50px'; ring.style.height = '50px'; ring.style.borderColor = 'var(--acc2)'; ring.style.opacity = '.85'; }
   });
   document.addEventListener('mouseout', function (e) {
-    if (e.target.closest(SEL)) { ring.style.width = '34px'; ring.style.height = '34px'; ring.style.borderColor = 'var(--ac)'; ring.style.opacity = '.6'; }
+    if (e.target.closest(SEL)) { ring.style.width = '34px'; ring.style.height = '34px'; ring.style.borderColor = 'var(--acc)'; ring.style.opacity = '.6'; }
   });
 }());
 
-/* ─────────────────────────────────────────────
-   9. NAV — scrolled state + active link highlight
-   ───────────────────────────────────────────── */
+/* ── 8. NAV — scrolled + active link ── */
 (function () {
-  var nv    = document.getElementById('nv');
+  var nav   = $('nv');
   var links = document.querySelectorAll('.na');
-  window.addEventListener('scroll', function () { nv.classList.toggle('sc', window.scrollY > 40); }, { passive: true });
-  nv.classList.toggle('sc', window.scrollY > 40);
+  window.addEventListener('scroll', function () { nav.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });
+  nav.classList.toggle('scrolled', window.scrollY > 40);
 
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id); });
+      if (e.isIntersecting)
+        links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id); });
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
   document.querySelectorAll('section[id]').forEach(function (s) { io.observe(s); });
 }());
 
-/* ─────────────────────────────────────────────
-   10. MOBILE NAV
-   ───────────────────────────────────────────── */
+/* ── 9. MOBILE NAV ── */
 (function () {
-  var hb = document.getElementById('hb');
-  var mo = document.getElementById('mo');
+  var hb = $('hb');
+  var mo = $('mo');
   if (!hb || !mo) return;
+
   document.querySelectorAll('#nls .na').forEach(function (l) {
-    var clone = l.cloneNode(true); clone.style.fontSize = '1rem'; clone.style.letterSpacing = '.18em'; mo.appendChild(clone);
+    var c = l.cloneNode(true);
+    mo.appendChild(c);
   });
-  function toggle(open) { hb.classList.toggle('op', open); hb.setAttribute('aria-expanded', open); mo.classList.toggle('op', open); document.body.style.overflow = open ? 'hidden' : ''; }
-  hb.addEventListener('click', function () { toggle(!mo.classList.contains('op')); });
+
+  function toggle(open) {
+    hb.classList.toggle('open', open);
+    hb.setAttribute('aria-expanded', String(open));
+    mo.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  hb.addEventListener('click', function () { toggle(!mo.classList.contains('open')); });
   mo.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
   mo.addEventListener('click', function (e) { if (e.target === mo) toggle(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
 }());
 
-/* ─────────────────────────────────────────────
-   11. SCROLL REVEAL
-   ───────────────────────────────────────────── */
+/* ── 10. SCROLL REVEAL ── */
 (function () {
   try {
     var els = document.querySelectorAll('.rv');
     if (!els.length) return;
-    document.body.classList.add('jr');
+    document.body.classList.add('js-ready');
+
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
     els.forEach(function (el) { io.observe(el); });
-    setTimeout(function () { document.querySelectorAll('.rv:not(.in)').forEach(function (el) { el.classList.add('in'); }); }, 1500);
-  } catch (err) { document.body.classList.remove('jr'); }
+    /* Safety net — force-reveal anything still hidden after 1.5s */
+    setTimeout(function () {
+      document.querySelectorAll('.rv:not(.visible)').forEach(function (el) { el.classList.add('visible'); });
+    }, 1500);
+  } catch (e) {
+    document.body.classList.remove('js-ready');
+  }
 }());
 
-/* ─────────────────────────────────────────────
-   12. ANIMATED COUNTERS
-   ───────────────────────────────────────────── */
+/* ── 11. ANIMATED COUNTERS ── */
 (function () {
-  var els = document.querySelectorAll('.sn2[data-t]');
+  var els = document.querySelectorAll('.stat-n[data-t]');
   if (!els.length) return;
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (!e.isIntersecting) return;
-      var el = e.target, target = +el.dataset.t, dur = 1400, t0 = performance.now();
-      (function tick(now) { var p = Math.min((now-t0)/dur,1); el.textContent = Math.round((1-Math.pow(1-p,4))*target); if (p<1) requestAnimationFrame(tick); }(performance.now()));
+      var el = e.target, target = +el.dataset.t, dur = 1200, t0 = performance.now();
+      (function tick(now) {
+        var p = Math.min((now-t0)/dur, 1);
+        el.textContent = Math.round((1 - Math.pow(1-p, 4)) * target);
+        if (p < 1) requestAnimationFrame(tick);
+      }(performance.now()));
       io.unobserve(el);
     });
   }, { threshold: .5 });
   els.forEach(function (el) { io.observe(el); });
 }());
 
-/* ─────────────────────────────────────────────
-   13. SKILL BARS
-   ───────────────────────────────────────────── */
+/* ── 12. SKILL BARS ── */
 (function () {
-  var sec = document.getElementById('skills');
+  var sec = $('skills');
   if (!sec) return;
-  var fills = sec.querySelectorAll('.skf[data-w]');
+  var fills = sec.querySelectorAll('.skill-fill[data-w]');
   new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (!e.isIntersecting) return;
-      fills.forEach(function (f, i) { setTimeout(function () { f.style.width = f.dataset.w + '%'; }, i * 70); });
+      fills.forEach(function (f, i) { setTimeout(function () { f.style.width = f.dataset.w + '%'; }, i * 60); });
     });
   }, { threshold: .2 }).observe(sec);
 }());
 
-/* ─────────────────────────────────────────────
-   14. PROJECT CARD TILT + GLOW
-   ───────────────────────────────────────────── */
+/* ── 13. PROJECT CARD TILT + GLOW ── */
 (function () {
   if (!window.matchMedia('(hover: hover)').matches) return;
   document.querySelectorAll('[data-tilt]').forEach(function (card) {
-    var glow = card.querySelector('.pg2');
+    var glow = card.querySelector('.proj-glow');
     card.addEventListener('mousemove', function (e) {
-      var r = card.getBoundingClientRect(), cx = (e.clientX-r.left)/r.width, cy = (e.clientY-r.top)/r.height;
-      card.style.transform = 'perspective(700px) rotateX('+((cy-.5)*-8)+'deg) rotateY('+((cx-.5)*8)+'deg) translateZ(4px)';
+      var r  = card.getBoundingClientRect();
+      var cx = (e.clientX - r.left) / r.width;
+      var cy = (e.clientY - r.top)  / r.height;
+      card.style.transform  = 'perspective(700px) rotateX(' + ((cy-.5)*-7) + 'deg) rotateY(' + ((cx-.5)*7) + 'deg) translateZ(4px)';
       card.style.transition = 'transform .1s linear';
-      if (glow) { glow.style.setProperty('--mx2',(cx*100)+'%'); glow.style.setProperty('--my',(cy*100)+'%'); }
+      if (glow) { glow.style.setProperty('--gx', (cx*100)+'%'); glow.style.setProperty('--gy', (cy*100)+'%'); }
     });
-    card.addEventListener('mouseleave', function () { card.style.transform = ''; card.style.transition = 'transform .6s cubic-bezier(.16,1,.3,1)'; });
+    card.addEventListener('mouseleave', function () {
+      card.style.transform  = '';
+      card.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)';
+    });
   });
 }());
 
-/* ─────────────────────────────────────────────
-   15. PROFILE PHOTO UPLOAD
-   ───────────────────────────────────────────── */
+/* ── 14. PROFILE PHOTO UPLOAD ── */
 (function () {
-  var inp = document.getElementById('phu'), img = document.getElementById('pi');
+  var inp = $('phu'), img = $('pi');
   if (!inp || !img) return;
   inp.addEventListener('change', function (e) {
     var f = e.target.files && e.target.files[0];
@@ -291,52 +289,63 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ─────────────────────────────────────────────
-   16. COPY EMAIL TO CLIPBOARD
-   ───────────────────────────────────────────── */
+/* ── 15. COPY EMAIL ── */
 (function () {
   document.querySelectorAll('.copy-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.preventDefault(); e.stopPropagation();
       var text = btn.dataset.copy;
       if (!text) return;
-      navigator.clipboard.writeText(text).then(function () {
-        toast('📋 Email copied to clipboard!', 'ok', 2500);
-      }).catch(function () {
-        toast('Could not copy — please copy manually.', 'err', 3000);
-      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(function () { toast('📋 Email copied!', 'ok', 2500); })
+          .catch(function () { toast('Could not copy — try manually.', 'err', 3000); });
+      } else {
+        /* Fallback for older browsers */
+        var tmp = document.createElement('input');
+        tmp.value = text; document.body.appendChild(tmp);
+        tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
+        toast('📋 Email copied!', 'ok', 2500);
+      }
     });
   });
 }());
 
-/* ─────────────────────────────────────────────
-   17. CONTACT FORM — EmailJS
-   ─────────────────────────────────────────────
+/* ── 16. CONTACT FORM — EmailJS ──────────────────────────
    Setup (free, ~5 min):
-   1. Sign up at https://www.emailjs.com
+   1. https://www.emailjs.com → sign up
    2. Email Services → Add Service → copy SERVICE_ID
-   3. Email Templates → Create Template with:
-        {{from_name}} {{from_email}} {{subject}} {{message}} {{to_name}}
+   3. Email Templates → use: {{from_name}} {{from_email}} {{subject}} {{message}} {{to_name}}
       → copy TEMPLATE_ID
    4. Account → General → copy PUBLIC_KEY
    5. Paste the three values below ↓
-   ───────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────── */
 (function () {
-  var PK = 'alg84AK46Bvk1Yx4b';
-  var SI = 'service_pfg97tj';
-  var TI = 'template_0oafehi';
+  var PK = 'YOUR_PUBLIC_KEY';
+  var SI = 'YOUR_SERVICE_ID';
+  var TI = 'YOUR_TEMPLATE_ID';
   var YN = 'Clarence Flores';
 
   if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: PK });
 
-  var form = document.getElementById('cf');
+  var form = $('cf');
   if (!form) return;
-  var btn  = document.getElementById('cfb');
-  var lbl  = document.getElementById('cbl');
-  var spin = document.getElementById('cs');
+  var btn  = $('cfb');
+  var lbl  = $('cbl');
+  var spin = $('cs');
 
-  function setLoading(on) { btn.disabled = on; lbl.textContent = on ? 'Sending…' : 'Send Message'; if (spin) spin.style.display = on ? 'inline-block' : 'none'; }
-  function shake(el) { el.style.animation = 'none'; el.getBoundingClientRect(); el.style.animation = 'shake .4s ease'; el.addEventListener('animationend', function () { el.style.animation = ''; }, { once: true }); el.focus(); }
+  function setLoading(on) {
+    btn.disabled = on;
+    lbl.textContent = on ? 'Sending…' : 'Send Message';
+    if (spin) spin.style.display = on ? 'inline-block' : 'none';
+  }
+  function shake(el) {
+    el.style.animation = 'none';
+    el.getBoundingClientRect();
+    el.style.animation = 'shake .4s ease';
+    el.addEventListener('animationend', function () { el.style.animation = ''; }, { once: true });
+    el.focus();
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -349,8 +358,9 @@ function toast(msg, type, dur) {
     if (!re.test(email)) { shake(form.querySelector('#cfe')); return; }
     if (!msg)            { shake(form.querySelector('#cfm')); return; }
 
+    /* Dev mode — credentials not yet set */
     if (PK === 'YOUR_PUBLIC_KEY') {
-      console.warn('[EmailJS] Paste your credentials into main.js');
+      console.warn('[EmailJS] Add your credentials to main.js');
       setLoading(true);
       setTimeout(function () { setLoading(false); form.reset(); toast('✓ Message sent! I\'ll be in touch soon.', 'ok'); }, 1200);
       return;
@@ -358,13 +368,19 @@ function toast(msg, type, dur) {
 
     setLoading(true);
     emailjs.send(SI, TI, {
-      to_name: YN, from_name: name, from_email: email,
-      subject: form.querySelector('#cfs').value.trim() || '(no subject)',
-      message: msg, reply_to: email
+      to_name:    YN,
+      from_name:  name,
+      from_email: email,
+      subject:    form.querySelector('#cfs').value.trim() || '(no subject)',
+      message:    msg,
+      reply_to:   email
     }).then(function () {
-      setLoading(false); form.reset(); toast('✓ Message sent! I\'ll be in touch soon.', 'ok');
+      setLoading(false); form.reset();
+      toast('✓ Message sent! I\'ll be in touch soon.', 'ok');
     }, function (err) {
-      console.error('[EmailJS]', err); setLoading(false); toast('✗ Something went wrong. Please try again.', 'err');
+      console.error('[EmailJS]', err);
+      setLoading(false);
+      toast('✗ Send failed — please email me directly.', 'err');
     });
   });
 }());
