@@ -321,9 +321,9 @@ $('tg').addEventListener('click', function () {
    5. Paste the three values below ↓
    ───────────────────────────────────────────────────────── */
 (function () {
-  var PK = 'YOUR_PUBLIC_KEY';
-  var SI = 'YOUR_SERVICE_ID';
-  var TI = 'YOUR_TEMPLATE_ID';
+  var PK = 'alg84AK46Bvk1Yx4b';
+  var SI = 'service_pfg97tj';
+  var TI = 'template_0oafehi';
   var YN = 'Clarence Flores';
 
   if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: PK });
@@ -359,7 +359,7 @@ $('tg').addEventListener('click', function () {
     if (!msg)            { shake(form.querySelector('#cfm')); return; }
 
     /* Dev mode — credentials not yet set */
-    if (PK === 'YOUR_PUBLIC_KEY') {
+    if (PK === 'alg84AK46Bvk1Yx4b') {
       console.warn('[EmailJS] Add your credentials to main.js');
       setLoading(true);
       setTimeout(function () { setLoading(false); form.reset(); toast('✓ Message sent! I\'ll be in touch soon.', 'ok'); }, 1200);
