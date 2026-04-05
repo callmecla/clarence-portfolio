@@ -311,15 +311,8 @@ $('tg').addEventListener('click', function () {
   });
 }());
 
-/* ── 16. CONTACT FORM — EmailJS ──────────────────────────
-   Setup (free, ~5 min):
-   1. https://www.emailjs.com → sign up
-   2. Email Services → Add Service → copy SERVICE_ID
-   3. Email Templates → use: {{from_name}} {{from_email}} {{subject}} {{message}} {{to_name}}
-      → copy TEMPLATE_ID
-   4. Account → General → copy PUBLIC_KEY
-   5. Paste the three values below ↓
-   ───────────────────────────────────────────────────────── */
+/* ── 16. CONTACT FORM — */
+
 (function () {
   var PK = 'alg84AK46Bvk1Yx4b';
   var SI = 'service_pfg97tj';
