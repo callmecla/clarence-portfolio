@@ -20,7 +20,7 @@
   </div>
 
   <div id="toast-wrap" aria-live="polite"></div>
-  <button id="btt" aria-label="Back to top">↑</button>
+  <button type="button" id="btt" aria-label="Back to top">↑</button>
 
   <div id="cd" aria-hidden="true"></div>
   <div id="cr" aria-hidden="true"></div>
@@ -29,7 +29,7 @@
   <!-- NAV -->
   <nav id="nv">
     <a href="#hero" class="nl">CF<span class="ld">.</span></a>
-    <button class="hb" id="hb" aria-label="Toggle menu" aria-expanded="false">
+    <button type="button" class="hb" id="hb" aria-label="Toggle menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
     <ul class="nls" id="nls">
@@ -41,7 +41,7 @@
       <li><a href="#certifications" class="na">Certs</a></li>
       <li><a href="#contact"        class="na">Contact</a></li>
     </ul>
-    <button class="tt" id="tg" aria-label="Toggle theme">
+    <button type="button" class="tt" id="tg" aria-label="Toggle theme">
       <span class="ttr"><span class="tth"></span></span>
       <span class="tti"><span class="tm">🌙</span><span class="ts">☀️</span></span>
     </button>
@@ -269,15 +269,17 @@
         <div class="rv d1">
           <p class="contact-tag">Have a project in mind, or just want to say hello? My inbox is always open.</p>
           <div class="socials">
-            <a href="mailto:flores.clarencekyle.manrique@gmail.com" class="social">
-              <span class="social-ico">✉</span>
-              <span class="social-text"><span class="social-label">Email</span><span class="social-val">flores.clarencekyle.manrique@gmail.com</span></span>
-              <button class="copy-btn" data-copy="flores.clarencekyle.manrique@gmail.com" aria-label="Copy email">
+            <div class="social">
+              <a href="mailto:flores.clarencekyle.manrique@gmail.com" class="social-link">
+                <span class="social-ico">✉</span>
+                <span class="social-text"><span class="social-label">Email</span><span class="social-val">flores.clarencekyle.manrique@gmail.com</span></span>
+              </a>
+              <button type="button" class="copy-btn" data-copy="flores.clarencekyle.manrique@gmail.com" aria-label="Copy email">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
-            </a>
-            <a href="https://www.linkedin.com/in/clarenceflores8/" target="_blank" rel="noopener" class="social"><span class="social-ico">in</span><span class="social-text"><span class="social-label">LinkedIn</span><span class="social-val">linkedin.com/in/yourname</span></span></a>
-            <a href="https://https://github.com/callmecla" target="_blank" rel="noopener" class="social"><span class="social-ico">⌥</span><span class="social-text"><span class="social-label">GitHub</span><span class="social-val">github.com/yourname</span></span></a>
+            </div>
+            <a href="https://www.linkedin.com/in/clarenceflores8/" target="_blank" rel="noopener" class="social"><span class="social-ico">in</span><span class="social-text"><span class="social-label">LinkedIn</span><span class="social-val">linkedin.com/in/clarenceflores8</span></span></a>
+            <a href="https://github.com/callmecla" target="_blank" rel="noopener" class="social"><span class="social-ico">⌥</span><span class="social-text"><span class="social-label">GitHub</span><span class="social-val">github.com/callmecla</span></span></a>
             <a href="https://www.facebook.com/clarenceflores.midzydive" target="_blank" rel="noopener" class="social"><span class="social-ico">📘</span><span class="social-text"><span class="social-label">Facebook</span><span class="social-val">@clarenceflores.midzydive</span></span> </a>
           </div>
         </div>
