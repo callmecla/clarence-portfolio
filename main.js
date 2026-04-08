@@ -1,11 +1,7 @@
-/* ============================================================
-   main.js — Clarence Flores Portfolio
-   ============================================================ */
 'use strict';
 
 const ROOT = document.documentElement;
 
-/* ── Helpers ── */
 const $ = id => document.getElementById(id);
 const toast = (msg, type, dur = 3500) => {
   const wrap = $('toast-wrap');
@@ -21,13 +17,12 @@ const toast = (msg, type, dur = 3500) => {
   }, dur);
 };
 
-/* ── 1. PAGE LOADER ── */
 (function () {
   const loader = $('loader');
   if (!loader) return;
   const done = () => loader.classList.add('done');
   window.addEventListener('load', () => setTimeout(done, 600));
-  setTimeout(done, 2200); /* fallback */
+  setTimeout(done, 2200);
 }());
 
 /* ── 2. SCROLL PROGRESS BAR ── */
@@ -104,7 +99,7 @@ if (themeToggle) {
   let H;
   let pts = [];
   let raf;
-  const N = window.innerWidth < 600 ? 30 : 65;
+  const N = window.innerWidth < 600 ? 15 : 30;
 
   const resize = () => {
     W = canvas.width = window.innerWidth;
@@ -157,6 +152,14 @@ if (themeToggle) {
     pts = [];
     for (let i = 0; i < N; i++) pts.push(mkPt());
     draw();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(raf);
+      raf = null;
+    } else if (!raf) {
+      draw();
+    }
   });
 }());
 
