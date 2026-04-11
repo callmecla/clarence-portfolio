@@ -1,3 +1,8 @@
+/* =====================================================
+   PORTFOLIO — style.css
+   Clarence Flores
+   ===================================================== */
+
 /* ── CSS VARIABLES ── */
 :root {
   --bg:      #09090f;
@@ -51,7 +56,8 @@ a   { color: inherit; text-decoration: none; }
 button { background: none; border: none; font: inherit; cursor: pointer; }
 input, textarea { font: inherit; }
 ul { list-style: none; }
-::selection { background: var(--acc); color: #000; }
+::selection { background: rgba(200,244,104,.35); color: var(--tx); }
+[data-theme="light"] ::selection { background: rgba(61,122,0,.18); color: var(--tx); }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 99px; }
@@ -100,7 +106,7 @@ ul { list-style: none; }
 
 /* ── BACK TO TOP ── */
 #btt {
-  position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 600;
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 600;
   width: 38px; height: 38px; border-radius: 50%;
   background: var(--surface); border: 1px solid var(--bdr2); color: var(--tx2);
   font-size: 1rem; line-height: 1;
@@ -464,7 +470,7 @@ footer { border-top: 1px solid var(--bdr); position: relative; z-index: 2; }
   /* Toast + back-to-top position */
   #toast-wrap { bottom: 1rem; right: 1rem; left: 1rem; }
   .toast { max-width: 100%; }
-  #btt { bottom: 1rem; left: 1rem; }
+  #btt { bottom: 1rem; right: 1rem; }
 
   /* Hide scroll hint on small screens to save space */
   .scroll-hint { display: none; }
