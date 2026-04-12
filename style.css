@@ -128,7 +128,7 @@ ul { list-style: none; }
 body.has-cursor, body.has-cursor * { cursor: none !important; }
 
 /* ── CANVAS ── */
-#cv { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .5; transition: opacity .6s; }
+#cv { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .5; transition: opacity .6s; contain: strict; will-change: transform; }
 [data-theme="light"] #cv { opacity: .12; }
 
 /* ── NAV ── */
@@ -339,10 +339,10 @@ a.ti:hover .ti-ext { opacity: 1; transform: translate(2px, -2px); }
 .exp-desc   { font-size: .88rem; line-height: 1.8; color: var(--tx2); }
 
 /* ── PROJECTS ── */
-.proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--bdr); border: 1px solid var(--bdr); border-radius: 8px; overflow: hidden; }
-.proj { background: var(--surface); padding: 1.75rem; position: relative; overflow: hidden; display: flex; flex-direction: column; transition: background .3s; }
+.proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--bdr); border: 1px solid var(--bdr); border-radius: 8px; overflow: hidden; contain: layout style; }
+.proj { background: var(--surface); padding: 1.75rem; position: relative; overflow: hidden; display: flex; flex-direction: column; transition: background .3s; contain: layout style; will-change: transform; }
 .proj:hover { background: var(--sur2); }
-.proj-glow { position: absolute; inset: 0; background: radial-gradient(circle at var(--gx,50%) var(--gy,50%), var(--acc-g) 0%, transparent 65%); opacity: 0; transition: opacity .4s; pointer-events: none; }
+.proj-glow { position: absolute; inset: 0; background: radial-gradient(circle at var(--gx,50%) var(--gy,50%), var(--acc-g) 0%, transparent 65%); opacity: 0; transition: opacity .4s; pointer-events: none; contain: strict; }
 .proj:hover .proj-glow { opacity: 1; }
 .proj-top  { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
 .proj-ico  { font-size: 1.5rem; }

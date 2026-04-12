@@ -1,0 +1,28 @@
+{
+  "name": "clarence-portfolio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "build": "node build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/callmecla/clarence-portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/callmecla/clarence-portfolio/issues"
+  },
+  "homepage": "https://github.com/callmecla/clarence-portfolio#readme",
+  "devDependencies": {
+    "cssnano": "^7.1.4",
+    "html-minifier": "^4.0.0",
+    "postcss": "^8.5.9",
+    "terser": "^5.46.1"
+  }
+}
