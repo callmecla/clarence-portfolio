@@ -423,13 +423,11 @@ a.ti:hover .ti-ext { opacity: 1; transform: translate(2px, -2px); }
 
 /* ── FOOTER ── */
 footer { border-top: 1px solid var(--bdr); position: relative; z-index: 2; }
-.footer-inner {
-  max-width: var(--max-w); margin: 0 auto;
-  padding: 1.5rem var(--pad);
-  display: flex; justify-content: center; align-items: center;
-}
-.footer-copy  { font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; color: var(--tx3); text-align: center; }
+.footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 1.5rem var(--pad); display: flex; justify-content: space-between; align-items: center; }
+.footer-copy  { font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; color: var(--tx3); }
 .footer-copy strong { color: var(--tx2); font-weight: 500; }
+.footer-top   { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: var(--surface); border: 1px solid var(--bdr); border-radius: 50%; color: var(--tx2); transition: border-color .25s, color .25s, transform .25s; }
+.footer-top:hover { border-color: var(--acc); color: var(--acc); transform: translateY(-3px); }
 
 /* ── KEYFRAMES ── */
 @keyframes fade-up  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
@@ -457,40 +455,53 @@ footer { border-top: 1px solid var(--bdr); position: relative; z-index: 2; }
 @media (max-width: 600px) {
   :root { --nav-h: 56px; --pad: 1rem; --sec-pad: 3rem; }
 
+  /* Show hamburger, hide desktop links */
   .hb  { display: flex; }
   .nls { display: none; }
 
+  /* Nav items in overlay get larger tap targets */
   .mo a { font-size: 1.05rem; padding: .5rem 0; }
 
+  /* Hero: stack vertically, smaller photo */
   .pw  { width: 130px; height: 130px; }
   .hn  { font-size: clamp(2.4rem, 11vw, 3.5rem); }
   .hb2 { font-size: .88rem; }
 
+  /* Hero buttons: stack on very small screens */
   .hbs { gap: .5rem; }
   .btn { min-height: 48px; font-size: .82rem; }
 
+  /* Stats: 2 columns on mobile */
   .stats { grid-template-columns: 1fr 1fr; }
 
+  /* Timeline: slightly less indent */
   .tl { padding-left: 1.25rem; }
   .ti { padding-left: 1.75rem; }
   .ti-icon { left: -1.25rem; width: 34px; height: 34px; font-size: .9rem; }
 
+  /* Experience: single column */
   .exp { gap: .4rem; }
   .exp-meta { flex-wrap: wrap; gap: .4rem; }
 
+  /* Projects: single column */
   .proj-grid  { grid-template-columns: 1fr; }
 
+  /* Skills: single column, pills wrap nicely */
   .skill-grid { grid-template-columns: 1fr; gap: 1rem; }
   .pill { font-size: .75rem; padding: .3rem .75rem; }
 
+  /* Certs: single column */
   .cert-grid { grid-template-columns: 1fr; }
 
+  /* Contact form: single column inputs */
   .form-row { grid-template-columns: 1fr; }
 
+  /* Toast + back-to-top position */
   #toast-wrap { bottom: 1rem; right: 1rem; left: 1rem; }
   .toast { max-width: 100%; }
   #btt { bottom: 1rem; right: 1rem; }
 
+  /* Hide scroll hint on small screens to save space */
   .scroll-hint { display: none; }
 }
 
@@ -508,5 +519,5 @@ footer { border-top: 1px solid var(--bdr); position: relative; z-index: 2; }
   #cd, #cr { display: none; }
   .proj-links { opacity: 1; transform: none; }
   .copy-btn   { opacity: 1; }
-  .pu         { opacity: 0; }
+  .pu         { opacity: 0; } /* keep hidden on touch, upload via long press */
 }
