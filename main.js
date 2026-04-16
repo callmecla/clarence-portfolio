@@ -26,13 +26,11 @@ function toast(msg, type, dur) {
   var loader = $('loader');
   if (!loader) return;
   function done() { loader.classList.add('done'); }
-  /* If page already loaded (script runs after load event), dismiss right away */
   if (document.readyState === 'complete') {
     setTimeout(done, 500);
   } else {
     window.addEventListener('load', function () { setTimeout(done, 500); });
   }
-  /* Hard fallback — always dismiss after 1.5s no matter what */
   setTimeout(done, 1500);
 }());
 
@@ -46,7 +44,7 @@ function toast(msg, type, dur) {
   }, { passive: true });
 }());
 
-/* ── 3. BACK TO TOP ── */
+/* ── 3. BACK TO TOP (floating button only — footer arrow removed) ── */
 (function () {
   var btn = $('btt');
   if (!btn) return;
@@ -68,7 +66,6 @@ $('tg').addEventListener('click', function () {
 (function () {
   var el = $('tw');
   if (!el) return;
-  /* Skip animation if user prefers reduced motion */
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     el.textContent = 'Full-Stack Developer'; return;
   }
@@ -85,22 +82,46 @@ $('tg').addEventListener('click', function () {
   setTimeout(tick, 1300);
 }());
 
-/* ── 6. CANVAS PARTICLES ── */
+/* ── 6. CANVAS PARTICLES ──
+   Connection lines use a spatial grid to reduce comparisons from O(n²)
+   to roughly O(n · k) where k = particles in neighbouring cells.
+   At N=65 the saving is modest but scales cleanly if N grows.
+   ── */
 (function () {
   var canvas = $('cv');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var W, H, pts = [], raf;
-  var N = window.innerWidth < 600 ? 30 : 65;
+  var N    = window.innerWidth < 600 ? 30 : 65;
+  var LINK = 110; /* max connection distance */
 
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   function mkPt()   { return { x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3, l: Math.random() }; }
   function color()  { return ROOT.getAttribute('data-theme') === 'light' ? '61,122,0,' : '200,244,104,'; }
 
+  /* Spatial grid: cell size = LINK so we only check 3×3 neighbour cells */
+  function buildGrid() {
+    var cs   = LINK;
+    var cols = Math.ceil(W / cs) + 1;
+    var rows = Math.ceil(H / cs) + 1;
+    var grid = {};
+    for (var i = 0; i < pts.length; i++) {
+      var p  = pts[i];
+      var cx = Math.floor(p.x / cs);
+      var cy = Math.floor(p.y / cs);
+      var k  = cx + ',' + cy;
+      if (!grid[k]) grid[k] = [];
+      grid[k].push(i);
+    }
+    return { grid: grid, cs: cs, cols: cols, rows: rows };
+  }
+
   function draw() {
     ctx.clearRect(0, 0, W, H);
     var c = color();
-    var i, j, p, dx, dy, d;
+    var i, p, dx, dy, d;
+
+    /* move + draw dots */
     for (i = 0; i < pts.length; i++) {
       p = pts[i];
       p.x += p.vx; p.y += p.vy; p.l = (p.l + .002) % 1;
@@ -109,15 +130,37 @@ $('tg').addEventListener('click', function () {
       ctx.beginPath(); ctx.arc(p.x, p.y, .9, 0, Math.PI*2);
       ctx.fillStyle = 'rgba(' + c + (Math.sin(p.l*Math.PI)*.5) + ')'; ctx.fill();
     }
+
+    /* draw lines using spatial grid */
+    var g  = buildGrid();
+    var cs = g.cs;
+    var seen = {};
     for (i = 0; i < pts.length; i++) {
-      for (j = i+1; j < pts.length; j++) {
-        dx = pts[i].x-pts[j].x; dy = pts[i].y-pts[j].y; d = Math.sqrt(dx*dx+dy*dy);
-        if (d < 110) {
-          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
-          ctx.strokeStyle = 'rgba(' + c + ((1-d/110)*.07) + ')'; ctx.lineWidth = .5; ctx.stroke();
+      p = pts[i];
+      var gx = Math.floor(p.x / cs);
+      var gy = Math.floor(p.y / cs);
+      for (var nx = gx - 1; nx <= gx + 1; nx++) {
+        for (var ny = gy - 1; ny <= gy + 1; ny++) {
+          var cell = g.grid[nx + ',' + ny];
+          if (!cell) continue;
+          for (var ci = 0; ci < cell.length; ci++) {
+            var j = cell[ci];
+            if (j <= i) continue; /* avoid duplicate pairs */
+            var key = i + '-' + j;
+            if (seen[key]) continue;
+            seen[key] = true;
+            dx = p.x - pts[j].x; dy = p.y - pts[j].y;
+            d  = Math.sqrt(dx*dx + dy*dy);
+            if (d < LINK) {
+              ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(pts[j].x, pts[j].y);
+              ctx.strokeStyle = 'rgba(' + c + ((1-d/LINK)*.07) + ')';
+              ctx.lineWidth = .5; ctx.stroke();
+            }
+          }
         }
       }
     }
+
     raf = requestAnimationFrame(draw);
   }
 
@@ -221,7 +264,6 @@ $('tg').addEventListener('click', function () {
     }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
     els.forEach(function (el) { io.observe(el); });
-    /* Safety net — force-reveal anything still hidden after 1.5s */
     setTimeout(function () {
       document.querySelectorAll('.rv:not(.visible)').forEach(function (el) { el.classList.add('visible'); });
     }, 1500);
@@ -282,15 +324,33 @@ $('tg').addEventListener('click', function () {
   });
 }());
 
-/* ── 14. PROFILE PHOTO UPLOAD ── */
+/* ── 14. PROFILE PHOTO UPLOAD — persisted to localStorage ──
+   Saves the photo as a base64 data-URL so it survives page refreshes.
+   ── */
 (function () {
-  var inp = $('phu'), img = $('pi');
+  var inp = $('phu');
+  var img = $('pi');
   if (!inp || !img) return;
+
+  /* Restore saved photo on load */
+  try {
+    var saved = localStorage.getItem('pf_photo');
+    if (saved) img.src = saved;
+  } catch (e) { /* localStorage blocked */ }
+
   inp.addEventListener('change', function (e) {
     var f = e.target.files && e.target.files[0];
     if (!f || !f.type.startsWith('image/')) return;
     var reader = new FileReader();
-    reader.onload = function (ev) { img.src = ev.target.result; toast('📷 Photo updated!', 'ok', 2500); };
+    reader.onload = function (ev) {
+      var dataUrl = ev.target.result;
+      img.src = dataUrl;
+      try { localStorage.setItem('pf_photo', dataUrl); } catch (ex) {
+        /* Quota exceeded — skip persistence silently */
+        console.warn('[Portfolio] Could not persist photo to localStorage:', ex.message);
+      }
+      toast('📷 Photo updated!', 'ok', 2500);
+    };
     reader.readAsDataURL(f);
   });
 }());
@@ -307,7 +367,6 @@ $('tg').addEventListener('click', function () {
           .then(function () { toast('📋 Email copied!', 'ok', 2500); })
           .catch(function () { toast('Could not copy — try manually.', 'err', 3000); });
       } else {
-        /* Fallback for older browsers */
         var tmp = document.createElement('input');
         tmp.value = text; document.body.appendChild(tmp);
         tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
@@ -364,7 +423,6 @@ $('tg').addEventListener('click', function () {
     if (!re.test(email)) { shake(form.querySelector('#cfe')); return; }
     if (!msg)            { shake(form.querySelector('#cfm')); return; }
 
-    /* Dev mode — credentials not yet set */
     if (PK === 'YOUR_PUBLIC_KEY') {
       console.warn('[EmailJS] Add your credentials to main.js');
       setLoading(true);
