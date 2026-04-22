@@ -1,6 +1,4 @@
-/* ============================================================
-   main.js — Clarence Flores Portfolio
-   ============================================================ */
+
 'use strict';
 
 var ROOT = document.documentElement;
