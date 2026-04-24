@@ -4,19 +4,40 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Clarence Flores — Portfolio</title>
+
+  <!-- ═══ SEO & Open Graph ═══ -->
+  <meta name="description" content="Clarence Flores — IT Student, Full-Stack Developer & UI/UX Enthusiast based in the Philippines."/>
+  <meta name="author" content="Clarence Flores"/>
+  <meta name="keywords" content="Clarence Flores, portfolio, full-stack developer, IT student, web development, Philippines"/>
+
+  <meta property="og:type"        content="website"/>
+  <meta property="og:url"         content="https://clarenceflores.dev/"/>
+  <meta property="og:title"       content="Clarence Flores — Portfolio"/>
+  <meta property="og:description" content="IT Student & Full-Stack Developer crafting beautiful, fast & accessible digital experiences."/>
+  <meta property="og:image"       content="https://clarenceflores.dev/og-image.jpg"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:title"       content="Clarence Flores — Portfolio"/>
+  <meta name="twitter:description" content="IT Student & Full-Stack Developer crafting beautiful, fast & accessible digital experiences."/>
+  <meta name="twitter:image"       content="https://clarenceflores.dev/og-image.jpg"/>
+
+  <!-- ═══ Fonts ═══ -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+  <!-- ═══ Theme (run before paint to avoid flash) ═══ -->
   <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('pt')||'dark')</script>
+
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
   <div id="spb"></div>
 
+  <!-- LOADER — single line, clean -->
   <div id="loader" aria-hidden="true">
-    <div class="loader-logo"><span>Clarence Flores</span></div>
-    <div class="loader-logo">Portfolio</div>
+    <div class="loader-logo">Clarence Flores<span>.</span></div>
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
 
@@ -27,7 +48,7 @@
   <div id="cr" aria-hidden="true"></div>
   <canvas id="cv" aria-hidden="true"></canvas>
 
-  <!-- NAV -->
+  <!-- ═══ NAV ═══ -->
   <nav id="nv">
     <a href="#hero" class="nl">CF<span class="ld">.</span></a>
     <button class="hb" id="hb" aria-label="Toggle menu" aria-expanded="false">
@@ -49,14 +70,25 @@
   </nav>
   <div class="mo" id="mo"></div>
 
-  <!-- HERO -->
+  <!-- ═══ HERO ═══ -->
   <section id="hero">
     <div class="hi">
       <div class="pw">
         <div class="pr"></div>
         <div class="pr r2"></div>
         <div class="pf">
-          <img id="pi" src="profile.jpg" alt="Clarence Flores" loading="eager"/>
+          <!--
+            Profile image — JS will:
+            1. Try localStorage for a user-uploaded photo
+            2. Fall back to profile.jpg if it exists
+            3. Fall back to the dicebear avatar (data-fallback)
+          -->
+          <img id="pi"
+               src="profile.jpg"
+               data-fallback="https://api.dicebear.com/8.x/lorelei/svg?seed=Clarence&backgroundColor=09090f"
+               alt="Clarence Flores"
+               loading="eager"
+               onerror="this.onerror=null;this.src=this.dataset.fallback"/>
           <label class="pu" for="phu" title="Upload your photo">
             <input type="file" id="phu" accept="image/*"/>
             <span>📷</span>
@@ -65,15 +97,16 @@
       </div>
       <div class="ht">
         <p class="he"><span class="bd"></span>Available for opportunities</p>
-        <h1 class="hn"><span class="h1">Clarence</span><span class="h2">Flores</span></h1>
+        <!-- Dot restored to match nav identity CF. -->
+        <h1 class="hn"><span class="h1">Clarence</span><span class="h2">Flores.</span></h1>
         <p class="hs">I'm a <span id="tw"></span><span class="tw-cur">|</span></p>
         <p class="hb2">I craft beautiful, fast &amp; accessible digital experiences — from pixel-perfect UIs to robust backend systems.</p>
         <div class="hbs">
           <a href="#projects" class="btn bp">View Work ↓</a>
           <a href="#contact"  class="btn bg">Message Me</a>
-          <a href="cv.pdf"         class="btn bi" download>
+          <a href="cv.pdf" class="btn bi" download>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download Resume
+            Resume
           </a>
         </div>
       </div>
@@ -84,7 +117,7 @@
     </div>
   </section>
 
-  <!-- ABOUT -->
+  <!-- ═══ ABOUT ═══ -->
   <section id="about" class="sec">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">01</span><h2 class="st2">About Me</h2></div>
@@ -95,16 +128,37 @@
           <p>When I'm not coding, you'll find me exploring generative art, contributing to open-source, or hunting for the perfect cup of coffee ☕</p>
         </div>
         <div class="stats rv d2">
-          <div class="stat"><span class="stat-n" data-t="3">0</span><span class="stat-u">+</span><span class="stat-l">Years Experience</span></div>
+          <div class="stat"><span class="stat-n" data-t="3">0</span><span class="stat-u">+</span><span class="stat-l">Years Coding</span></div>
           <div class="stat"><span class="stat-n" data-t="24">0</span><span class="stat-l">Projects Shipped</span></div>
           <div class="stat"><span class="stat-n" data-t="12">0</span><span class="stat-l">Happy Clients</span></div>
           <div class="stat"><span class="stat-n" data-t="8">0</span><span class="stat-l">Certifications</span></div>
         </div>
       </div>
+
+      <!-- GitHub Contribution Graph -->
+      <div class="gh-graph rv d3">
+        <div class="gh-graph-hd">
+          <span class="gh-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            github.com/callmecla — contribution activity
+          </span>
+          <a href="https://github.com/callmecla" target="_blank" rel="noopener" class="gh-link">View Profile ↗</a>
+        </div>
+        <!-- Embedded GitHub contribution graph via ghchart.rshah.org (no auth required) -->
+        <div class="gh-graph-wrap">
+          <img
+            src="https://ghchart.rshah.org/c8f468/callmecla"
+            alt="Clarence Flores GitHub contribution graph"
+            class="gh-chart-img"
+            loading="lazy"
+            onerror="this.closest('.gh-graph').style.display='none'"
+          />
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- EDUCATION -->
+  <!-- ═══ EDUCATION ═══ -->
   <section id="education" class="sec alt">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">02</span><h2 class="st2">Education</h2></div>
@@ -143,7 +197,7 @@
     </div>
   </section>
 
-  <!-- EXPERIENCE -->
+  <!-- ═══ EXPERIENCE ═══ -->
   <section id="experience" class="sec">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">03</span><h2 class="st2">Experience</h2></div>
@@ -188,53 +242,175 @@
     </div>
   </section>
 
-  <!-- PROJECTS -->
+  <!-- ═══ PROJECTS ═══ -->
   <section id="projects" class="sec alt">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">04</span><h2 class="st2">Projects</h2></div>
       <div class="proj-grid">
-        <article class="proj rv d1" data-tilt><div class="proj-glow"></div><div class="proj-top"><span class="proj-ico">🚀</span><div class="proj-links"><a href="#" class="proj-link">GH</a><a href="#" class="proj-link">↗</a></div></div><h3 class="proj-name">LaunchPad</h3><p class="proj-desc">No-code landing page builder with drag-and-drop blocks, live preview, and one-click Vercel deploy. 1,200+ beta users.</p><div class="proj-tags"><span class="ptag">React</span><span class="ptag">Node</span><span class="ptag">Vercel</span></div></article>
-        <article class="proj rv d2" data-tilt><div class="proj-glow"></div><div class="proj-top"><span class="proj-ico">🧠</span><div class="proj-links"><a href="#" class="proj-link">GH</a><a href="#" class="proj-link">↗</a></div></div><h3 class="proj-name">MindMap AI</h3><p class="proj-desc">AI-powered knowledge graph connecting concepts from your notes using embeddings and a force-directed graph UI.</p><div class="proj-tags"><span class="ptag">Python</span><span class="ptag">D3.js</span><span class="ptag">OpenAI</span></div></article>
-        <article class="proj rv d3" data-tilt><div class="proj-glow"></div><div class="proj-top"><span class="proj-ico">📊</span><div class="proj-links"><a href="#" class="proj-link">GH</a><a href="#" class="proj-link">↗</a></div></div><h3 class="proj-name">DataPulse</h3><p class="proj-desc">Real-time analytics dashboard ingesting 50k+ events/sec via Kafka, visualized with custom WebGL charts.</p><div class="proj-tags"><span class="ptag">Kafka</span><span class="ptag">WebGL</span><span class="ptag">Go</span></div></article>
-        <article class="proj rv d1" data-tilt><div class="proj-glow"></div><div class="proj-top"><span class="proj-ico">🎨</span><div class="proj-links"><a href="#" class="proj-link">GH</a><a href="#" class="proj-link">↗</a></div></div><h3 class="proj-name">Pixel Studio</h3><p class="proj-desc">Collaborative pixel art editor with real-time multiplayer via WebRTC. Featured on Product Hunt.</p><div class="proj-tags"><span class="ptag">WebRTC</span><span class="ptag">Canvas</span><span class="ptag">OT</span></div></article>
-        <article class="proj rv d2" data-tilt><div class="proj-glow"></div><div class="proj-top"><span class="proj-ico">🔐</span><div class="proj-links"><a href="#" class="proj-link">GH</a><a href="#" class="proj-link">↗</a></div></div><h3 class="proj-name">VaultPass</h3><p class="proj-desc">E2E encrypted password manager with zero-knowledge architecture, TOTP support, and browser extension.</p><div class="proj-tags"><span class="ptag">Crypto</span><span class="ptag">Extension</span><span class="ptag">Rust</span></div></article>
-        <article class="proj rv d3" data-tilt><div class="proj-glow"></div><div class="proj-top"><span class="proj-ico">🌍</span><div class="proj-links"><a href="#" class="proj-link">GH</a><a href="#" class="proj-link">↗</a></div></div><h3 class="proj-name">EcoTrack</h3><p class="proj-desc">Carbon footprint tracker with gamification mechanics. Won 1st place at a climate-tech hackathon.</p><div class="proj-tags"><span class="ptag">Vue</span><span class="ptag">Firebase</span><span class="ptag">Maps</span></div></article>
+        <!--
+          For each project:
+          - Set real href on GH/live links, or leave href="#" and add data-wip="true" for "coming soon" state
+          - data-wip projects show a tooltip and dimmed state on the link buttons
+        -->
+        <article class="proj rv d1" data-tilt>
+          <div class="proj-glow"></div>
+          <div class="proj-top">
+            <span class="proj-ico">🚀</span>
+            <div class="proj-links">
+              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+            </div>
+          </div>
+          <h3 class="proj-name">LaunchPad</h3>
+          <p class="proj-desc">No-code landing page builder with drag-and-drop blocks, live preview, and one-click Vercel deploy. 1,200+ beta users.</p>
+          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">Node</span><span class="ptag">Vercel</span></div>
+        </article>
+
+        <article class="proj rv d2" data-tilt>
+          <div class="proj-glow"></div>
+          <div class="proj-top">
+            <span class="proj-ico">🧠</span>
+            <div class="proj-links">
+              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+            </div>
+          </div>
+          <h3 class="proj-name">MindMap AI</h3>
+          <p class="proj-desc">AI-powered knowledge graph connecting concepts from your notes using embeddings and a force-directed graph UI.</p>
+          <div class="proj-tags"><span class="ptag">Python</span><span class="ptag">D3.js</span><span class="ptag">OpenAI</span></div>
+        </article>
+
+        <article class="proj rv d3" data-tilt>
+          <div class="proj-glow"></div>
+          <div class="proj-top">
+            <span class="proj-ico">📊</span>
+            <div class="proj-links">
+              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+            </div>
+          </div>
+          <h3 class="proj-name">DataPulse</h3>
+          <p class="proj-desc">Real-time analytics dashboard ingesting 50k+ events/sec via Kafka, visualized with custom WebGL charts.</p>
+          <div class="proj-tags"><span class="ptag">Kafka</span><span class="ptag">WebGL</span><span class="ptag">Go</span></div>
+        </article>
+
+        <article class="proj rv d1" data-tilt>
+          <div class="proj-glow"></div>
+          <div class="proj-top">
+            <span class="proj-ico">🎨</span>
+            <div class="proj-links">
+              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+            </div>
+          </div>
+          <h3 class="proj-name">Pixel Studio</h3>
+          <p class="proj-desc">Collaborative pixel art editor with real-time multiplayer via WebRTC. Featured on Product Hunt.</p>
+          <div class="proj-tags"><span class="ptag">WebRTC</span><span class="ptag">Canvas</span><span class="ptag">OT</span></div>
+        </article>
+
+        <article class="proj rv d2" data-tilt>
+          <div class="proj-glow"></div>
+          <div class="proj-top">
+            <span class="proj-ico">🔐</span>
+            <div class="proj-links">
+              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+            </div>
+          </div>
+          <h3 class="proj-name">VaultPass</h3>
+          <p class="proj-desc">E2E encrypted password manager with zero-knowledge architecture, TOTP support, and browser extension.</p>
+          <div class="proj-tags"><span class="ptag">Crypto</span><span class="ptag">Extension</span><span class="ptag">Rust</span></div>
+        </article>
+
+        <article class="proj rv d3" data-tilt>
+          <div class="proj-glow"></div>
+          <div class="proj-top">
+            <span class="proj-ico">🌍</span>
+            <div class="proj-links">
+              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+            </div>
+          </div>
+          <h3 class="proj-name">EcoTrack</h3>
+          <p class="proj-desc">Carbon footprint tracker with gamification mechanics. Won 1st place at a climate-tech hackathon.</p>
+          <div class="proj-tags"><span class="ptag">Vue</span><span class="ptag">Firebase</span><span class="ptag">Maps</span></div>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- SKILLS -->
+  <!-- ═══ SKILLS — replaced % bars with context badges ═══ -->
   <section id="skills" class="sec">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">05</span><h2 class="st2">Skills</h2></div>
       <div class="skill-grid">
+
         <div class="skill-group rv d1">
           <h3 class="skill-group-title">⚛️ Frontend</h3>
-          <div class="skill-bars">
-            <div class="skill-row"><div class="skill-info"><span>React / Next.js</span><span class="skill-pct">95%</span></div><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>TypeScript</span><span class="skill-pct">90%</span></div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>CSS / Tailwind</span><span class="skill-pct">92%</span></div><div class="skill-bar"><div class="skill-fill" data-w="92"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>Three.js / WebGL</span><span class="skill-pct">70%</span></div><div class="skill-bar"><div class="skill-fill" data-w="70"></div></div></div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <span class="skill-name">React / Next.js</span>
+              <span class="skill-ctx">3 yrs · 8 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">TypeScript</span>
+              <span class="skill-ctx">2 yrs · 6 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">CSS / Tailwind</span>
+              <span class="skill-ctx">3 yrs · 12 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Three.js / WebGL</span>
+              <span class="skill-ctx">1 yr · 2 projects</span>
+            </div>
           </div>
         </div>
+
         <div class="skill-group rv d2">
           <h3 class="skill-group-title">⚙️ Backend</h3>
-          <div class="skill-bars">
-            <div class="skill-row"><div class="skill-info"><span>Node.js</span><span class="skill-pct">88%</span></div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>Python / FastAPI</span><span class="skill-pct">82%</span></div><div class="skill-bar"><div class="skill-fill" data-w="82"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>PostgreSQL</span><span class="skill-pct">85%</span></div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>Redis</span><span class="skill-pct">75%</span></div><div class="skill-bar"><div class="skill-fill" data-w="75"></div></div></div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <span class="skill-name">Node.js</span>
+              <span class="skill-ctx">2 yrs · 7 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Python / FastAPI</span>
+              <span class="skill-ctx">2 yrs · 5 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">PostgreSQL</span>
+              <span class="skill-ctx">2 yrs · 6 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Redis</span>
+              <span class="skill-ctx">1 yr · 3 projects</span>
+            </div>
           </div>
         </div>
+
         <div class="skill-group rv d3">
           <h3 class="skill-group-title">☁️ DevOps &amp; Tools</h3>
-          <div class="skill-bars">
-            <div class="skill-row"><div class="skill-info"><span>AWS / GCP</span><span class="skill-pct">78%</span></div><div class="skill-bar"><div class="skill-fill" data-w="78"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>Docker / K8s</span><span class="skill-pct">72%</span></div><div class="skill-bar"><div class="skill-fill" data-w="72"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>Git / CI/CD</span><span class="skill-pct">93%</span></div><div class="skill-bar"><div class="skill-fill" data-w="93"></div></div></div>
-            <div class="skill-row"><div class="skill-info"><span>Figma / Design</span><span class="skill-pct">80%</span></div><div class="skill-bar"><div class="skill-fill" data-w="80"></div></div></div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <span class="skill-name">AWS / GCP</span>
+              <span class="skill-ctx">1 yr · 4 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Docker / K8s</span>
+              <span class="skill-ctx">1 yr · 3 projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Git / CI/CD</span>
+              <span class="skill-ctx">3 yrs · all projects</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Figma / Design</span>
+              <span class="skill-ctx">2 yrs · 10 projects</span>
+            </div>
           </div>
         </div>
+
       </div>
       <div class="pill-cloud rv d2">
         <span class="pill">JavaScript</span><span class="pill">React</span><span class="pill">Next.js</span>
@@ -247,7 +423,7 @@
     </div>
   </section>
 
-  <!-- CERTIFICATIONS -->
+  <!-- ═══ CERTIFICATIONS ═══ -->
   <section id="certifications" class="sec alt">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">06</span><h2 class="st2">Certifications</h2></div>
@@ -262,7 +438,7 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
+  <!-- ═══ CONTACT ═══ -->
   <section id="contact" class="sec">
     <div class="si">
       <div class="sec-hd rv"><span class="sn">07</span><h2 class="st2">Let's Talk</h2></div>
@@ -272,14 +448,26 @@
           <div class="socials">
             <a href="mailto:flores.clarencekyle.manrique@gmail.com" class="social">
               <span class="social-ico">✉</span>
-              <span class="social-text"><span class="social-label">Email</span><span class="social-val">flores.clarencekyle.manrique@gmail.com</span></span>
+              <span class="social-text">
+                <span class="social-label">Email</span>
+                <span class="social-val">flores.clarencekyle.manrique@gmail.com</span>
+              </span>
               <button class="copy-btn" data-copy="flores.clarencekyle.manrique@gmail.com" aria-label="Copy email">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </a>
-            <a href="https://linkedin.com/in/clarenceflores8/" target="_blank" rel="noopener" class="social"><span class="social-ico">in</span><span class="social-text"><span class="social-label">LinkedIn</span><span class="social-val">linkedin.com/in/clarenceflores8</span></span></a>
-            <a href="https://github.com/callmecla" target="_blank" rel="noopener" class="social"><span class="social-ico">⌥</span><span class="social-text"><span class="social-label">GitHub</span><span class="social-val">github.com/callmecla</span></span></a>
-            <a href="https://www.facebook.com/clarenceflores.midzydive" target="_blank" rel="noopener" class="social"><span class="social-ico">f</span><span class="social-text"><span class="social-label">Facebook</span><span class="social-val">facebook.com/clarenceflores.midzydive</span></span></a>
+            <a href="https://linkedin.com/in/clarenceflores8/" target="_blank" rel="noopener" class="social">
+              <span class="social-ico">in</span>
+              <span class="social-text"><span class="social-label">LinkedIn</span><span class="social-val">linkedin.com/in/clarenceflores8</span></span>
+            </a>
+            <a href="https://github.com/callmecla" target="_blank" rel="noopener" class="social">
+              <span class="social-ico">⌥</span>
+              <span class="social-text"><span class="social-label">GitHub</span><span class="social-val">github.com/callmecla</span></span>
+            </a>
+            <a href="https://www.facebook.com/clarenceflores.midzydive" target="_blank" rel="noopener" class="social">
+              <span class="social-ico">f</span>
+              <span class="social-text"><span class="social-label">Facebook</span><span class="social-val">facebook.com/clarenceflores.midzydive</span></span>
+            </a>
           </div>
         </div>
         <form id="cf" class="contact-form rv d2" novalidate>
@@ -300,7 +488,7 @@
 
   <footer>
     <div class="footer-inner">
-      <p class="footer-copy">© 2025 <strong>Clarence Flores</strong>.</p>
+      <p class="footer-copy">© 2025 <strong>Clarence Flores</strong>. Built with ☕</p>
     </div>
   </footer>
 
