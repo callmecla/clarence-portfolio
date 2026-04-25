@@ -317,7 +317,7 @@ body.js-ready .d3 { transition-delay: .24s; }
 .stat-u { font-family: var(--serif); font-size: 1.6rem; color: var(--acc); line-height: 1; }
 .stat-l { font-family: var(--mono); font-size: .54rem; letter-spacing: .14em; text-transform: uppercase; color: var(--tx3); margin-top: .15rem; }
 
-/* GitHub contribution graph */
+/* ── GitHub Contribution Graph ── */
 .gh-graph {
   margin-top: 2.5rem;
   background: var(--surface);
@@ -327,6 +327,7 @@ body.js-ready .d3 { transition-delay: .24s; }
   transition: border-color .25s;
 }
 .gh-graph:hover { border-color: var(--acc); }
+
 .gh-graph-hd {
   display: flex; justify-content: space-between; align-items: center;
   padding: .85rem 1.25rem;
@@ -343,24 +344,57 @@ body.js-ready .d3 { transition-delay: .24s; }
   transition: opacity .2s;
 }
 .gh-link:hover { opacity: .7; }
+
 .gh-graph-wrap {
-  padding: 1rem 1.25rem 1.25rem;
+  padding: 1rem 1.25rem .75rem;
   overflow-x: auto;
-  /* Smooth scrolling for the graph on small screens */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--bdr2) transparent;
 }
-.gh-chart-img {
-  width: 100%;
+.gh-canvas {
+  display: block;
   min-width: 600px;
+  width: 100%;
   height: auto;
-  border-radius: 4px;
-  /* Invert in light mode so the chart colours remain readable */
-  filter: none;
+  border-radius: 3px;
 }
-[data-theme="light"] .gh-chart-img {
-  filter: brightness(.85) contrast(1.1);
+.gh-fallback {
+  font-family: var(--mono); font-size: .65rem; color: var(--tx3);
+  padding: 1rem 0; text-align: center;
+}
+.gh-fallback a { color: var(--acc); }
+
+/* Legend row */
+.gh-graph-ft {
+  display: flex; align-items: center; gap: 4px;
+  padding: .5rem 1.25rem .85rem;
+  justify-content: flex-end;
+}
+.gh-legend-label {
+  font-family: var(--mono); font-size: .55rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--tx3);
+}
+/* Legend cells mirror the canvas palette */
+.gh-cell {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+}
+.gh-l0 { background: #161b22; }
+.gh-l1 { background: #1e3a1e; }
+.gh-l2 { background: #2d5a1e; }
+.gh-l3 { background: #4a8c2a; }
+.gh-l4 { background: #7cc832; }
+[data-theme="light"] .gh-l0 { background: #ebedf0; }
+[data-theme="light"] .gh-l1 { background: #c6e48b; }
+[data-theme="light"] .gh-l2 { background: #7bc96f; }
+[data-theme="light"] .gh-l3 { background: #239a3b; }
+[data-theme="light"] .gh-l4 { background: #196127; }
+
+.gh-total {
+  font-family: var(--mono); font-size: .58rem; color: var(--tx3);
+  margin-left: .6rem;
 }
 
 /* ── TIMELINE ── */
