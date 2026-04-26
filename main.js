@@ -1,18 +1,3 @@
-/* ============================================================
-   main.js — Clarence Flores Portfolio
-   ============================================================
-   Performance & memory notes:
-   · All scroll handlers use { passive: true }
-   · Scroll progress and BTT use requestAnimationFrame throttling
-     (no setTimeout/setInterval on scroll)
-   · IntersectionObserver replaces all scroll-based visibility checks
-   · Canvas particle loop is cancelAnimationFrame-safe on resize
-   · localStorage writes are guarded against QuotaExceededError
-   · All event listeners that need cleanup are stored and removed
-     if the section they power is removed from the DOM
-   · content-visibility: auto in CSS skips paint for off-screen
-     sections — JS still works because IO fires before paint
-   ============================================================ */
 'use strict';
 
 var ROOT = document.documentElement;
