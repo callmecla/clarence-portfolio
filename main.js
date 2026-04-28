@@ -407,157 +407,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ── 13. GITHUB CONTRIBUTION GRAPH — canvas renderer ──
-   Fetches the last 52 weeks of data via a public API (no auth).
-   Colour palette mirrors GitHub's dark theme but toned down
-   to complement the site's deep navy/lime aesthetic:
-     L0 (none)   #1a1f2e  — site surface, empty cell blends in
-     L1 (low)    #1e3a1e  — very dark green, subtle
-     L2 (medium) #2d5a1e  — muted mid green
-     L3 (high)   #4a8c2a  — readable green
-     L4 (max)    #7cc832  — close to site accent, slightly toned
-   Redraws on theme toggle and debounced resize.
-   Only fetches when the graph scrolls into view (IO lazy load).
-   ── */
-(function () {
-  var canvas   = $('gh-canvas');
-  var fallback = $('gh-fallback');
-  var totalEl  = $('gh-total');
-  if (!canvas) return;
-
-  var DARK_PAL  = ['#1a1f2e', '#1e3a1e', '#2d5a1e', '#4a8c2a', '#7cc832'];
-  var LIGHT_PAL = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
-  var CELL  = 11;
-  var GAP   = 3;
-  var WEEKS = 53;
-
-  function pal() {
-    return ROOT.getAttribute('data-theme') === 'light' ? LIGHT_PAL : DARK_PAL;
-  }
-
-  function drawGraph(weeks) {
-    var p   = pal();
-    var W   = WEEKS * (CELL + GAP) - GAP;
-    var H   = 7 * (CELL + GAP) - GAP + 20;
-    var dpr = window.devicePixelRatio || 1;
-
-    canvas.width  = W * dpr;
-    canvas.height = H * dpr;
-    canvas.style.width  = W + 'px';
-    canvas.style.height = H + 'px';
-
-    var ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, W, H);
-
-    /* Month labels */
-    var isLight = ROOT.getAttribute('data-theme') === 'light';
-    ctx.font         = '9px "JetBrains Mono", monospace';
-    ctx.fillStyle    = isLight ? 'rgba(0,0,0,.4)' : 'rgba(255,255,255,.28)';
-    ctx.textBaseline = 'top';
-
-    var MONTHS   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var lastMon  = -1;
-    for (var wi = 0; wi < weeks.length; wi++) {
-      var firstCell = weeks[wi] && weeks[wi][0];
-      if (firstCell && firstCell.date) {
-        var m = new Date(firstCell.date + 'T00:00:00').getMonth();
-        if (m !== lastMon) {
-          ctx.fillText(MONTHS[m], wi * (CELL + GAP), 0);
-          lastMon = m;
-        }
-      }
-    }
-
-    var OY = 16; /* vertical offset below month labels */
-
-    /* Cells */
-    for (var w = 0; w < weeks.length; w++) {
-      var week = weeks[w] || [];
-      for (var d = 0; d < 7; d++) {
-        var cell = week[d];
-        if (!cell) continue;
-        var x = w * (CELL + GAP);
-        var y = OY + d * (CELL + GAP);
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          ctx.roundRect(x, y, CELL, CELL, 2);
-        } else {
-          ctx.rect(x, y, CELL, CELL);
-        }
-        ctx.fillStyle = p[Math.min(cell.level, 4)] || p[0];
-        ctx.fill();
-      }
-    }
-  }
-
-  function showFallback() {
-    canvas.style.display = 'none';
-    if (fallback) fallback.style.display = 'block';
-  }
-
-  function load() {
-    fetch('https://github-contributions-api.jogruber.de/v4/callmecla?y=last')
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (json) {
-        var contrib = json && json.contributions;
-        if (!contrib || !contrib.length) { showFallback(); return; }
-
-        /* Sort ascending */
-        contrib = contrib.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
-
-        /* Build week columns — Sunday (0) = first row */
-        var weeks = [];
-        var week  = [];
-        var total = 0;
-
-        /* Pad so the first week starts on Sunday */
-        var startDay = new Date(contrib[0].date + 'T00:00:00').getDay();
-        for (var p = 0; p < startDay; p++) week.push({ count: 0, level: 0, date: '' });
-
-        contrib.forEach(function (c) {
-          total += c.count;
-          week.push({ count: c.count, level: c.level || 0, date: c.date });
-          if (week.length === 7) { weeks.push(week); week = []; }
-        });
-        if (week.length) {
-          while (week.length < 7) week.push({ count: 0, level: 0, date: '' });
-          weeks.push(week);
-        }
-
-        /* Keep latest 53 weeks */
-        if (weeks.length > WEEKS) weeks = weeks.slice(weeks.length - WEEKS);
-
-        drawGraph(weeks);
-        canvas.style.display = 'block';
-        if (totalEl) totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
-
-        /* Redraw on theme toggle */
-        new MutationObserver(function () { drawGraph(weeks); })
-          .observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
-
-        /* Debounced redraw on resize */
-        var rt;
-        window.addEventListener('resize', function () {
-          clearTimeout(rt); rt = setTimeout(function () { drawGraph(weeks); }, 150);
-        }, { passive: true });
-      })
-      .catch(showFallback);
-  }
-
-  /* Lazy-load: only fetch when graph enters viewport */
-  var graphEl = $('gh-graph');
-  if (graphEl && 'IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) { io.disconnect(); load(); }
-    }, { threshold: 0.1 });
-    io.observe(graphEl);
-  } else {
-    load();
-  }
-}());
-
-/* ── 14. PROFILE PHOTO — localStorage persistence ──
+/* ── 13. PROFILE PHOTO — localStorage persistence ──
    Storage budget note:
    A 240×240 JPEG at moderate quality ≈ 30–80 KB as base64.
    localStorage limit is typically 5 MB per origin.
@@ -602,7 +452,7 @@ function toast(msg, type, dur) {
   };
 }());
 
-/* ── 15. COPY EMAIL ── */
+/* ── 14. COPY EMAIL ── */
 (function () {
   document.querySelectorAll('.copy-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
@@ -627,7 +477,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ── 16. WIP PROJECT LINKS ──
+/* ── 15. WIP PROJECT LINKS ──
    Adds a tooltip-style visual cue on hover so it's clear
    the link is intentionally disabled, not broken.
    ── */
@@ -640,7 +490,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ── 17. CONTACT FORM — EmailJS ── */
+/* ── 16. CONTACT FORM — EmailJS ── */
 (function () {
   /* ↓ Your real credentials */
   var PK = 'alg84AK46Bvk1Yx4b';
