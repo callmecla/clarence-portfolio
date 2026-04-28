@@ -354,7 +354,9 @@ body.js-ready .d3 { transition-delay: .24s; }
 }
 .gh-canvas {
   display: block;
-  width: 100%;  /* JS sets height; width always fills wrapper */
+  min-width: 600px;
+  width: 100%;
+  height: auto;
   border-radius: 3px;
 }
 .gh-fallback {
