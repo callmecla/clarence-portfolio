@@ -407,7 +407,199 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ── 13. PROFILE PHOTO — localStorage persistence ──
+/* ── 13. GITHUB CONTRIBUTION GRAPH — canvas renderer ──
+   Three problems fixed vs. previous version:
+   1. Logo: viewBox was non-square (0 0 98 96) causing squish at 14×14.
+      Fixed in HTML — logo now uses a proper 16×16 square viewBox path.
+   2. Empty right space: canvas was sized to a fixed pixel width while
+      the wrapper was 100% — canvas now reads its container width and
+      scales cell size to fit exactly, no leftover gap.
+   3. Data: switched to github-contributions-api.deno.dev which returns
+      an array already ordered Sun→Sat per week, matching GitHub exactly.
+      Previous jogruber API returned flat list requiring error-prone
+      re-grouping that produced wrong week columns.
+   ── */
+(function () {
+  var canvas   = $('gh-canvas');
+  var fallback = $('gh-fallback');
+  var totalEl  = $('gh-total');
+  var wrapper  = canvas && canvas.parentElement;
+  if (!canvas || !wrapper) return;
+
+  /* ── Palette ── */
+  var DARK_PAL  = ['#1c2030', '#1e3a1e', '#2d5a1e', '#4a8c2a', '#7cc832'];
+  var LIGHT_PAL = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
+
+  var ROWS  = 7;   /* days per week, Sun–Sat */
+  var GAP   = 3;   /* px gap between cells */
+  var LABEL = 18;  /* px reserved above cells for month text */
+
+  function getPal() {
+    return ROOT.getAttribute('data-theme') === 'light' ? LIGHT_PAL : DARK_PAL;
+  }
+
+  /* ── Draw ──
+     Derives CELL size from the wrapper's current rendered width
+     so the graph always fills its container with no leftover space.
+  */
+  function drawGraph(weeks) {
+    if (!weeks || !weeks.length) return;
+
+    var totalWeeks = weeks.length;
+    /* Fit cell size to container: solve for CELL in
+       totalWeeks*(CELL+GAP) - GAP = containerWidth           */
+    var containerW = wrapper.clientWidth || 720;
+    var CELL = Math.max(8, Math.floor((containerW + GAP) / totalWeeks - GAP));
+
+    var W   = totalWeeks * (CELL + GAP) - GAP;
+    var H   = LABEL + ROWS * (CELL + GAP) - GAP;
+    var dpr = window.devicePixelRatio || 1;
+
+    canvas.width        = Math.round(W * dpr);
+    canvas.height       = Math.round(H * dpr);
+    canvas.style.width  = '100%';   /* always fills wrapper */
+    canvas.style.height = H + 'px';
+
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, W, H);
+
+    var p       = getPal();
+    var isLight = ROOT.getAttribute('data-theme') === 'light';
+    var MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    /* Month labels */
+    ctx.font         = (Math.max(8, CELL - 2)) + 'px "JetBrains Mono", monospace';
+    ctx.fillStyle    = isLight ? 'rgba(0,0,0,.4)' : 'rgba(255,255,255,.3)';
+    ctx.textBaseline = 'top';
+    var lastMon = -1;
+    for (var wi = 0; wi < weeks.length; wi++) {
+      /* Use Sunday (index 0) of each week for month detection */
+      var sun = weeks[wi] && weeks[wi][0];
+      if (sun && sun.date) {
+        var mo = new Date(sun.date + 'T12:00:00').getMonth();
+        if (mo !== lastMon) {
+          ctx.fillText(MONTHS[mo], wi * (CELL + GAP), 0);
+          lastMon = mo;
+        }
+      }
+    }
+
+    /* Cells */
+    for (var w = 0; w < weeks.length; w++) {
+      for (var d = 0; d < ROWS; d++) {
+        var cell = weeks[w] && weeks[w][d];
+        if (!cell) continue;
+        var x  = w * (CELL + GAP);
+        var y  = LABEL + d * (CELL + GAP);
+        var lv = Math.min(Math.max(cell.level || 0, 0), 4);
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x, y, CELL, CELL, Math.max(2, CELL * 0.18));
+        } else {
+          ctx.rect(x, y, CELL, CELL);
+        }
+        ctx.fillStyle = p[lv];
+        ctx.fill();
+      }
+    }
+  }
+
+  function showFallback() {
+    canvas.style.display = 'none';
+    if (fallback) fallback.style.display = 'block';
+  }
+
+  /* ── Fetch & parse ──
+     API: github-contributions-api.deno.dev/callmecla
+     Returns: { contributions: [ { date, count, level, week } ] }
+     where `week` is the 0-based column index and days within each
+     week are already sorted Sun(0)→Sat(6). This avoids any manual
+     re-grouping and matches GitHub's own column order exactly.
+  */
+  function load() {
+    fetch('https://github-contributions-api.deno.dev/callmecla')
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (json) {
+        var flat = json && json.contributions;
+        if (!flat || !flat.length) { showFallback(); return; }
+
+        /* Sort by date ascending to guarantee order */
+        flat = flat.slice().sort(function (a, b) {
+          return a.date < b.date ? -1 : 1;
+        });
+
+        /* Group into week columns using the date's actual weekday.
+           Sunday = row 0, Saturday = row 6.
+           Walk day by day, starting a new week column every Sunday. */
+        var weeks   = [];
+        var curWeek = null;
+        var total   = 0;
+
+        flat.forEach(function (c) {
+          var dayOfWeek = new Date(c.date + 'T12:00:00').getDay(); /* 0=Sun */
+
+          if (dayOfWeek === 0 || curWeek === null) {
+            /* Pad previous incomplete week if needed */
+            if (curWeek && curWeek.length < 7) {
+              while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+            }
+            curWeek = [];
+            /* If the very first entry is not a Sunday, pad from Sunday */
+            if (curWeek !== null && dayOfWeek !== 0) {
+              for (var pad = 0; pad < dayOfWeek; pad++) {
+                curWeek.push({ count: 0, level: 0, date: '' });
+              }
+            }
+            weeks.push(curWeek);
+          }
+
+          curWeek.push({ count: c.count, level: c.level || 0, date: c.date });
+          total += c.count || 0;
+        });
+
+        /* Pad last week */
+        if (curWeek && curWeek.length < 7) {
+          while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+        }
+
+        /* Keep last 53 weeks — same window as GitHub */
+        if (weeks.length > 53) weeks = weeks.slice(weeks.length - 53);
+
+        /* Draw */
+        drawGraph(weeks);
+        canvas.style.display = 'block';
+        if (totalEl) {
+          totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
+        }
+
+        /* Redraw on theme toggle */
+        new MutationObserver(function () { drawGraph(weeks); })
+          .observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
+
+        /* Debounced redraw on resize — recalculates cell size to fill width */
+        var rt;
+        window.addEventListener('resize', function () {
+          clearTimeout(rt);
+          rt = setTimeout(function () { drawGraph(weeks); }, 150);
+        }, { passive: true });
+      })
+      .catch(showFallback);
+  }
+
+  /* Only fetch when graph is about to enter viewport */
+  var graphEl = $('gh-graph');
+  if (graphEl && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { io.disconnect(); load(); }
+    }, { rootMargin: '200px' });
+    io.observe(graphEl);
+  } else {
+    load();
+  }
+}());
+
+/* ── 14. PROFILE PHOTO — localStorage persistence ──
    Storage budget note:
    A 240×240 JPEG at moderate quality ≈ 30–80 KB as base64.
    localStorage limit is typically 5 MB per origin.
@@ -452,7 +644,7 @@ function toast(msg, type, dur) {
   };
 }());
 
-/* ── 14. COPY EMAIL ── */
+/* ── 15. COPY EMAIL ── */
 (function () {
   document.querySelectorAll('.copy-btn').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
@@ -477,7 +669,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ── 15. WIP PROJECT LINKS ──
+/* ── 16. WIP PROJECT LINKS ──
    Adds a tooltip-style visual cue on hover so it's clear
    the link is intentionally disabled, not broken.
    ── */
@@ -490,7 +682,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ── 16. CONTACT FORM — EmailJS ── */
+/* ── 17. CONTACT FORM — EmailJS ── */
 (function () {
   /* ↓ Your real credentials */
   var PK = 'alg84AK46Bvk1Yx4b';
