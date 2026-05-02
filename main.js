@@ -139,6 +139,8 @@ function toast(msg, type, dur) {
   timer = setTimeout(tick, 1300);
 }());
 
+
+
 /* ── 6. CANVAS PARTICLES — spatial grid O(n·k) ──
    Memory notes:
    · pts array is recreated on resize (old one GC'd)
