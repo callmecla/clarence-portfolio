@@ -340,8 +340,7 @@ function toast(msg, type, dur) {
         new MutationObserver(function () { drawGraph(weeks); }).observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
         var rt;
         window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { drawGraph(weeks); }, 150); }, { passive: true });
-      })
-    }).catch(showFallback);
+      }).catch(showFallback);
   }
   var graphEl = $('gh-graph');
   if (graphEl && 'IntersectionObserver' in window) {
