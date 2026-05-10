@@ -1,3 +1,6 @@
+/* ============================================================
+   main.js — Clarence Flores Portfolio
+   ============================================================ */
 'use strict';
 
 var ROOT = document.documentElement;
@@ -299,9 +302,22 @@ function toast(msg, type, dur) {
   }
   function showFallback() { canvas.style.display = 'none'; if (fallback) fallback.style.display = 'block'; }
   function load() {
-    fetch('https://github-contributions-api.deno.dev/callmecla')
-      .then(function (r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-      .then(function (json) {
+    /* ── sessionStorage cache: one network request per session ──
+       Prevents re-fetching on every tab open or page refresh.     */
+    var CACHE_KEY = 'gh_contrib_v1';
+    var cached = null;
+    try { cached = sessionStorage.getItem(CACHE_KEY); } catch (e) {}
+
+    var promise = cached
+      ? Promise.resolve(JSON.parse(cached))
+      : fetch('https://github-contributions-api.deno.dev/callmecla')
+          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function (json) {
+            try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(json)); } catch (e) {}
+            return json;
+          });
+
+    promise.then(function (json) {
         var flat = json && json.contributions;
         if (!flat || !flat.length) { showFallback(); return; }
         flat = flat.slice().sort(function (a,b) { return a.date < b.date ? -1 : 1; });
@@ -325,7 +341,7 @@ function toast(msg, type, dur) {
         var rt;
         window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { drawGraph(weeks); }, 150); }, { passive: true });
       })
-      .catch(showFallback);
+    }).catch(showFallback);
   }
   var graphEl = $('gh-graph');
   if (graphEl && 'IntersectionObserver' in window) {
@@ -375,14 +391,35 @@ function toast(msg, type, dur) {
   document.querySelectorAll('.proj-link[data-wip]').forEach(function (link) { link.setAttribute('aria-disabled','true'); link.setAttribute('tabindex','-1'); });
 }());
 
-/* ── 17. CONTACT FORM — EmailJS ── */
+/* ── 17. CONTACT FORM — EmailJS (lazy-loaded) ── */
 (function () {
   var PK = 'alg84AK46Bvk1Yx4b', SI = 'service_wg7jkbe', TI = 'template_0oafehi', YN = 'Clarence Flores';
-  if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: PK });
   var form = $('cf'); if (!form) return;
   var btn = $('cfb'), lbl = $('cbl'), spin = $('cs');
+  var ejsReady = false;
+
+  /* ── Lazy-load the EmailJS SDK only when contact section nears viewport ──
+     Saves ~15 KB on every page load for visitors who never scroll to contact. */
+  function loadEmailJS(cb) {
+    if (ejsReady) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+    s.onload = function () { emailjs.init({ publicKey: PK }); ejsReady = true; cb(); };
+    s.onerror = function () { cb(new Error('EmailJS failed to load')); };
+    document.body.appendChild(s);
+  }
+
+  var contact = document.getElementById('contact');
+  if (contact && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { io.disconnect(); loadEmailJS(function () {}); }
+    }, { rootMargin: '300px' });
+    io.observe(contact);
+  }
+
   function setLoading(on) { btn.disabled = on; lbl.textContent = on ? 'Sending…' : 'Send Message'; if (spin) spin.style.display = on ? 'inline-block' : 'none'; }
   function shake(el) { el.style.animation = 'none'; el.getBoundingClientRect(); el.style.animation = 'shake .4s ease'; el.addEventListener('animationend', function () { el.style.animation = ''; }, { once: true }); el.focus(); }
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var name = form.querySelector('#cfn').value.trim(), email = form.querySelector('#cfe').value.trim(), msg = form.querySelector('#cfm').value.trim();
@@ -391,8 +428,12 @@ function toast(msg, type, dur) {
     if (!re.test(email)) { shake(form.querySelector('#cfe')); return; }
     if (!msg) { shake(form.querySelector('#cfm')); return; }
     setLoading(true);
-    emailjs.send(SI, TI, { to_name: YN, from_name: name, from_email: email, subject: form.querySelector('#cfs').value.trim() || '(no subject)', message: msg, reply_to: email })
-      .then(function () { setLoading(false); form.reset(); toast('✓ Message sent!', 'ok'); }, function (err) { console.error('[EmailJS]', err); setLoading(false); toast('✗ Send failed — email me directly.', 'err'); });
+    loadEmailJS(function (err) {
+      if (err) { setLoading(false); toast('✗ Send failed — email me directly.', 'err'); return; }
+      emailjs.send(SI, TI, { to_name: YN, from_name: name, from_email: email, subject: form.querySelector('#cfs').value.trim() || '(no subject)', message: msg, reply_to: email })
+        .then(function () { setLoading(false); form.reset(); toast('✓ Message sent!', 'ok'); },
+              function (err) { console.error('[EmailJS]', err); setLoading(false); toast('✗ Send failed — email me directly.', 'err'); });
+    });
   });
 }());
 
@@ -697,4 +738,3 @@ function toast(msg, type, dur) {
     .finally(function () { isBusy = false; sendBtn.disabled = false; });
   }
 }());
-
