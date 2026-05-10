@@ -1,0 +1,18 @@
+/*
+  # Prevent clickjacking
+  X-Frame-Options: DENY
+
+  # Stop MIME-type sniffing
+  X-Content-Type-Options: nosniff
+
+  # Control referrer info sent to external sites
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Content Security Policy
+  # — self: your own files
+  # — cdn.jsdelivr.net: EmailJS (lazy-loaded)
+  # — fonts.googleapis.com / fonts.gstatic.com: Google Fonts
+  # — api.dicebear.com: avatar fallback
+  # — github-contributions-api.deno.dev: GitHub graph
+  # — api.anthropic.com: AI chat widget
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data: api.dicebear.com; connect-src 'self' github-contributions-api.deno.dev api.anthropic.com; frame-ancestors 'none'
