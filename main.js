@@ -19,14 +19,34 @@ var ls = {
 function toast(msg, type, dur) {
   var wrap = $('toast-wrap');
   if (!wrap) return;
+
+  // ✅ Remove any existing toasts to prevent overlap
+  var existing = wrap.querySelectorAll('.toast');
+  existing.forEach(function (el) {
+    el.classList.remove('show');
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 200); // quick cleanup
+  });
+
   var t = document.createElement('div');
   t.className = 'toast' + (type ? ' ' + type : '');
   t.textContent = msg;
   wrap.appendChild(t);
-  requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('show'); }); });
+
+  // Smooth show animation
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      t.classList.add('show');
+    });
+  });
+
+  // Auto remove
   setTimeout(function () {
     t.classList.remove('show');
-    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 400);
+    setTimeout(function () {
+      if (t.parentNode) t.parentNode.removeChild(t);
+    }, 400);
   }, dur || 3500);
 }
 
