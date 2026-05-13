@@ -20,13 +20,18 @@ function toast(msg, type, dur) {
   var wrap = $('toast-wrap');
   if (!wrap) return;
 
-  // ✅ Remove any existing toasts to prevent overlap
+  // ✅ Adjust position if Back-to-Top is visible
+  var btt = $('btt');
+  var offset = (btt && btt.classList.contains('show')) ? 70 : 20;
+  wrap.style.bottom = offset + 'px';
+
+  // ✅ Remove existing toasts
   var existing = wrap.querySelectorAll('.toast');
   existing.forEach(function (el) {
     el.classList.remove('show');
     setTimeout(function () {
       if (el.parentNode) el.parentNode.removeChild(el);
-    }, 200); // quick cleanup
+    }, 200);
   });
 
   var t = document.createElement('div');
@@ -34,14 +39,12 @@ function toast(msg, type, dur) {
   t.textContent = msg;
   wrap.appendChild(t);
 
-  // Smooth show animation
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
       t.classList.add('show');
     });
   });
 
-  // Auto remove
   setTimeout(function () {
     t.classList.remove('show');
     setTimeout(function () {
