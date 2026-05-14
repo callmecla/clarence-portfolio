@@ -757,3 +757,5 @@ function toast(msg, type, dur) {
     .finally(function () { isBusy = false; sendBtn.disabled = false; });
   }
 }());
+
+/* Code written by Clarence */
