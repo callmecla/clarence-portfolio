@@ -16,3 +16,5 @@
   # — github-contributions-api.deno.dev: GitHub graph
   # — api.anthropic.com: AI chat widget
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data: api.dicebear.com; connect-src 'self' github-contributions-api.deno.dev api.anthropic.com; frame-ancestors 'none'
+
+/* Code written by Clarence */
