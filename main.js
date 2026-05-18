@@ -738,20 +738,32 @@ function toast(msg, type, dur) {
     addMsg('user', text);
     history.push({ role:'user', content:text });
     addTyping();
-    fetch('https://api.anthropic.com/v1/messages', {
+    fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:300, system:SYSTEM, messages:history.slice(-10) })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: history,
+        system: SYSTEM,
+        max_tokens: 300
+      })
     })
     .then(function (r) { return r.json(); })
     .then(function (data) {
       removeTyping();
+      if (data.error) {
+        console.error(data.error);
+        addMsg('ai', 'Something went wrong. Try emailing Clarence at flores.clarencekyle.manrique@gmail.com!');
+        return;
+      }
       var reply = (data.content && data.content[0] && data.content[0].text) || 'Sorry, I couldn\'t get a response right now.';
       history.push({ role:'assistant', content:reply });
       addMsg('ai', reply);
     })
-    .catch(function () {
+    .catch(function (err) {
       removeTyping();
+      console.error('Request failed:', err);
       addMsg('ai', 'Something went wrong. Try emailing Clarence at flores.clarencekyle.manrique@gmail.com!');
     })
     .finally(function () { isBusy = false; sendBtn.disabled = false; });
