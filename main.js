@@ -769,3 +769,5 @@ function toast(msg, type, dur) {
     .finally(function () { isBusy = false; sendBtn.disabled = false; });
   }
 }());
+
+/* Clarence Flores */
