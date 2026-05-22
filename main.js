@@ -680,17 +680,16 @@ function toast(msg, type, dur) {
     '- Full-Stack Developer @ StartupXYZ (Jun 2022-Dec 2023): Fintech app, 3 payment APIs, WebSockets. Stack: Next.js, Node.js, PostgreSQL, AWS.',
     '- Junior Web Developer @ Agency Co. (Sep 2021-May 2022): 12+ client sites, CI/CD. Stack: HTML/CSS, JS, WordPress.',
     '',
-    'PROJECTS: LaunchPad (no-code builder, 1200+ users), MindMap AI (knowledge graph), DataPulse (analytics, Kafka), Pixel Studio (WebRTC art editor), VaultPass (E2E password manager), EcoTrack (hackathon winner).',
-    '',
-    'SKILLS: React/Next.js, TypeScript, CSS/Tailwind, Three.js, Node.js, Python/FastAPI, PostgreSQL, Redis, AWS, Docker, Git, Figma.',
-    '',
-    'CERTIFICATIONS: AWS Solutions Architect, Google Cloud Developer, Meta Frontend Developer, CompTIA Security+, Python/IBM, MongoDB.',
-    '',
-    'AVAILABILITY: Open to new opportunities. Direct to email or LinkedIn for hiring.',
+    'PROJECTS: LaunchPad, MindMap AI, DataPulse, Pixel Studio, VaultPass, EcoTrack.',
+    'SKILLS: React/Next.js, TypeScript, CSS/Tailwind, Node.js, Python, PostgreSQL, AWS, Docker, Git, Figma.',
+    'CERTIFICATIONS: AWS, Google Cloud, Meta Frontend, CompTIA Security+, IBM Python, MongoDB.',
+    'AVAILABILITY: Open to new opportunities.',
     'Only answer questions about Clarence. Keep it friendly, short, plain text only.'
   ].join('\n');
 
-  var history = [], isOpen = false, isBusy = false;
+  var history = [];
+  var isOpen = false;
+  var isBusy = false;
 
   function togglePanel(open) {
     isOpen = open;
@@ -701,16 +700,29 @@ function toast(msg, type, dur) {
 
   bubble.addEventListener('click', function () { togglePanel(!isOpen); });
   if (closeBtn) closeBtn.addEventListener('click', function () { togglePanel(false); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) togglePanel(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) togglePanel(false);
+  });
 
   if (sugBox) {
     sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) {
-      btn.addEventListener('click', function () { sugBox.style.display = 'none'; send(btn.dataset.q); });
+      btn.addEventListener('click', function () {
+        sugBox.style.display = 'none';
+        send(btn.dataset.q);
+      });
     });
   }
 
-  inputEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !isBusy) { e.preventDefault(); send(inputEl.value.trim()); } });
-  sendBtn.addEventListener('click', function () { if (!isBusy) send(inputEl.value.trim()); });
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !isBusy) {
+      e.preventDefault();
+      send();
+    }
+  });
+
+  sendBtn.addEventListener('click', function () {
+    if (!isBusy) send();
+  });
 
   function addMsg(role, text) {
     var div = document.createElement('div');
@@ -724,25 +736,36 @@ function toast(msg, type, dur) {
 
   function addTyping() {
     var div = document.createElement('div');
-    div.className = 'chat-msg ai'; div.id = 'chat-typing-indicator';
+    div.className = 'chat-msg ai';
+    div.id = 'chat-typing-indicator';
     div.innerHTML = '<div class="chat-typing"><span></span><span></span><span></span></div>';
-    messages.appendChild(div); messages.scrollTop = messages.scrollHeight;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
   }
 
-  function removeTyping() { var t = $('chat-typing-indicator'); if (t) t.parentNode.removeChild(t); }
+  function removeTyping() {
+    var t = $('chat-typing-indicator');
+    if (t) t.parentNode.removeChild(t);
+  }
 
   function send(text) {
-    if (!text || isBusy) return;
-    inputEl.value = ''; isBusy = true; sendBtn.disabled = true;
+    var msg = (text || inputEl.value).trim();
+    if (!msg || isBusy) return;
+
+    inputEl.value = '';
+    isBusy = true;
+    sendBtn.disabled = true;
+
     if (sugBox) sugBox.style.display = 'none';
-    addMsg('user', text);
-    history.push({ role:'user', content:text });
+
+    addMsg('user', msg);
+    history.push({ role: 'user', content: msg });
+
     addTyping();
+
     fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: history,
         system: SYSTEM,
@@ -752,22 +775,28 @@ function toast(msg, type, dur) {
     .then(function (r) { return r.json(); })
     .then(function (data) {
       removeTyping();
+
       if (data.error) {
         console.error(data.error);
         addMsg('ai', 'Something went wrong. Try emailing Clarence at flores.clarencekyle.manrique@gmail.com!');
         return;
       }
-      var reply = (data.content && data.content[0] && data.content[0].text) || 'Sorry, I couldn\'t get a response right now.';
-      history.push({ role:'assistant', content:reply });
+
+      var reply = data.reply || 'Sorry, I couldn\'t get a response right now.';
+      history.push({ role: 'assistant', content: reply });
       addMsg('ai', reply);
     })
     .catch(function (err) {
       removeTyping();
-      console.error('Request failed:', err);
-      addMsg('ai', 'Something went wrong. Try emailing Clarence at flores.clarencekyle.manrique@gmail.com!');
+      console.error(err);
+      addMsg('ai', 'Network error. Please try again.');
     })
-    .finally(function () { isBusy = false; sendBtn.disabled = false; });
+    .finally(function () {
+      isBusy = false;
+      sendBtn.disabled = false;
+    });
   }
+
 }());
 
 /* Clarence Flores */
