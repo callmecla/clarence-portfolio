@@ -11,12 +11,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Missing Gemini API key' });
     }
 
-    // ✅ Simple prompt (stable for Gemini REST)
+    // Combine messages into a prompt
     const prompt = messages.map(m => m.content).join('\n');
 
-    // ✅ USE v1 (NOT v1beta)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -35,7 +34,7 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error(data);
+      console.error("Gemini API Error:", data);
       return res.status(500).json({
         error: data.error?.message || 'Gemini request failed'
       });
