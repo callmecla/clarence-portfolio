@@ -657,35 +657,13 @@ function toast(msg, type, dur) {
   var bubble   = $('chat-bubble');
   var panel    = $('chat-panel');
   var closeBtn = $('chat-close');
-  var messages = $('chat-messages');
+  var messagesEl = $('chat-messages');
   var inputEl  = $('chat-input');
   var sendBtn  = $('chat-send');
   var sugBox   = $('chat-suggestions');
   if (!bubble || !panel) return;
 
-  var SYSTEM = [
-    'You are a helpful AI assistant embedded in Clarence Flores\'s personal portfolio website.',
-    'Answer questions about Clarence concisely, warmly, and in 2-4 sentences max.',
-    '',
-    'NAME: Clarence Flores | ROLE: IT Student, Full-Stack Developer, UI/UX Enthusiast | LOCATION: Philippines',
-    'EMAIL: flores.clarencekyle.manrique@gmail.com | GITHUB: github.com/callmecla | LINKEDIN: linkedin.com/in/clarenceflores8',
-    '',
-    'EDUCATION:',
-    '- B.S. IT, Quezon City University (2022-Present), GPA 1.75, Dean\'s List',
-    '- STEM, Our Lady of Fatima University (2020-2022), Dean\'s List',
-    '- UX Design Bootcamp, Design Academy Online (Summer 2022)',
-    '',
-    'EXPERIENCE:',
-    '- Senior Frontend Engineer @ TechCorp (Jan 2024-Present): SaaS dashboard, -62% load time, mentored 3 devs. Stack: React, TypeScript, GraphQL.',
-    '- Full-Stack Developer @ StartupXYZ (Jun 2022-Dec 2023): Fintech app, 3 payment APIs, WebSockets. Stack: Next.js, Node.js, PostgreSQL, AWS.',
-    '- Junior Web Developer @ Agency Co. (Sep 2021-May 2022): 12+ client sites, CI/CD. Stack: HTML/CSS, JS, WordPress.',
-    '',
-    'PROJECTS: LaunchPad, MindMap AI, DataPulse, Pixel Studio, VaultPass, EcoTrack.',
-    'SKILLS: React/Next.js, TypeScript, CSS/Tailwind, Node.js, Python, PostgreSQL, AWS, Docker, Git, Figma.',
-    'CERTIFICATIONS: AWS, Google Cloud, Meta Frontend, CompTIA Security+, IBM Python, MongoDB.',
-    'AVAILABILITY: Open to new opportunities.',
-    'Only answer questions about Clarence. Keep it friendly, short, plain text only.'
-  ].join('\n');
+  var SYSTEM = "You are a helpful assistant for Clarence Flores' portfolio. Keep answers short, friendly, and professional.";
 
   var history = [];
   var isOpen = false;
@@ -698,105 +676,127 @@ function toast(msg, type, dur) {
     if (open) setTimeout(function () { inputEl.focus(); }, 150);
   }
 
-  bubble.addEventListener('click', function () { togglePanel(!isOpen); });
-  if (closeBtn) closeBtn.addEventListener('click', function () { togglePanel(false); });
+  bubble.addEventListener('click', function () {
+    togglePanel(!isOpen);
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function () {
+      togglePanel(false);
+    });
+  }
+
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && isOpen) togglePanel(false);
   });
 
-  if (sugBox) {
-    sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        sugBox.style.display = 'none';
-        send(btn.dataset.q);
-      });
+  function addMsg(role, text) {
+    var div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+
+    var p = document.createElement('p');
+    p.textContent = text;
+
+    div.appendChild(p);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addTyping() {
+    var div = document.createElement('div');
+    div.className = 'chat-msg ai';
+    div.id = 'chat-typing';
+
+    var p = document.createElement('p');
+    p.textContent = 'Typing...';
+
+    div.appendChild(p);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function removeTyping() {
+    var t = document.getElementById('chat-typing');
+    if (t) t.remove();
+  }
+
+  async function send(text) {
+    if (isBusy) return;
+
+    var userText = text || inputEl.value.trim();
+    if (!userText) return;
+
+    isBusy = true;
+
+    addMsg('user', userText);
+
+    history.push({
+      role: 'user',
+      content: userText
     });
+
+    inputEl.value = '';
+    if (sugBox) sugBox.style.display = 'none';
+
+    addTyping();
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: history,
+          system: SYSTEM
+        })
+      });
+
+      const data = await res.json();
+
+      removeTyping();
+
+      if (!res.ok) {
+        addMsg('ai', 'Error: ' + (data.error || 'Something went wrong'));
+        isBusy = false;
+        return;
+      }
+
+      const reply = data.reply || 'No response';
+
+      addMsg('ai', reply);
+
+      history.push({
+        role: 'assistant',
+        content: reply
+      });
+
+    } catch (err) {
+      removeTyping();
+      addMsg('ai', 'Error connecting to server.');
+      console.error(err);
+    }
+
+    isBusy = false;
   }
 
   inputEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !isBusy) {
+    if (e.key === 'Enter' && !e.shiftKey && !isBusy) {
       e.preventDefault();
       send();
     }
   });
 
   sendBtn.addEventListener('click', function () {
-    if (!isBusy) send();
+    send();
   });
 
-  function addMsg(role, text) {
-    var div = document.createElement('div');
-    div.className = 'chat-msg ' + role;
-    var p = document.createElement('p');
-    p.textContent = text;
-    div.appendChild(p);
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function addTyping() {
-    var div = document.createElement('div');
-    div.className = 'chat-msg ai';
-    div.id = 'chat-typing-indicator';
-    div.innerHTML = '<div class="chat-typing"><span></span><span></span><span></span></div>';
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function removeTyping() {
-    var t = $('chat-typing-indicator');
-    if (t) t.parentNode.removeChild(t);
-  }
-
-  function send(text) {
-    var msg = (text || inputEl.value).trim();
-    if (!msg || isBusy) return;
-
-    inputEl.value = '';
-    isBusy = true;
-    sendBtn.disabled = true;
-
-    if (sugBox) sugBox.style.display = 'none';
-
-    addMsg('user', msg);
-    history.push({ role: 'user', content: msg });
-
-    addTyping();
-
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: history,
-        system: SYSTEM,
-        max_tokens: 300
-      })
-    })
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-      removeTyping();
-
-      if (data.error) {
-        console.error(data.error);
-        addMsg('ai', 'Something went wrong. Try emailing Clarence at flores.clarencekyle.manrique@gmail.com!');
-        return;
-      }
-
-      var reply = data.reply || 'Sorry, I couldn\'t get a response right now.';
-      history.push({ role: 'assistant', content: reply });
-      addMsg('ai', reply);
-    })
-    .catch(function (err) {
-      removeTyping();
-      console.error(err);
-      addMsg('ai', 'Network error. Please try again.');
-    })
-    .finally(function () {
-      isBusy = false;
-      sendBtn.disabled = false;
+  if (sugBox) {
+    sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        send(btn.dataset.q);
+      });
     });
   }
 
-}());
+})();
 
 /* Clarence Flores */
