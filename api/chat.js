@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Only allow POST
+  // Allow only POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -7,57 +7,48 @@ export default async function handler(req, res) {
   try {
     const body = req.body || {};
     const messages = body.messages || [];
-    const system = body.system || '';
-    const model = process.env.ANTHROPIC_MODEL || 'claude-3-haiku-20240307';
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: 'Missing API key' });
+      return res.status(500).json({ error: 'Missing Gemini API key' });
     }
 
-    // Call Anthropic API
-    const upstream = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: Math.min(Number(body.max_tokens) || 300, 1024),
-        system: system,
-        messages: messages
-      })
-    });
+    // Convert messages to a single prompt
+    const prompt = messages.map(msg => msg.content).join('\n');
 
-    let data;
+    // Call Gemini API
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }]
+            }
+          ]
+        })
+      }
+    );
 
-    try {
-      data = await upstream.json();
-    } catch (err) {
-      console.error('Invalid JSON from Anthropic:', err);
-      return res.status(502).json({ error: 'Invalid response from AI provider' });
-    }
+    const data = await response.json();
 
     // Handle API errors
-    if (!upstream.ok) {
-      const msg =
-        (data.error && (data.error.message || data.error.type)) ||
-        'Anthropic request failed';
-
-      return res.status(upstream.status).json({ error: msg });
+    if (!response.ok) {
+      return res.status(500).json({
+        error: data.error?.message || 'Gemini request failed'
+      });
     }
 
     // Extract reply
-    const text =
-      data.content &&
-      data.content[0] &&
-      data.content[0].text;
+    const reply =
+      data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    return res.status(200).json({
-      reply: text || ''
-    });
+    return res.status(200).json({ reply });
 
   } catch (error) {
     console.error('Server error:', error);
