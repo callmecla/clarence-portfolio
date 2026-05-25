@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   try {
     const { messages = [] } = req.body || {};
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.CLARENCE_FLORES_PORTFOLIO;
 
     if (!apiKey) {
       return res.status(500).json({ error: 'Missing Gemini API key' });
