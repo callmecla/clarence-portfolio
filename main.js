@@ -721,81 +721,52 @@ function toast(msg, type, dur) {
   }
 
   async function send(text) {
-    if (isBusy) return;
+  if (isBusy) return;
 
-    var userText = text || inputEl.value.trim();
-    if (!userText) return;
+  var userText = text || inputEl.value.trim();
+  if (!userText) return;
 
-    isBusy = true;
+  isBusy = true;
 
-    addMsg('user', userText);
+  addMsg('user', userText);
+
+  history.push({
+    role: 'user',
+    content: userText
+  });
+
+  inputEl.value = '';
+  if (sugBox) sugBox.style.display = 'none';
+
+  addTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history })
+    });
+
+    const data = await res.json();
+
+    removeTyping();
+
+    const reply = data.reply || "No response.";
+    addMsg('ai', reply);
 
     history.push({
-      role: 'user',
-      content: userText
+      role: 'assistant',
+      content: reply
     });
 
-    inputEl.value = '';
-    if (sugBox) sugBox.style.display = 'none';
-
-    addTyping();
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: history,
-          system: SYSTEM
-        })
-      });
-
-      const data = await res.json();
-
-      removeTyping();
-
-      if (!res.ok) {
-        addMsg('ai', 'Error: ' + (data.error || 'Something went wrong'));
-        isBusy = false;
-        return;
-      }
-
-      const reply = data.reply || 'No response';
-
-      addMsg('ai', reply);
-
-      history.push({
-        role: 'assistant',
-        content: reply
-      });
-
-    } catch (err) {
-      removeTyping();
-      addMsg('ai', 'Error connecting to server.');
-      console.error(err);
-    }
-
-    isBusy = false;
+  } catch (err) {
+    console.error(err);
+    removeTyping();
+    addMsg('ai', "Error connecting to AI.");
   }
 
-  inputEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.shiftKey && !isBusy) {
-      e.preventDefault();
-      send();
-    }
-  });
-
-  sendBtn.addEventListener('click', function () {
-    send();
-  });
-
-  if (sugBox) {
-    sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        send(btn.dataset.q);
-      });
-    });
-  }
+  isBusy = false;
+}
 
 })();
 
