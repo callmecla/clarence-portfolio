@@ -654,20 +654,18 @@ function toast(msg, type, dur) {
    FEATURE 21 — AI CHAT WIDGET
    ══════════════════════════════════════════════════════════ */
 (function () {
-  var bubble   = $('chat-bubble');
-  var panel    = $('chat-panel');
-  var closeBtn = $('chat-close');
+  var bubble     = $('chat-bubble');
+  var panel      = $('chat-panel');
+  var closeBtn   = $('chat-close');
   var messagesEl = $('chat-messages');
-  var inputEl  = $('chat-input');
-  var sendBtn  = $('chat-send');
-  var sugBox   = $('chat-suggestions');
+  var inputEl    = $('chat-input');
+  var sendBtn    = $('chat-send');
+  var sugBox     = $('chat-suggestions');
   if (!bubble || !panel) return;
 
-  var SYSTEM = "You are a helpful assistant for Clarence Flores' portfolio. Keep answers short, friendly, and professional.";
-
   var history = [];
-  var isOpen = false;
-  var isBusy = false;
+  var isOpen  = false;
+  var isBusy  = false;
 
   function togglePanel(open) {
     isOpen = open;
@@ -676,27 +674,15 @@ function toast(msg, type, dur) {
     if (open) setTimeout(function () { inputEl.focus(); }, 150);
   }
 
-  bubble.addEventListener('click', function () {
-    togglePanel(!isOpen);
-  });
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', function () {
-      togglePanel(false);
-    });
-  }
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) togglePanel(false);
-  });
+  bubble.addEventListener('click', function () { togglePanel(!isOpen); });
+  if (closeBtn) closeBtn.addEventListener('click', function () { togglePanel(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) togglePanel(false); });
 
   function addMsg(role, text) {
     var div = document.createElement('div');
     div.className = 'chat-msg ' + role;
-
     var p = document.createElement('p');
     p.textContent = text;
-
     div.appendChild(p);
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -706,10 +692,8 @@ function toast(msg, type, dur) {
     var div = document.createElement('div');
     div.className = 'chat-msg ai';
     div.id = 'chat-typing';
-
     var p = document.createElement('p');
     p.textContent = 'Typing...';
-
     div.appendChild(p);
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -720,54 +704,54 @@ function toast(msg, type, dur) {
     if (t) t.remove();
   }
 
-  async function send(text) {
-  if (isBusy) return;
+  function send(text) {
+    if (isBusy) return;
 
-  var userText = text || inputEl.value.trim();
-  if (!userText) return;
+    var userText = (text || inputEl.value).trim();
+    if (!userText) return;
 
-  isBusy = true;
+    isBusy = true;
+    inputEl.value = '';
+    if (sugBox) sugBox.style.display = 'none';
 
-  addMsg('user', userText);
+    addMsg('user', userText);
+    history.push({ role: 'user', content: userText });
+    addTyping();
 
-  history.push({
-    role: 'user',
-    content: userText
-  });
-
-  inputEl.value = '';
-  if (sugBox) sugBox.style.display = 'none';
-
-  addTyping();
-
-  try {
-    const res = await fetch('/api/chat', {
+    fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: history })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      removeTyping();
+      var reply = data.reply || data.error || 'No response.';
+      addMsg('ai', reply);
+      history.push({ role: 'assistant', content: reply });
+    })
+    .catch(function (err) {
+      console.error(err);
+      removeTyping();
+      addMsg('ai', 'Error connecting to AI.');
+    })
+    .finally(function () {
+      isBusy = false;
     });
-
-    const data = await res.json();
-
-    removeTyping();
-
-    const reply = data.reply || "No response.";
-    addMsg('ai', reply);
-
-    history.push({
-      role: 'assistant',
-      content: reply
-    });
-
-  } catch (err) {
-    console.error(err);
-    removeTyping();
-    addMsg('ai', "Error connecting to AI.");
   }
 
-  isBusy = false;
-}
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
 
-})();
+  sendBtn.addEventListener('click', function () { send(); });
+
+  if (sugBox) {
+    sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) {
+      btn.addEventListener('click', function () { send(btn.dataset.q); });
+    });
+  }
+
+}());
 
 /* Clarence Flores */
