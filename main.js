@@ -754,4 +754,3 @@ function toast(msg, type, dur) {
 
 }());
 
-/* Clarence Flores */
