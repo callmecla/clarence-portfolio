@@ -754,3 +754,4 @@ function toast(msg, type, dur) {
 
 }());
 
+/*This is Clarence's personal website JS file. It includes various features such as a canvas background animation, custom cursor, navigation active state, mobile navigation, scroll reveal animations, animated counters, project card tilt and glow effects, GitHub contribution graph, profile photo upload and reset, copy email functionality, handling of work-in-progress project links, contact form integration with EmailJS, system theme synchronization with OS settings, magnetic button hover effects, a command palette for quick navigation and actions, and an AI chat widget for user interaction. Each feature is implemented in a self-contained IIFE (Immediately Invoked Function Expression) to avoid polluting the global namespace. The code also includes event listeners for user interactions and window events to enhance the user experience on the website.*/
