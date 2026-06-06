@@ -20,12 +20,10 @@ function toast(msg, type, dur) {
   var wrap = $('toast-wrap');
   if (!wrap) return;
 
-  // ✅ Adjust position if Back-to-Top is visible
   var btt = $('btt');
   var offset = (btt && btt.classList.contains('show')) ? 70 : 20;
   wrap.style.bottom = offset + 'px';
 
-  // ✅ Remove existing toasts
   var existing = wrap.querySelectorAll('.toast');
   existing.forEach(function (el) {
     el.classList.remove('show');
@@ -322,13 +320,13 @@ function toast(msg, type, dur) {
   }
   function showFallback() { canvas.style.display = 'none'; if (fallback) fallback.style.display = 'block'; }
   function load() {
-    var CACHE_KEY = 'gh_contrib_v2';   // bumped from v1 — clears old deno cache
+    var CACHE_KEY = 'gh_contrib_v2';
     var cached = null;
     try { cached = sessionStorage.getItem(CACHE_KEY); } catch (e) {}
 
     var promise = cached
       ? Promise.resolve(JSON.parse(cached))
-      : fetch('/api/github')                          // ← your own serverless fn
+      : fetch('/api/github')
           .then(function (r) {
             if (!r.ok) throw new Error('HTTP ' + r.status);
             return r.json();
@@ -339,71 +337,38 @@ function toast(msg, type, dur) {
           });
 
     promise.then(function (json) {
-        var flat = json && json.contributions;
-        if (!flat || !flat.length) { showFallback(); return; }
-
-        flat = flat.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
-
-        var weeks = [], curWeek = null, total = 0;
-        flat.forEach(function (c) {
-          var dayOfWeek = new Date(c.date + 'T12:00:00').getDay();
-          if (dayOfWeek === 0 || curWeek === null) {
-            if (curWeek && curWeek.length < 7)
-              while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
-            curWeek = [];
-            if (dayOfWeek !== 0)
-              for (var pad = 0; pad < dayOfWeek; pad++)
-                curWeek.push({ count: 0, level: 0, date: '' });
-            weeks.push(curWeek);
-          }
-          curWeek.push({ count: c.count, level: c.level || 0, date: c.date });
-          total += c.count || 0;
-        });
-
-        if (curWeek && curWeek.length < 7)
-          while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
-        if (weeks.length > 53) weeks = weeks.slice(weeks.length - 53);
-
-        drawGraph(weeks);
-        canvas.style.display = 'block';
-        if (totalEl) totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
-
-        new MutationObserver(function () { drawGraph(weeks); })
-          .observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
-
-        var rt;
-        window.addEventListener('resize', function () {
-          clearTimeout(rt);
-          rt = setTimeout(function () { drawGraph(weeks); }, 150);
-        }, { passive: true });
-
-      }).catch(showFallback);
-  }
-
-    promise.then(function (json) {
-        var flat = json && json.contributions;
-        if (!flat || !flat.length) { showFallback(); return; }
-        flat = flat.slice().sort(function (a,b) { return a.date < b.date ? -1 : 1; });
-        var weeks = [], curWeek = null, total = 0;
-        flat.forEach(function (c) {
-          var dayOfWeek = new Date(c.date+'T12:00:00').getDay();
-          if (dayOfWeek === 0 || curWeek === null) {
-            if (curWeek && curWeek.length < 7) while (curWeek.length < 7) curWeek.push({ count:0, level:0, date:'' });
-            curWeek = [];
-            if (dayOfWeek !== 0) for (var pad = 0; pad < dayOfWeek; pad++) curWeek.push({ count:0, level:0, date:'' });
-            weeks.push(curWeek);
-          }
-          curWeek.push({ count: c.count, level: c.level||0, date: c.date });
-          total += c.count || 0;
-        });
-        if (curWeek && curWeek.length < 7) while (curWeek.length < 7) curWeek.push({ count:0, level:0, date:'' });
-        if (weeks.length > 53) weeks = weeks.slice(weeks.length-53);
-        drawGraph(weeks); canvas.style.display = 'block';
-        if (totalEl) totalEl.textContent = total.toLocaleString()+' contributions in the last year';
-        new MutationObserver(function () { drawGraph(weeks); }).observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
-        var rt;
-        window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { drawGraph(weeks); }, 150); }, { passive: true });
-      }).catch(showFallback);
+      var flat = json && json.contributions;
+      if (!flat || !flat.length) { showFallback(); return; }
+      flat = flat.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+      var weeks = [], curWeek = null, total = 0;
+      flat.forEach(function (c) {
+        var dayOfWeek = new Date(c.date + 'T12:00:00').getDay();
+        if (dayOfWeek === 0 || curWeek === null) {
+          if (curWeek && curWeek.length < 7)
+            while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+          curWeek = [];
+          if (dayOfWeek !== 0)
+            for (var pad = 0; pad < dayOfWeek; pad++)
+              curWeek.push({ count: 0, level: 0, date: '' });
+          weeks.push(curWeek);
+        }
+        curWeek.push({ count: c.count, level: c.level || 0, date: c.date });
+        total += c.count || 0;
+      });
+      if (curWeek && curWeek.length < 7)
+        while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+      if (weeks.length > 53) weeks = weeks.slice(weeks.length - 53);
+      drawGraph(weeks);
+      canvas.style.display = 'block';
+      if (totalEl) totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
+      new MutationObserver(function () { drawGraph(weeks); })
+        .observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
+      var rt;
+      window.addEventListener('resize', function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () { drawGraph(weeks); }, 150);
+      }, { passive: true });
+    }).catch(showFallback);
   }
 
   var graphEl = $('gh-graph');
@@ -411,7 +376,7 @@ function toast(msg, type, dur) {
     var io = new IntersectionObserver(function (entries) { if (entries[0].isIntersecting) { io.disconnect(); load(); } }, { rootMargin: '200px' });
     io.observe(graphEl);
   } else { load(); }
-   ());
+}());
 
 /* ── 14. PROFILE PHOTO ── */
 (function () {
@@ -461,8 +426,6 @@ function toast(msg, type, dur) {
   var btn = $('cfb'), lbl = $('cbl'), spin = $('cs');
   var ejsReady = false;
 
-  /* ── Lazy-load the EmailJS SDK only when contact section nears viewport ──
-     Saves ~15 KB on every page load for visitors who never scroll to contact. */
   function loadEmailJS(cb) {
     if (ejsReady) { cb(); return; }
     var s = document.createElement('script');
@@ -500,11 +463,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ══════════════════════════════════════════════════════════
-   FEATURE 18 — SYSTEM THEME SYNC (OS live listener)
-   The initial theme is set before paint in index.html.
-   This adds a live listener for OS theme changes mid-session.
-   ══════════════════════════════════════════════════════════ */
+/* ── 18. SYSTEM THEME SYNC ── */
 (function () {
   var mq = window.matchMedia('(prefers-color-scheme: dark)');
   mq.addEventListener('change', function (e) {
@@ -512,11 +471,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ══════════════════════════════════════════════════════════
-   FEATURE 19 — MAGNETIC BUTTON HOVER
-   Elements with class .mag translate toward the cursor.
-   Desktop + fine pointer only. Respects reduced-motion.
-   ══════════════════════════════════════════════════════════ */
+/* ── 19. MAGNETIC BUTTON HOVER ── */
 (function () {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -556,9 +511,7 @@ function toast(msg, type, dur) {
   });
 }());
 
-/* ══════════════════════════════════════════════════════════
-   FEATURE 20 — COMMAND PALETTE  ⌘K / Ctrl+K
-   ══════════════════════════════════════════════════════════ */
+/* ── 20. COMMAND PALETTE ── */
 (function () {
   var overlay = $('cp-overlay');
   var modal   = $('cp-modal');
@@ -694,9 +647,7 @@ function toast(msg, type, dur) {
   overlay.addEventListener('click', function (e) { if (!modal.contains(e.target)) closePalette(); });
 }());
 
-/* ══════════════════════════════════════════════════════════
-   FEATURE 21 — AI CHAT WIDGET
-   ══════════════════════════════════════════════════════════ */
+/* ── 21. AI CHAT WIDGET ── */
 (function () {
   var bubble     = $('chat-bubble');
   var panel      = $('chat-panel');
@@ -736,9 +687,7 @@ function toast(msg, type, dur) {
     var div = document.createElement('div');
     div.className = 'chat-msg ai';
     div.id = 'chat-typing';
-    var p = document.createElement('p');
-    p.textContent = 'Typing...';
-    div.appendChild(p);
+    div.innerHTML = '<div class="chat-typing"><span></span><span></span><span></span></div>';
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -750,18 +699,14 @@ function toast(msg, type, dur) {
 
   function send(text) {
     if (isBusy) return;
-
     var userText = (text || inputEl.value).trim();
     if (!userText) return;
-
     isBusy = true;
     inputEl.value = '';
     if (sugBox) sugBox.style.display = 'none';
-
     addMsg('user', userText);
     history.push({ role: 'user', content: userText });
     addTyping();
-
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -777,17 +722,14 @@ function toast(msg, type, dur) {
     .catch(function (err) {
       console.error(err);
       removeTyping();
-      addMsg('ai', 'Error connecting to AI.');
+      addMsg('ai', 'Sorry, I couldn\'t connect right now. Try emailing Clarence directly!');
     })
-    .finally(function () {
-      isBusy = false;
-    });
+    .finally(function () { isBusy = false; });
   }
 
   inputEl.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
-
   sendBtn.addEventListener('click', function () { send(); });
 
   if (sugBox) {
@@ -795,6 +737,4 @@ function toast(msg, type, dur) {
       btn.addEventListener('click', function () { send(btn.dataset.q); });
     });
   }
-
 }());
-
