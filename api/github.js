@@ -28,6 +28,7 @@ export default async function handler(req, res) {
   // ── CORS: allow your own domain + localhost dev ──
   const origin = req.headers.origin || '';
   const allowed = [
+    'https://clarence-portfolio-rho.vercel.app/',
     'https://clarenceflores.dev',
     'https://www.clarenceflores.dev',
     'http://localhost:3000',
