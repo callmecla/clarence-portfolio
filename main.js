@@ -322,20 +322,63 @@ function toast(msg, type, dur) {
   }
   function showFallback() { canvas.style.display = 'none'; if (fallback) fallback.style.display = 'block'; }
   function load() {
-    /* ── sessionStorage cache: one network request per session ──
-       Prevents re-fetching on every tab open or page refresh.     */
-    var CACHE_KEY = 'gh_contrib_v1';
+    var CACHE_KEY = 'gh_contrib_v2';   // bumped from v1 — clears old deno cache
     var cached = null;
     try { cached = sessionStorage.getItem(CACHE_KEY); } catch (e) {}
 
     var promise = cached
       ? Promise.resolve(JSON.parse(cached))
-      : fetch('https://github-contributions-api.deno.dev/callmecla')
-          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      : fetch('/api/github')                          // ← your own serverless fn
+          .then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
           .then(function (json) {
             try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(json)); } catch (e) {}
             return json;
           });
+
+    promise.then(function (json) {
+        var flat = json && json.contributions;
+        if (!flat || !flat.length) { showFallback(); return; }
+
+        flat = flat.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+
+        var weeks = [], curWeek = null, total = 0;
+        flat.forEach(function (c) {
+          var dayOfWeek = new Date(c.date + 'T12:00:00').getDay();
+          if (dayOfWeek === 0 || curWeek === null) {
+            if (curWeek && curWeek.length < 7)
+              while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+            curWeek = [];
+            if (dayOfWeek !== 0)
+              for (var pad = 0; pad < dayOfWeek; pad++)
+                curWeek.push({ count: 0, level: 0, date: '' });
+            weeks.push(curWeek);
+          }
+          curWeek.push({ count: c.count, level: c.level || 0, date: c.date });
+          total += c.count || 0;
+        });
+
+        if (curWeek && curWeek.length < 7)
+          while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+        if (weeks.length > 53) weeks = weeks.slice(weeks.length - 53);
+
+        drawGraph(weeks);
+        canvas.style.display = 'block';
+        if (totalEl) totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
+
+        new MutationObserver(function () { drawGraph(weeks); })
+          .observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
+
+        var rt;
+        window.addEventListener('resize', function () {
+          clearTimeout(rt);
+          rt = setTimeout(function () { drawGraph(weeks); }, 150);
+        }, { passive: true });
+
+      }).catch(showFallback);
+  }
 
     promise.then(function (json) {
         var flat = json && json.contributions;
