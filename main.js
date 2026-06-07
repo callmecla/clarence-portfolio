@@ -540,6 +540,11 @@ function toast(msg, type, dur) {
     { icon:'💼', label:'LinkedIn',         cat:'Action',  keys:'linkedin professional network',     action: function(){ window.open('https://linkedin.com/in/clarenceflores8/','_blank'); closePalette(); } },
     { icon:'☀️', label:'Light Mode',       cat:'Theme',   keys:'light theme mode day',              action: function(){ setTh('light'); } },
     { icon:'🌙', label:'Dark Mode',        cat:'Theme',   keys:'dark theme mode night',             action: function(){ setTh('dark'); } },
+    { icon:'🇵🇭', label:'Filipino',  cat:'Theme', keys:'tagalog filipino language',  action: function(){ switchLangFromPalette('tl'); } }, 
+    { icon:'🇯🇵', label:'日本語',    cat:'Theme', keys:'japanese nihongo language',   action: function(){ switchLangFromPalette('ja'); } }, 
+    { icon:'🇩🇪', label:'Deutsch',   cat:'Theme', keys:'german deutsch language',     action: function(){ switchLangFromPalette('de'); } },
+    { icon:'🇨🇳', label:'中文',      cat:'Theme', keys:'chinese mandarin language',   action: function(){ switchLangFromPalette('zh'); } },
+    { icon:'🇺🇸', label:'English',   cat:'Theme', keys:'english language',            action: function(){ switchLangFromPalette('en'); } },
   ];
 
   function setTh(t) { ROOT.setAttribute('data-theme',t); ls.set('pt',t); toast(t==='light'?'☀️ Light mode':'🌙 Dark mode','',2000); closePalette(); }
@@ -1015,6 +1020,8 @@ function toast(msg, type, dur) {
     var lbl = document.getElementById('lang-btn-label');
     if (lbl) lbl.textContent = 'EN';
   }
+
+  window.switchLangFromPalette = switchLang;
  
 }());
 
