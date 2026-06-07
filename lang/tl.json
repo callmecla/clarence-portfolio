@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "about": "Tungkol",
+    "education": "Edukasyon",
+    "experience": "Karanasan",
+    "projects": "Mga Projects",
+    "skills": "Mga Skills",
+    "certifications": "Mga Sertipikasyon",
+    "contact": "Makipag-ugnayan"
+  },
+  "hero": {
+    "available": "Bukas sa mga oportunidad",
+    "tagline": "Gumagawa ako ng maganda, mabilis, at accessible na digital na karanasan — mula sa pixel-perfect na UI hanggang sa matibay na backend systems.",
+    "btn_work": "Tingnan ang Trabaho ↓",
+    "btn_message": "Makipag-ugnayan",
+    "btn_resume": "Resume"
+  },
+  "about": {
+    "title": "Tungkol sa Akin",
+    "p1": "Kamusta! Ako ay isang masigasig na IT student at problem-solver na nagtatayo ng mga bagay para sa web at higit pa. Mahilig akong gumawa ng mga eleganteng interface na may matalas na focus sa performance at user experience.",
+    "p2": "Sa background ko sa parehong design at engineering, tinutulay ko ang agwat sa pagitan ng magandang aesthetics at matibay na code.",
+    "p3": "Kapag hindi ako nag-co-code, mahahanap mo ako na nag-eeksplora ng generative art, nag-aambag sa open-source, o naghahanap ng perpektong tasa ng kape ☕",
+    "stat_years": "Taon sa Coding",
+    "stat_projects": "Mga Projects",
+    "stat_clients": "Mga Kliyente",
+    "stat_certs": "Mga Sertipikasyon"
+  },
+  "education": {
+    "title": "Edukasyon",
+    "qcu_degree": "B.S. Information Technology",
+    "qcu_desc": "Nag-major sa IT na may focus sa software development at web applications.",
+    "fatima_degree": "Science, Technology, Engineering & Mathematics",
+    "fatima_desc": "Nakumpleto ang mga pangunahing kurso sa STEM na may matibay na akademikong rekord.",
+    "ux_degree": "UX Design Bootcamp",
+    "ux_desc": "12-linggong programa na sumasaklaw sa UX research, Figma prototyping, at usability testing."
+  },
+  "experience": {
+    "title": "Karanasan",
+    "tc_role": "Senior Frontend Engineer",
+    "tc_desc": "Pinamunuan ang redesign ng flagship SaaS dashboard, binawasan ang load time ng 62%. Nag-mentor ng 3 junior developers at nagtatag ng component library na ginagamit sa 5 products.",
+    "sx_role": "Full-Stack Developer",
+    "sx_desc": "Itinayo mula sa simula ang customer-facing app para sa isang Series A fintech startup. Nag-integrate ng 3 payment APIs at real-time notifications sa pamamagitan ng WebSockets.",
+    "ag_role": "Junior Web Developer",
+    "ag_desc": "Bumuo ng 12+ na websites ng kliyente na may pixel-perfect na responsive layouts at automated CI/CD deployment pipelines."
+  },
+  "projects": {
+    "title": "Mga Projects",
+    "lp_desc": "No-code landing page builder na may drag-and-drop blocks, live preview, at one-click Vercel deploy. 1,200+ beta users.",
+    "mm_desc": "AI-powered knowledge graph na nag-uugnay ng mga konsepto mula sa iyong mga tala gamit ang embeddings at force-directed graph UI.",
+    "dp_desc": "Real-time analytics dashboard na nag-iinggest ng 50k+ events/sec sa pamamagitan ng Kafka, na na-visualize sa custom WebGL charts.",
+    "ps_desc": "Collaborative pixel art editor na may real-time multiplayer sa pamamagitan ng WebRTC. Featured sa Product Hunt.",
+    "vp_desc": "E2E encrypted password manager na may zero-knowledge architecture, TOTP support, at browser extension.",
+    "et_desc": "Carbon footprint tracker na may gamification mechanics. Nanalo ng 1st place sa isang climate-tech hackathon."
+  },
+  "skills": {
+    "title": "Mga Skills",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "devops": "DevOps at Mga Kasangkapan"
+  },
+  "certifications": {
+    "title": "Mga Sertipikasyon",
+    "verified": "✓ Napatunayan"
+  },
+  "contact": {
+    "title": "Makipag-usap",
+    "tagline": "May proyekto ka bang nasa isip, o gusto mo lang mag-kamusta? Lagi akong bukas.",
+    "label_name": "Pangalan",
+    "label_email": "Email",
+    "label_subject": "Paksa",
+    "label_message": "Mensahe",
+    "ph_name": "Ilagay ang iyong pangalan",
+    "ph_email": "halimbawa@email.com",
+    "ph_subject": "Ilagay ang paksa dito...",
+    "ph_message": "Ilagay ang iyong mensahe dito...",
+    "btn_send": "Ipadala ang Mensahe"
+  },
+  "footer": {
+    "copy": "Lahat ng karapatan ay nakalaan."
+  },
+  "chat": {
+    "title": "Magtanong tungkol kay Clarence",
+    "subtitle": "Pinapagana ng Gemini AI",
+    "placeholder": "Magtanong ng kahit ano…",
+    "greeting": "Kamusta! Ako ay isang AI na alam ang lahat tungkol kay Clarence. Magtanong tungkol sa kanyang mga skills, projects, karanasan, o kahit ano pa.",
+    "q1": "Pinakamalakas na skills?",
+    "q2": "Pinakamahusay na projects?",
+    "q3": "Available para sa trabaho?"
+  }
+}

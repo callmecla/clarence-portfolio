@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "about": "Über mich",
+    "education": "Ausbildung",
+    "experience": "Erfahrung",
+    "projects": "Projekte",
+    "skills": "Fähigkeiten",
+    "certifications": "Zertifikate",
+    "contact": "Kontakt"
+  },
+  "hero": {
+    "available": "Offen für neue Möglichkeiten",
+    "tagline": "Ich gestalte schöne, schnelle und zugängliche digitale Erlebnisse — von pixelgenauen UIs bis zu robusten Backend-Systemen.",
+    "btn_work": "Arbeiten ansehen ↓",
+    "btn_message": "Nachricht senden",
+    "btn_resume": "Lebenslauf"
+  },
+  "about": {
+    "title": "Über mich",
+    "p1": "Hallo! Ich bin ein leidenschaftlicher IT-Student und Problemlöser, der Dinge für das Web und darüber hinaus entwickelt. Ich liebe es, elegante Interfaces mit einem starken Fokus auf Performance und User Experience zu gestalten.",
+    "p2": "Mit einem Hintergrund in Design und Engineering überbrücke ich die Lücke zwischen ästhetischem Anspruch und robustem Code.",
+    "p3": "Wenn ich nicht code, entdecke ich generative Kunst, trage zu Open-Source-Projekten bei oder suche nach der perfekten Tasse Kaffee ☕",
+    "stat_years": "Jahre Coding",
+    "stat_projects": "Abgeschlossene Projekte",
+    "stat_clients": "Zufriedene Kunden",
+    "stat_certs": "Zertifizierungen"
+  },
+  "education": {
+    "title": "Ausbildung",
+    "qcu_degree": "B.S. Informationstechnologie",
+    "qcu_desc": "Schwerpunkt IT mit Fokus auf Softwareentwicklung und Webanwendungen.",
+    "fatima_degree": "Naturwissenschaften, Technologie, Ingenieurwesen & Mathematik",
+    "fatima_desc": "Abschluss grundlegender STEM-Kurse mit hervorragenden akademischen Leistungen.",
+    "ux_degree": "UX Design Bootcamp",
+    "ux_desc": "12-wöchiges Programm zu UX-Forschung, Figma-Prototyping und Usability-Testing."
+  },
+  "experience": {
+    "title": "Berufserfahrung",
+    "tc_role": "Senior Frontend Engineer",
+    "tc_desc": "Leitete das Redesign des Haupt-SaaS-Dashboards und reduzierte die Ladezeit um 62%. Mentoring von 3 Junior-Entwicklern und Aufbau der Komponentenbibliothek für 5 Produkte.",
+    "sx_role": "Full-Stack Entwickler",
+    "sx_desc": "Entwickelte die kundenorientierte App von Grund auf für ein Series-A-Fintech-Startup. Integration von 3 Zahlungs-APIs und Echtzeit-Benachrichtigungen über WebSockets.",
+    "ag_role": "Junior Webentwickler",
+    "ag_desc": "Entwickelte 12+ Kundenwebseiten mit pixelgenauen responsiven Layouts und automatisierten CI/CD-Deployment-Pipelines."
+  },
+  "projects": {
+    "title": "Projekte",
+    "lp_desc": "No-Code Landing-Page-Builder mit Drag-and-Drop-Blöcken, Live-Vorschau und One-Click-Vercel-Deployment. 1.200+ Beta-Nutzer.",
+    "mm_desc": "KI-gestützter Wissensgraph, der Konzepte aus Notizen mithilfe von Embeddings und einer Force-Directed-Graph-UI verbindet.",
+    "dp_desc": "Echtzeit-Analytics-Dashboard, das 50.000+ Ereignisse/Sek. über Kafka verarbeitet und mit benutzerdefinierten WebGL-Diagrammen visualisiert.",
+    "ps_desc": "Kollaborativer Pixel-Art-Editor mit Echtzeit-Multiplayer über WebRTC. Auf Product Hunt vorgestellt.",
+    "vp_desc": "E2E-verschlüsselter Passwort-Manager mit Zero-Knowledge-Architektur, TOTP-Unterstützung und Browser-Erweiterung.",
+    "et_desc": "Carbon-Footprint-Tracker mit Gamification-Mechaniken. 1. Platz beim Climate-Tech-Hackathon."
+  },
+  "skills": {
+    "title": "Fähigkeiten",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "devops": "DevOps & Werkzeuge"
+  },
+  "certifications": {
+    "title": "Zertifizierungen",
+    "verified": "✓ Verifiziert"
+  },
+  "contact": {
+    "title": "Kontakt aufnehmen",
+    "tagline": "Haben Sie ein Projekt im Sinn oder möchten Sie einfach Hallo sagen? Mein Posteingang ist immer offen.",
+    "label_name": "Name",
+    "label_email": "E-Mail",
+    "label_subject": "Betreff",
+    "label_message": "Nachricht",
+    "ph_name": "Ihren Namen eingeben",
+    "ph_email": "beispiel@email.com",
+    "ph_subject": "Betreff hier eingeben...",
+    "ph_message": "Ihre Nachricht hier eingeben...",
+    "btn_send": "Nachricht senden"
+  },
+  "footer": {
+    "copy": "Alle Rechte vorbehalten."
+  },
+  "chat": {
+    "title": "Fragen Sie nach Clarence",
+    "subtitle": "Powered by Gemini AI",
+    "placeholder": "Stellen Sie eine Frage…",
+    "greeting": "Hallo! Ich bin eine KI, die alles über Clarence weiß. Fragen Sie nach seinen Fähigkeiten, Projekten, Erfahrungen oder allem anderen.",
+    "q1": "Stärkste Fähigkeiten?",
+    "q2": "Beste Projekte?",
+    "q3": "Verfügbar für Aufträge?"
+  }
+}

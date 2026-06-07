@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "about": "关于我",
+    "education": "教育背景",
+    "experience": "工作经验",
+    "projects": "项目作品",
+    "skills": "技能",
+    "certifications": "资质认证",
+    "contact": "联系我"
+  },
+  "hero": {
+    "available": "开放合作机会",
+    "tagline": "我打造美观、快速且无障碍的数字体验 — 从像素级精准的 UI 到稳健的后端系统。",
+    "btn_work": "查看作品 ↓",
+    "btn_message": "发送消息",
+    "btn_resume": "简历"
+  },
+  "about": {
+    "title": "关于我",
+    "p1": "你好！我是一名充满热情的 IT 学生和问题解决者，致力于为 Web 及更广泛领域构建优质产品。我热衷于打造精致的界面，并始终专注于性能与用户体验。",
+    "p2": "凭借设计与工程双重背景，我能够在精美的视觉效果与健壮的代码之间架起桥梁。",
+    "p3": "不在写代码的时候，你会发现我在探索生成艺术、参与开源贡献，或者寻觅那杯完美的咖啡 ☕",
+    "stat_years": "编程年限",
+    "stat_projects": "已交付项目",
+    "stat_clients": "满意客户",
+    "stat_certs": "资质认证"
+  },
+  "education": {
+    "title": "教育背景",
+    "qcu_degree": "信息技术学士",
+    "qcu_desc": "主修 IT，专注于软件开发与 Web 应用程序。",
+    "fatima_degree": "理工科综合课程",
+    "fatima_desc": "以优异成绩完成 STEM 基础课程学习。",
+    "ux_degree": "UX 设计训练营",
+    "ux_desc": "为期 12 周的课程，涵盖 UX 研究、Figma 原型设计与可用性测试。"
+  },
+  "experience": {
+    "title": "工作经验",
+    "tc_role": "高级前端工程师",
+    "tc_desc": "主导旗舰 SaaS 仪表板重新设计，将加载时间缩短 62%。指导 3 名初级开发者，并建立了跨 5 款产品使用的组件库。",
+    "sx_role": "全栈开发工程师",
+    "sx_desc": "为一家 A 轮金融科技初创公司从零搭建面向用户的应用程序，集成 3 个支付 API 并通过 WebSocket 实现实时通知。",
+    "ag_role": "初级 Web 开发工程师",
+    "ag_desc": "开发了 12 个以上客户网站，布局像素级精准且具有完整响应式设计，并自动化了 CI/CD 部署流水线。"
+  },
+  "projects": {
+    "title": "项目作品",
+    "lp_desc": "无代码落地页构建工具，支持拖放式模块、实时预览和一键 Vercel 部署，已有 1,200+ 位测试用户。",
+    "mm_desc": "AI 驱动的知识图谱，利用嵌入向量和力导向图 UI 将笔记中的概念相互关联。",
+    "dp_desc": "实时分析仪表板，通过 Kafka 每秒处理 50,000+ 个事件，并以自定义 WebGL 图表进行可视化。",
+    "ps_desc": "支持 WebRTC 实时多人协作的像素画编辑器，已在 Product Hunt 上获得推荐。",
+    "vp_desc": "端到端加密密码管理器，采用零知识架构，支持 TOTP 及浏览器扩展。",
+    "et_desc": "带有游戏化机制的碳足迹追踪工具，在气候科技黑客松中荣获第一名。"
+  },
+  "skills": {
+    "title": "技能",
+    "frontend": "前端",
+    "backend": "后端",
+    "devops": "DevOps 与工具"
+  },
+  "certifications": {
+    "title": "资质认证",
+    "verified": "✓ 已认证"
+  },
+  "contact": {
+    "title": "联系我",
+    "tagline": "有项目想法，或者只是想打个招呼？我的收件箱随时欢迎你。",
+    "label_name": "姓名",
+    "label_email": "电子邮件",
+    "label_subject": "主题",
+    "label_message": "留言",
+    "ph_name": "请输入您的姓名",
+    "ph_email": "example@email.com",
+    "ph_subject": "请输入主题...",
+    "ph_message": "请输入您的留言...",
+    "btn_send": "发送消息"
+  },
+  "footer": {
+    "copy": "保留所有权利。"
+  },
+  "chat": {
+    "title": "询问关于 Clarence 的问题",
+    "subtitle": "由 Gemini AI 提供支持",
+    "placeholder": "随时提问…",
+    "greeting": "你好！我是一个了解 Clarence 一切的 AI。欢迎询问他的技能、项目、工作经历或任何其他问题。",
+    "q1": "最强的技能是什么？",
+    "q2": "最佳项目有哪些？",
+    "q3": "是否接受工作邀约？"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "about": "About",
+    "education": "Education",
+    "experience": "Experience",
+    "projects": "Projects",
+    "skills": "Skills",
+    "certifications": "Certifications",
+    "contact": "Contact"
+  },
+  "hero": {
+    "available": "Available for opportunities",
+    "tagline": "I craft beautiful, fast & accessible digital experiences — from pixel-perfect UIs to robust backend systems.",
+    "btn_work": "View Work ↓",
+    "btn_message": "Message Me",
+    "btn_resume": "Resume"
+  },
+  "about": {
+    "title": "About Me",
+    "p1": "Hi! I'm a passionate IT student and problem-solver who builds things for the web and beyond. I love crafting elegant interfaces with a sharp focus on performance and user experience.",
+    "p2": "With a background in both design and engineering, I bridge the gap between beautiful aesthetics and robust code.",
+    "p3": "When I'm not coding, you'll find me exploring generative art, contributing to open-source, or hunting for the perfect cup of coffee ☕",
+    "stat_years": "Years Coding",
+    "stat_projects": "Projects Shipped",
+    "stat_clients": "Happy Clients",
+    "stat_certs": "Certifications"
+  },
+  "education": {
+    "title": "Education",
+    "qcu_degree": "B.S. Information Technology",
+    "qcu_desc": "Majoring in IT with a focus on software development and web applications.",
+    "fatima_degree": "Science, Technology, Engineering & Mathematics",
+    "fatima_desc": "Completed foundational STEM courses maintaining a strong academic record.",
+    "ux_degree": "UX Design Bootcamp",
+    "ux_desc": "12-week program covering UX research, Figma prototyping, and usability testing."
+  },
+  "experience": {
+    "title": "Experience",
+    "tc_role": "Senior Frontend Engineer",
+    "tc_desc": "Led redesign of flagship SaaS dashboard, reducing load time by 62%. Mentored 3 junior developers and established the component library used across 5 products.",
+    "sx_role": "Full-Stack Developer",
+    "sx_desc": "Built the customer-facing app from scratch for a Series A fintech startup. Integrated 3 payment APIs and real-time notifications via WebSockets.",
+    "ag_role": "Junior Web Developer",
+    "ag_desc": "Developed 12+ client websites with pixel-perfect responsive layouts and automated CI/CD deployment pipelines."
+  },
+  "projects": {
+    "title": "Projects",
+    "lp_desc": "No-code landing page builder with drag-and-drop blocks, live preview, and one-click Vercel deploy. 1,200+ beta users.",
+    "mm_desc": "AI-powered knowledge graph connecting concepts from your notes using embeddings and a force-directed graph UI.",
+    "dp_desc": "Real-time analytics dashboard ingesting 50k+ events/sec via Kafka, visualized with custom WebGL charts.",
+    "ps_desc": "Collaborative pixel art editor with real-time multiplayer via WebRTC. Featured on Product Hunt.",
+    "vp_desc": "E2E encrypted password manager with zero-knowledge architecture, TOTP support, and browser extension.",
+    "et_desc": "Carbon footprint tracker with gamification mechanics. Won 1st place at a climate-tech hackathon."
+  },
+  "skills": {
+    "title": "Skills",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "devops": "DevOps & Tools"
+  },
+  "certifications": {
+    "title": "Certifications",
+    "verified": "✓ Verified"
+  },
+  "contact": {
+    "title": "Let's Talk",
+    "tagline": "Have a project in mind, or just want to say hello? My inbox is always open.",
+    "label_name": "Name",
+    "label_email": "Email",
+    "label_subject": "Subject",
+    "label_message": "Message",
+    "ph_name": "Enter your name",
+    "ph_email": "example@email.com",
+    "ph_subject": "Enter the subject here...",
+    "ph_message": "Enter your message here...",
+    "btn_send": "Send Message"
+  },
+  "footer": {
+    "copy": "All rights reserved."
+  },
+  "chat": {
+    "title": "Ask about Clarence",
+    "subtitle": "Powered by Gemini AI",
+    "placeholder": "Ask anything…",
+    "greeting": "Hi! I'm an AI that knows everything about Clarence. Ask me about his skills, projects, experience, or anything else.",
+    "q1": "Strongest skills?",
+    "q2": "Best projects?",
+    "q3": "Available for work?"
+  }
+}

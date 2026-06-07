@@ -737,4 +737,285 @@ function toast(msg, type, dur) {
       btn.addEventListener('click', function () { send(btn.dataset.q); });
     });
   }
+
+/* ══════════════════════════════════════════════════════════
+   FEATURE 22 — LANGUAGE SELECTOR
+   Adds a globe button to the nav that swaps all static text
+   content using pre-translated JSON files in /lang/.
+   Selection persists in localStorage under key 'pt_lang'.
+   ══════════════════════════════════════════════════════════ */
+(function () {
+ 
+  var LANGS = [
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'tl', label: 'TL', name: 'Filipino' },
+    { code: 'ja', label: 'JA', name: '日本語' },
+    { code: 'de', label: 'DE', name: 'Deutsch' },
+    { code: 'zh', label: 'ZH', name: '中文' },
+  ];
+ 
+  var cache = {};      // loaded JSON cached here
+  var current = 'en';
+ 
+  // ── DOM selectors — keyed to data-i18n attributes we'll add to HTML ──
+  // Each entry: [data-i18n value] → function(t) that applies the translation
+  function applyTranslation(t) {
+    function setText(sel, val) {
+      var el = document.querySelector(sel);
+      if (el) el.textContent = val;
+    }
+    function setAttr(sel, attr, val) {
+      var el = document.querySelector(sel);
+      if (el) el.setAttribute(attr, val);
+    }
+    function setAll(sel, val) {
+      document.querySelectorAll(sel).forEach(function(el){ el.textContent = val; });
+    }
+ 
+    // ── Nav ──
+    setText('a[href="#about"].na',          t.nav.about);
+    setText('a[href="#education"].na',      t.nav.education);
+    setText('a[href="#experience"].na',     t.nav.experience);
+    setText('a[href="#projects"].na',       t.nav.projects);
+    setText('a[href="#skills"].na',         t.nav.skills);
+    setText('a[href="#certifications"].na', t.nav.certifications);
+    setText('a[href="#contact"].na',        t.nav.contact);
+ 
+    // ── Hero ──
+    var badge = document.querySelector('.he');
+    if (badge) {
+      // preserve the <span class="bd"> dot
+      var dot = badge.querySelector('.bd');
+      badge.textContent = t.hero.available;
+      if (dot) badge.insertBefore(dot, badge.firstChild);
+    }
+    setText('.hb2', t.hero.tagline);
+    var btnWork = document.querySelector('a[href="#projects"].btn.bp');
+    if (btnWork) btnWork.textContent = t.hero.btn_work;
+    var btnMsg  = document.querySelector('a[href="#contact"].btn.bg');
+    if (btnMsg)  btnMsg.textContent  = t.hero.btn_message;
+    var btnResume = document.querySelector('a[href="cv.pdf"]');
+    if (btnResume) {
+      // preserve the SVG icon
+      var svg = btnResume.querySelector('svg');
+      btnResume.textContent = t.hero.btn_resume;
+      if (svg) btnResume.insertBefore(svg, btnResume.firstChild);
+    }
+ 
+    // ── About ──
+    var aboutTitle = document.querySelector('#about .st2');
+    if (aboutTitle) aboutTitle.textContent = t.about.title;
+    var aboutPs = document.querySelectorAll('#about .at p');
+    if (aboutPs[0]) aboutPs[0].innerHTML = t.about.p1
+      .replace('passionate IT student and problem-solver', '<strong>passionate IT student and problem-solver</strong>')
+      .replace('performance and user experience', '<strong>performance and user experience</strong>');
+    if (aboutPs[1]) aboutPs[1].innerHTML = t.about.p2
+      .replace('design and engineering', '<strong>design and engineering</strong>');
+    if (aboutPs[2]) aboutPs[2].textContent = t.about.p3;
+    var statLabels = document.querySelectorAll('.stat-l');
+    if (statLabels[0]) statLabels[0].textContent = t.about.stat_years;
+    if (statLabels[1]) statLabels[1].textContent = t.about.stat_projects;
+    if (statLabels[2]) statLabels[2].textContent = t.about.stat_clients;
+    if (statLabels[3]) statLabels[3].textContent = t.about.stat_certs;
+ 
+    // ── Education ──
+    var eduTitle = document.querySelector('#education .st2');
+    if (eduTitle) eduTitle.textContent = t.education.title;
+    var eduItems = document.querySelectorAll('#education .ti-body');
+    if (eduItems[0]) {
+      eduItems[0].querySelector('.ti-title').childNodes[0].textContent = t.education.qcu_degree + ' ';
+      eduItems[0].querySelector('.ti-desc').textContent = t.education.qcu_desc;
+    }
+    if (eduItems[1]) {
+      eduItems[1].querySelector('.ti-title').childNodes[0].textContent = t.education.fatima_degree + ' ';
+      eduItems[1].querySelector('.ti-desc').textContent = t.education.fatima_desc;
+    }
+    if (eduItems[2]) {
+      eduItems[2].querySelector('.ti-title').childNodes[0].textContent = t.education.ux_degree + ' ';
+      eduItems[2].querySelector('.ti-desc').textContent = t.education.ux_desc;
+    }
+ 
+    // ── Experience ──
+    var expTitle = document.querySelector('#experience .st2');
+    if (expTitle) expTitle.textContent = t.experience.title;
+    var expItems = document.querySelectorAll('.exp');
+    if (expItems[0]) {
+      expItems[0].querySelector('.exp-role').textContent = t.experience.tc_role;
+      expItems[0].querySelector('.exp-desc').textContent = t.experience.tc_desc;
+    }
+    if (expItems[1]) {
+      expItems[1].querySelector('.exp-role').textContent = t.experience.sx_role;
+      expItems[1].querySelector('.exp-desc').textContent = t.experience.sx_desc;
+    }
+    if (expItems[2]) {
+      expItems[2].querySelector('.exp-role').textContent = t.experience.ag_role;
+      expItems[2].querySelector('.exp-desc').textContent = t.experience.ag_desc;
+    }
+ 
+    // ── Projects ──
+    var projTitle = document.querySelector('#projects .st2');
+    if (projTitle) projTitle.textContent = t.projects.title;
+    var projDescs = document.querySelectorAll('.proj-desc');
+    var projKeys = ['lp_desc','mm_desc','dp_desc','ps_desc','vp_desc','et_desc'];
+    projDescs.forEach(function(el, i){ if (projKeys[i]) el.textContent = t.projects[projKeys[i]]; });
+ 
+    // ── Skills ──
+    var skillTitle = document.querySelector('#skills .st2');
+    if (skillTitle) skillTitle.textContent = t.skills.title;
+    var skillGroups = document.querySelectorAll('.skill-group-title');
+    if (skillGroups[0]) skillGroups[0].textContent = '⚛️ ' + t.skills.frontend;
+    if (skillGroups[1]) skillGroups[1].textContent = '⚙️ ' + t.skills.backend;
+    if (skillGroups[2]) skillGroups[2].textContent = '☁️ ' + t.skills.devops;
+ 
+    // ── Certifications ──
+    var certTitle = document.querySelector('#certifications .st2');
+    if (certTitle) certTitle.textContent = t.certifications.title;
+    document.querySelectorAll('.cert-badge').forEach(function(el){ el.textContent = t.certifications.verified; });
+ 
+    // ── Contact ──
+    var contactTitle = document.querySelector('#contact .st2');
+    if (contactTitle) contactTitle.textContent = t.contact.title;
+    setText('#contact .contact-tag', t.contact.tagline);
+    var labels = document.querySelectorAll('.form-field label');
+    var labelKeys = ['label_name','label_email','label_subject','label_message'];
+    labels.forEach(function(el,i){ if (labelKeys[i]) el.textContent = t.contact[labelKeys[i]]; });
+    setAttr('#cfn', 'placeholder', t.contact.ph_name);
+    setAttr('#cfe', 'placeholder', t.contact.ph_email);
+    setAttr('#cfs', 'placeholder', t.contact.ph_subject);
+    setAttr('#cfm', 'placeholder', t.contact.ph_message);
+    var sendLbl = $('cbl');
+    if (sendLbl) sendLbl.textContent = t.contact.btn_send;
+ 
+    // ── Footer ──
+    var footerCopy = document.querySelector('.footer-copy');
+    if (footerCopy) footerCopy.innerHTML = '© 2025 <strong>Clarence Flores</strong>. ' + t.footer.copy;
+ 
+    // ── Chat widget ──
+    setText('.chat-title',    t.chat.title);
+    setText('.chat-subtitle', t.chat.subtitle);
+    setAttr('#chat-input', 'placeholder', t.chat.placeholder);
+    var sug = document.querySelectorAll('.chat-suggestion');
+    var sugKeys = ['q1','q2','q3'];
+    sug.forEach(function(btn, i){ if (sugKeys[i]) btn.textContent = t.chat[sugKeys[i]]; });
+ 
+    // ── Section numbers stay, only headings change ──
+    document.querySelector('#skills .sn') && null; // sn are numeric, skip
+ 
+    // ── Update html lang attribute for accessibility ──
+    document.documentElement.lang = current;
+  }
+ 
+  function switchLang(code) {
+    if (code === current && cache[code]) return;
+    current = code;
+    ls.set('pt_lang', code);
+ 
+    // Update button label
+    var lbl = document.getElementById('lang-btn-label');
+    if (lbl) lbl.textContent = LANGS.find(function(l){ return l.code === code; }).label;
+ 
+    if (cache[code]) {
+      applyTranslation(cache[code]);
+      return;
+    }
+ 
+    fetch('/lang/' + code + '.json')
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(data){
+        cache[code] = data;
+        applyTranslation(data);
+      })
+      .catch(function(err){ console.error('[i18n] Failed to load', code, err); });
+  }
+ 
+  // ── Build the dropdown UI ──
+  function buildUI() {
+    // Find the nav element
+    var nav = $('nv');
+    if (!nav) return;
+ 
+    // Create wrapper
+    var wrap = document.createElement('div');
+    wrap.id = 'lang-wrap';
+    wrap.style.cssText = 'position:relative;display:flex;align-items:center;flex-shrink:0;';
+ 
+    // Globe button
+    var btn = document.createElement('button');
+    btn.id = 'lang-btn';
+    btn.setAttribute('aria-label', 'Select language');
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML =
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>' +
+      '<span id="lang-btn-label">EN</span>' +
+      '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
+ 
+    // Dropdown
+    var drop = document.createElement('ul');
+    drop.id = 'lang-drop';
+    drop.setAttribute('role', 'listbox');
+    drop.setAttribute('aria-label', 'Language');
+ 
+    LANGS.forEach(function(lang) {
+      var li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.setAttribute('data-lang', lang.code);
+      li.innerHTML = '<span class="lang-code">' + lang.label + '</span><span class="lang-name">' + lang.name + '</span>';
+      li.addEventListener('click', function() {
+        switchLang(lang.code);
+        closeDrop();
+        document.querySelectorAll('#lang-drop li').forEach(function(el){
+          el.setAttribute('aria-selected', el.dataset.lang === lang.code ? 'true' : 'false');
+        });
+      });
+      drop.appendChild(li);
+    });
+ 
+    wrap.appendChild(btn);
+    wrap.appendChild(drop);
+ 
+    // Insert before the theme toggle button
+    var tt = nav.querySelector('.tt');
+    if (tt) nav.insertBefore(wrap, tt);
+    else nav.appendChild(wrap);
+ 
+    // Toggle open/close
+    function openDrop() {
+      drop.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+    function closeDrop() {
+      drop.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+ 
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      drop.classList.contains('open') ? closeDrop() : openDrop();
+    });
+    document.addEventListener('click', closeDrop);
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDrop(); });
+  }
+ 
+  // ── Init ──
+  var saved = ls.get('pt_lang') || 'en';
+  buildUI();
+ 
+  // Pre-cache English (already rendered, just parse for future re-apply)
+  fetch('/lang/en.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){ cache['en'] = data; })
+    .catch(function(){});
+ 
+  // Apply saved language on load (skip if English — page is already English)
+  if (saved && saved !== 'en') {
+    switchLang(saved);
+  } else {
+    current = 'en';
+    var lbl = document.getElementById('lang-btn-label');
+    if (lbl) lbl.textContent = 'EN';
+  }
+ 
+}());
+
 }());
