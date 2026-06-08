@@ -19,35 +19,22 @@ var ls = {
 function toast(msg, type, dur) {
   var wrap = $('toast-wrap');
   if (!wrap) return;
-
   var btt = $('btt');
   var offset = (btt && btt.classList.contains('show')) ? 70 : 20;
   wrap.style.bottom = offset + 'px';
-
   var existing = wrap.querySelectorAll('.toast');
   existing.forEach(function (el) {
     el.classList.remove('show');
-    setTimeout(function () {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    }, 200);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 200);
   });
-
   var t = document.createElement('div');
   t.className = 'toast' + (type ? ' ' + type : '');
   t.textContent = msg;
   wrap.appendChild(t);
-
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
-      t.classList.add('show');
-    });
-  });
-
+  requestAnimationFrame(function () { requestAnimationFrame(function () { t.classList.add('show'); }); });
   setTimeout(function () {
     t.classList.remove('show');
-    setTimeout(function () {
-      if (t.parentNode) t.parentNode.removeChild(t);
-    }, 400);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 400);
   }, dur || 3500);
 }
 
@@ -68,7 +55,9 @@ function toast(msg, type, dur) {
   var ticking = false;
   function update() {
     var scrollable = document.body.scrollHeight - window.innerHeight;
-    bar.style.width = Math.min(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0, 100) + '%';
+    var pct = Math.min(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0, 100);
+    bar.style.width = pct + '%';
+    bar.setAttribute('aria-valuenow', Math.round(pct));
     ticking = false;
   }
   window.addEventListener('scroll', function () { if (!ticking) { requestAnimationFrame(update); ticking = true; } }, { passive: true });
@@ -92,11 +81,14 @@ function toast(msg, type, dur) {
     var next = ROOT.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     ROOT.setAttribute('data-theme', next);
     ls.set('pt', next);
+    tg.setAttribute('aria-label', 'Switch to ' + (next === 'dark' ? 'light' : 'dark') + ' mode');
     toast(next === 'light' ? '☀️ Light mode' : '🌙 Dark mode', '', 2000);
   });
 }());
 
 /* ── 5. TYPEWRITER ── */
+/* FIX 3: aria-live="polite" is already on the #tw span in HTML.
+   No JS change needed — the live region announces automatically. */
 (function () {
   var el = $('tw');
   if (!el) return;
@@ -115,9 +107,15 @@ function toast(msg, type, dur) {
 }());
 
 /* ── 6. CANVAS PARTICLES ── */
+/* FIX (optimization): pause animation loop when prefers-reduced-motion is set */
 (function () {
   var canvas = $('cv');
   if (!canvas) return;
+  /* FIX: respect reduced motion — skip canvas entirely */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
   var ctx = canvas.getContext('2d');
   var W, H, pts = [], raf;
   var N = window.innerWidth < 600 ? 30 : 65;
@@ -177,6 +175,13 @@ function toast(msg, type, dur) {
     for (var i = 0; i < N; i++) pts.push(mkPt());
     draw();
   }
+
+  /* Pause when tab is hidden — saves CPU */
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { cancelAnimationFrame(raf); }
+    else { draw(); }
+  });
+
   init();
   var resizeTimer;
   window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(init, 120); }, { passive: true });
@@ -215,7 +220,11 @@ function toast(msg, type, dur) {
   updateNav();
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#'+e.target.id); });
+      if (e.isIntersecting) links.forEach(function (a) {
+        var active = a.getAttribute('href') === '#'+e.target.id;
+        a.classList.toggle('active', active);
+        a.setAttribute('aria-current', active ? 'true' : 'false');
+      });
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
   document.querySelectorAll('section[id]').forEach(function (s) { io.observe(s); });
@@ -227,8 +236,11 @@ function toast(msg, type, dur) {
   if (!hb || !mo) return;
   document.querySelectorAll('#nls .na').forEach(function (l) { mo.appendChild(l.cloneNode(true)); });
   function toggle(open) {
-    hb.classList.toggle('open', open); hb.setAttribute('aria-expanded', String(open));
-    mo.classList.toggle('open', open); document.body.style.overflow = open ? 'hidden' : '';
+    hb.classList.toggle('open', open);
+    hb.setAttribute('aria-expanded', String(open));
+    mo.classList.toggle('open', open);
+    mo.setAttribute('aria-hidden', String(!open));
+    document.body.style.overflow = open ? 'hidden' : '';
   }
   hb.addEventListener('click', function () { toggle(!mo.classList.contains('open')); });
   mo.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
@@ -323,19 +335,11 @@ function toast(msg, type, dur) {
     var CACHE_KEY = 'gh_contrib_v2';
     var cached = null;
     try { cached = sessionStorage.getItem(CACHE_KEY); } catch (e) {}
-
     var promise = cached
       ? Promise.resolve(JSON.parse(cached))
       : fetch('/api/github')
-          .then(function (r) {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
-          })
-          .then(function (json) {
-            try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(json)); } catch (e) {}
-            return json;
-          });
-
+          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function (json) { try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(json)); } catch (e) {} return json; });
     promise.then(function (json) {
       var flat = json && json.contributions;
       if (!flat || !flat.length) { showFallback(); return; }
@@ -344,33 +348,26 @@ function toast(msg, type, dur) {
       flat.forEach(function (c) {
         var dayOfWeek = new Date(c.date + 'T12:00:00').getDay();
         if (dayOfWeek === 0 || curWeek === null) {
-          if (curWeek && curWeek.length < 7)
-            while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+          if (curWeek && curWeek.length < 7) while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
           curWeek = [];
-          if (dayOfWeek !== 0)
-            for (var pad = 0; pad < dayOfWeek; pad++)
-              curWeek.push({ count: 0, level: 0, date: '' });
+          if (dayOfWeek !== 0) for (var pad = 0; pad < dayOfWeek; pad++) curWeek.push({ count: 0, level: 0, date: '' });
           weeks.push(curWeek);
         }
         curWeek.push({ count: c.count, level: c.level || 0, date: c.date });
         total += c.count || 0;
       });
-      if (curWeek && curWeek.length < 7)
-        while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
+      if (curWeek && curWeek.length < 7) while (curWeek.length < 7) curWeek.push({ count: 0, level: 0, date: '' });
       if (weeks.length > 53) weeks = weeks.slice(weeks.length - 53);
       drawGraph(weeks);
       canvas.style.display = 'block';
       if (totalEl) totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
-      new MutationObserver(function () { drawGraph(weeks); })
-        .observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
+      /* Update aria-label with total count */
+      canvas.setAttribute('aria-label', 'GitHub contribution graph for callmecla — ' + total.toLocaleString() + ' contributions in the last year');
+      new MutationObserver(function () { drawGraph(weeks); }).observe(ROOT, { attributes: true, attributeFilter: ['data-theme'] });
       var rt;
-      window.addEventListener('resize', function () {
-        clearTimeout(rt);
-        rt = setTimeout(function () { drawGraph(weeks); }, 150);
-      }, { passive: true });
+      window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { drawGraph(weeks); }, 150); }, { passive: true });
     }).catch(showFallback);
   }
-
   var graphEl = $('gh-graph');
   if (graphEl && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) { if (entries[0].isIntersecting) { io.disconnect(); load(); } }, { rootMargin: '200px' });
@@ -416,10 +413,15 @@ function toast(msg, type, dur) {
 
 /* ── 16. WIP PROJECT LINKS ── */
 (function () {
-  document.querySelectorAll('.proj-link[data-wip]').forEach(function (link) { link.setAttribute('aria-disabled','true'); link.setAttribute('tabindex','-1'); });
+  document.querySelectorAll('.proj-link[data-wip]').forEach(function (link) {
+    link.setAttribute('aria-disabled', 'true');
+    link.setAttribute('tabindex', '-1');
+    link.addEventListener('click', function (e) { e.preventDefault(); });
+  });
 }());
 
 /* ── 17. CONTACT FORM — EmailJS (lazy-loaded) ── */
+/* FIX 4: Inline error messages with aria-invalid */
 (function () {
   var PK = 'alg84AK46Bvk1Yx4b', SI = 'service_wg7jkbe', TI = 'template_0oafehi', YN = 'Clarence Flores';
   var form = $('cf'); if (!form) return;
@@ -443,22 +445,55 @@ function toast(msg, type, dur) {
     io.observe(contact);
   }
 
-  function setLoading(on) { btn.disabled = on; lbl.textContent = on ? 'Sending…' : 'Send Message'; if (spin) spin.style.display = on ? 'inline-block' : 'none'; }
-  function shake(el) { el.style.animation = 'none'; el.getBoundingClientRect(); el.style.animation = 'shake .4s ease'; el.addEventListener('animationend', function () { el.style.animation = ''; }, { once: true }); el.focus(); }
+  function setLoading(on) {
+    btn.disabled = on;
+    lbl.textContent = on ? 'Sending…' : 'Send Message';
+    if (spin) spin.style.display = on ? 'inline-block' : 'none';
+  }
+
+  /* FIX 4: showError / clearError helpers */
+  function showError(inputEl, errId, message) {
+    var errEl = document.getElementById(errId);
+    inputEl.setAttribute('aria-invalid', 'true');
+    if (errEl) { errEl.textContent = message; errEl.classList.add('visible'); }
+    inputEl.focus();
+  }
+
+  function clearError(inputEl, errId) {
+    var errEl = document.getElementById(errId);
+    inputEl.removeAttribute('aria-invalid');
+    if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+  }
+
+  /* Clear errors on input */
+  [['cfn','cfn-err'],['cfe','cfe-err'],['cfs','cfs-err'],['cfm','cfm-err']].forEach(function(pair) {
+    var el = $(pair[0]); if (el) el.addEventListener('input', function () { clearError(el, pair[1]); });
+  });
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var name = form.querySelector('#cfn').value.trim(), email = form.querySelector('#cfe').value.trim(), msg = form.querySelector('#cfm').value.trim();
+    var nameEl = form.querySelector('#cfn'), emailEl = form.querySelector('#cfe'), msgEl = form.querySelector('#cfm');
+    var name = nameEl.value.trim(), email = emailEl.value.trim(), msg = msgEl.value.trim();
     var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!name) { shake(form.querySelector('#cfn')); return; }
-    if (!re.test(email)) { shake(form.querySelector('#cfe')); return; }
-    if (!msg) { shake(form.querySelector('#cfm')); return; }
+
+    /* Clear all first */
+    clearError(nameEl, 'cfn-err'); clearError(emailEl, 'cfe-err'); clearError(msgEl, 'cfm-err');
+
+    /* Validate — stop at first error so focus is useful */
+    if (!name)          { showError(nameEl,  'cfn-err', 'Please enter your name.'); return; }
+    if (!re.test(email)){ showError(emailEl, 'cfe-err', 'Please enter a valid email address.'); return; }
+    if (!msg)           { showError(msgEl,   'cfm-err', 'Please enter a message.'); return; }
+
     setLoading(true);
     loadEmailJS(function (err) {
       if (err) { setLoading(false); toast('✗ Send failed — email me directly.', 'err'); return; }
-      emailjs.send(SI, TI, { to_name: YN, from_name: name, from_email: email, subject: form.querySelector('#cfs').value.trim() || '(no subject)', message: msg, reply_to: email })
-        .then(function () { setLoading(false); form.reset(); toast('✓ Message sent!', 'ok'); },
-              function (err) { console.error('[EmailJS]', err); setLoading(false); toast('✗ Send failed — email me directly.', 'err'); });
+      emailjs.send(SI, TI, {
+        to_name: YN, from_name: name, from_email: email,
+        subject: form.querySelector('#cfs').value.trim() || '(no subject)',
+        message: msg, reply_to: email
+      })
+      .then(function () { setLoading(false); form.reset(); toast('✓ Message sent!', 'ok'); },
+            function (err2) { console.error('[EmailJS]', err2); setLoading(false); toast('✗ Send failed — email me directly.', 'err'); });
     });
   });
 }());
@@ -475,29 +510,22 @@ function toast(msg, type, dur) {
 (function () {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
   var STRENGTH = 0.32;
-
   document.querySelectorAll('.mag').forEach(function (el) {
     var tx = 0, ty = 0, animating = false;
-
     function lerp(a, b, t) { return a + (b - a) * t; }
-
     function loop() {
       if (!animating) return;
-      tx = lerp(tx, el._tx || 0, 0.14);
-      ty = lerp(ty, el._ty || 0, 0.14);
+      tx = lerp(tx, el._tx || 0, 0.14); ty = lerp(ty, el._ty || 0, 0.14);
       el.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px)';
       requestAnimationFrame(loop);
     }
-
     el.addEventListener('mousemove', function (e) {
       var r = el.getBoundingClientRect();
       el._tx = (e.clientX - (r.left + r.width  / 2)) * STRENGTH;
       el._ty = (e.clientY - (r.top  + r.height / 2)) * STRENGTH;
       if (!animating) { animating = true; loop(); }
     });
-
     el.addEventListener('mouseleave', function () {
       el._tx = 0; el._ty = 0;
       function snapBack() {
@@ -513,11 +541,7 @@ function toast(msg, type, dur) {
 
 /* ── 20. COMMAND PALETTE ── */
 (function () {
-  var overlay = $('cp-overlay');
-  var modal   = $('cp-modal');
-  var input   = $('cp-input');
-  var results = $('cp-results');
-  var trigger = $('cp-trigger');
+  var overlay = $('cp-overlay'), modal = $('cp-modal'), input = $('cp-input'), results = $('cp-results'), trigger = $('cp-trigger');
   if (!overlay || !input || !results) return;
 
   var ITEMS = [
@@ -534,45 +558,36 @@ function toast(msg, type, dur) {
     { icon:'🎨', label:'Pixel Studio',     cat:'Project', keys:'pixel studio art webrtc canvas',    action: function(){ go('#projects'); } },
     { icon:'🔐', label:'VaultPass',        cat:'Project', keys:'vaultpass password crypto rust',    action: function(){ go('#projects'); } },
     { icon:'🌍', label:'EcoTrack',         cat:'Project', keys:'ecotrack carbon vue firebase',      action: function(){ go('#projects'); } },
-    { icon:'⬇️', label:'Download Resume',  cat:'Action',  keys:'download resume cv pdf',            action: function(){ var a=document.createElement('a'); a.href='cv.pdf'; a.download=''; a.click(); closePalette(); } },
+    { icon:'⬇️', label:'Download Resume',  cat:'Action',  keys:'download resume cv pdf',            action: function(){ var a=document.createElement('a'); a.href='clarenceflores-cv.pdf'; a.download=''; a.click(); closePalette(); } },
     { icon:'✉️', label:'Send Email',       cat:'Action',  keys:'email send contact message',        action: function(){ window.location.href='mailto:flores.clarencekyle.manrique@gmail.com'; closePalette(); } },
-    { icon:'🐙', label:'GitHub',           cat:'Action',  keys:'github code repository',            action: function(){ window.open('https://github.com/callmecla','_blank'); closePalette(); } },
-    { icon:'💼', label:'LinkedIn',         cat:'Action',  keys:'linkedin professional network',     action: function(){ window.open('https://linkedin.com/in/clarenceflores8/','_blank'); closePalette(); } },
+    { icon:'🐙', label:'GitHub',           cat:'Action',  keys:'github code repository',            action: function(){ window.open('https://github.com/callmecla','_blank','noopener noreferrer'); closePalette(); } },
+    { icon:'💼', label:'LinkedIn',         cat:'Action',  keys:'linkedin professional network',     action: function(){ window.open('https://linkedin.com/in/clarenceflores8/','_blank','noopener noreferrer'); closePalette(); } },
     { icon:'☀️', label:'Light Mode',       cat:'Theme',   keys:'light theme mode day',              action: function(){ setTh('light'); } },
     { icon:'🌙', label:'Dark Mode',        cat:'Theme',   keys:'dark theme mode night',             action: function(){ setTh('dark'); } },
-    { icon:'🇵🇭', label:'Filipino',  cat:'Theme', keys:'tagalog filipino language',  action: function(){ switchLangFromPalette('tl'); } }, 
-    { icon:'🇯🇵', label:'日本語',    cat:'Theme', keys:'japanese nihongo language',   action: function(){ switchLangFromPalette('ja'); } }, 
-    { icon:'🇩🇪', label:'Deutsch',   cat:'Theme', keys:'german deutsch language',     action: function(){ switchLangFromPalette('de'); } },
-    { icon:'🇨🇳', label:'中文',      cat:'Theme', keys:'chinese mandarin language',   action: function(){ switchLangFromPalette('zh'); } },
-    { icon:'🇺🇸', label:'English',   cat:'Theme', keys:'english language',            action: function(){ switchLangFromPalette('en'); } },
+    { icon:'🇵🇭', label:'Filipino',        cat:'Theme',   keys:'tagalog filipino language',          action: function(){ switchLangFromPalette('tl'); } },
+    { icon:'🇯🇵', label:'日本語',          cat:'Theme',   keys:'japanese nihongo language',          action: function(){ switchLangFromPalette('ja'); } },
+    { icon:'🇩🇪', label:'Deutsch',         cat:'Theme',   keys:'german deutsch language',            action: function(){ switchLangFromPalette('de'); } },
+    { icon:'🇨🇳', label:'中文',            cat:'Theme',   keys:'chinese mandarin language',          action: function(){ switchLangFromPalette('zh'); } },
+    { icon:'🇺🇸', label:'English',         cat:'Theme',   keys:'english language',                  action: function(){ switchLangFromPalette('en'); } },
   ];
 
   function setTh(t) { ROOT.setAttribute('data-theme',t); ls.set('pt',t); toast(t==='light'?'☀️ Light mode':'🌙 Dark mode','',2000); closePalette(); }
-
-  function go(hash) {
-    closePalette();
-    setTimeout(function () { var el = document.querySelector(hash); if (el) el.scrollIntoView({ behavior:'smooth' }); }, 100);
-  }
+  function go(hash) { closePalette(); setTimeout(function () { var el = document.querySelector(hash); if (el) el.scrollIntoView({ behavior:'smooth' }); }, 100); }
 
   var activeIdx = -1, flatList = [];
 
   function openPalette() {
-    overlay.classList.add('open');
-    overlay.setAttribute('aria-hidden','false');
+    overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false');
     document.body.style.overflow = 'hidden';
     input.value = ''; render('');
     requestAnimationFrame(function () { input.focus(); });
   }
-
   function closePalette() {
-    overlay.classList.remove('open');
-    overlay.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-    activeIdx = -1;
+    overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true');
+    document.body.style.overflow = ''; activeIdx = -1;
   }
 
   function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
   function highlight(text, q) {
     if (!q) return escHtml(text);
     return escHtml(text).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
@@ -580,43 +595,24 @@ function toast(msg, type, dur) {
 
   function render(q) {
     var query = q.trim().toLowerCase();
-    var filtered = query
-      ? ITEMS.filter(function (it) { return (it.label+' '+it.keys).toLowerCase().indexOf(query) !== -1; })
-      : ITEMS;
-
+    var filtered = query ? ITEMS.filter(function (it) { return (it.label+' '+it.keys).toLowerCase().indexOf(query) !== -1; }) : ITEMS;
     results.innerHTML = '';
-    flatList = filtered;
-    activeIdx = filtered.length ? 0 : -1;
-
-    if (!filtered.length) {
-      results.innerHTML = '<div style="text-align:center;padding:1.5rem;font-family:var(--mono);font-size:.72rem;color:var(--tx3)">No results</div>';
-      return;
-    }
-
+    flatList = filtered; activeIdx = filtered.length ? 0 : -1;
+    if (!filtered.length) { results.innerHTML = '<div style="text-align:center;padding:1.5rem;font-family:var(--mono);font-size:.72rem;color:var(--tx3)" role="status">No results</div>'; return; }
     var groups = {}, ORDER = ['Section','Project','Action','Theme'];
     filtered.forEach(function (it) { if (!groups[it.cat]) groups[it.cat] = []; groups[it.cat].push(it); });
-
-    var globalIdx = 0;
     ORDER.forEach(function (cat) {
       if (!groups[cat]) return;
-      var hdr = document.createElement('div');
-      hdr.className = 'cp-section-header'; hdr.textContent = cat+'s';
-      results.appendChild(hdr);
+      var hdr = document.createElement('div'); hdr.className = 'cp-section-header'; hdr.textContent = cat+'s'; hdr.setAttribute('aria-hidden','true'); results.appendChild(hdr);
       groups[cat].forEach(function (item) {
         var i = filtered.indexOf(item);
         var btn = document.createElement('button');
         btn.className = 'cp-item' + (i === 0 ? ' active' : '');
-        btn.setAttribute('role','option'); btn.setAttribute('data-idx', i);
-        btn.innerHTML =
-          '<span class="cp-item-icon">'+item.icon+'</span>'+
-          '<span class="cp-item-body">'+
-            '<span class="cp-item-label">'+highlight(item.label, query)+'</span>'+
-            '<span class="cp-item-cat">'+escHtml(item.cat)+'</span>'+
-          '</span>';
+        btn.setAttribute('role','option'); btn.setAttribute('data-idx', i); btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        btn.innerHTML = '<span class="cp-item-icon" aria-hidden="true">'+item.icon+'</span><span class="cp-item-body"><span class="cp-item-label">'+highlight(item.label, query)+'</span><span class="cp-item-cat">'+escHtml(item.cat)+'</span></span>';
         btn.addEventListener('mouseenter', function () { setActive(i); });
-        btn.addEventListener('click',      function () { item.action(); });
+        btn.addEventListener('click', function () { item.action(); });
         results.appendChild(btn);
-        globalIdx++;
       });
     });
   }
@@ -625,16 +621,14 @@ function toast(msg, type, dur) {
     activeIdx = Math.max(0, Math.min(flatList.length-1, i));
     results.querySelectorAll('.cp-item').forEach(function (b) {
       var on = +b.dataset.idx === activeIdx;
-      b.classList.toggle('active', on);
+      b.classList.toggle('active', on); b.setAttribute('aria-selected', String(on));
       if (on) b.scrollIntoView({ block:'nearest' });
     });
   }
 
   input.addEventListener('input', function () { render(input.value); });
-
   input.addEventListener('keydown', function (e) {
-    var len = flatList.length;
-    if (!len) return;
+    var len = flatList.length; if (!len) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); setActive((activeIdx+1) % len); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((activeIdx-1+len) % len); }
     else if (e.key === 'Enter') { e.preventDefault(); if (flatList[activeIdx]) flatList[activeIdx].action(); }
@@ -643,12 +637,10 @@ function toast(msg, type, dur) {
 
   if (trigger) trigger.addEventListener('click', openPalette);
   window.openCommandPalette = openPalette;
-
   document.addEventListener('keydown', function (e) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); overlay.classList.contains('open') ? closePalette() : openPalette(); }
     if (e.key === 'Escape' && overlay.classList.contains('open')) closePalette();
   });
-
   overlay.addEventListener('click', function (e) { if (!modal.contains(e.target)) closePalette(); });
 }());
 
@@ -663,18 +655,19 @@ function toast(msg, type, dur) {
   var sugBox     = $('chat-suggestions');
   if (!bubble || !panel) return;
 
-  var history = [];
-  var isOpen  = false;
-  var isBusy  = false;
+  var history = [], isOpen = false, isBusy = false;
 
   function togglePanel(open) {
     isOpen = open;
     panel.classList.toggle('open', open);
     panel.setAttribute('aria-hidden', String(!open));
+    bubble.setAttribute('aria-expanded', String(open));
     if (open) setTimeout(function () { inputEl.focus(); }, 150);
   }
 
   bubble.addEventListener('click', function () { togglePanel(!isOpen); });
+  /* FIX: chat bubble is a div with role=button — also handle keyboard */
+  bubble.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePanel(!isOpen); } });
   if (closeBtn) closeBtn.addEventListener('click', function () { togglePanel(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) togglePanel(false); });
 
@@ -690,67 +683,38 @@ function toast(msg, type, dur) {
 
   function addTyping() {
     var div = document.createElement('div');
-    div.className = 'chat-msg ai';
-    div.id = 'chat-typing';
-    div.innerHTML = '<div class="chat-typing"><span></span><span></span><span></span></div>';
+    div.className = 'chat-msg ai'; div.id = 'chat-typing';
+    div.setAttribute('aria-label', 'AI is typing');
+    div.innerHTML = '<div class="chat-typing" aria-hidden="true"><span></span><span></span><span></span></div>';
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  function removeTyping() {
-    var t = document.getElementById('chat-typing');
-    if (t) t.remove();
-  }
+  function removeTyping() { var t = $('chat-typing'); if (t) t.remove(); }
 
   function send(text) {
     if (isBusy) return;
     var userText = (text || inputEl.value).trim();
     if (!userText) return;
-    isBusy = true;
-    inputEl.value = '';
+    isBusy = true; inputEl.value = '';
     if (sugBox) sugBox.style.display = 'none';
     addMsg('user', userText);
     history.push({ role: 'user', content: userText });
     addTyping();
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: history })
-    })
-    .then(function (res) { return res.json(); })
-    .then(function (data) {
-      removeTyping();
-      var reply = data.reply || data.error || 'No response.';
-      addMsg('ai', reply);
-      history.push({ role: 'assistant', content: reply });
-    })
-    .catch(function (err) {
-      console.error(err);
-      removeTyping();
-      addMsg('ai', 'Sorry, I couldn\'t connect right now. Try emailing Clarence directly!');
-    })
-    .finally(function () { isBusy = false; });
+    fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: history }) })
+      .then(function (res) { return res.json(); })
+      .then(function (data) { removeTyping(); var reply = data.reply || data.error || 'No response.'; addMsg('ai', reply); history.push({ role: 'assistant', content: reply }); })
+      .catch(function (err) { console.error(err); removeTyping(); addMsg('ai', 'Sorry, I couldn\'t connect right now. Try emailing Clarence directly!'); })
+      .finally(function () { isBusy = false; });
   }
 
-  inputEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-  });
+  inputEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
   sendBtn.addEventListener('click', function () { send(); });
+  if (sugBox) { sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) { btn.addEventListener('click', function () { send(btn.dataset.q); }); }); }
+}());
 
-  if (sugBox) {
-    sugBox.querySelectorAll('.chat-suggestion').forEach(function (btn) {
-      btn.addEventListener('click', function () { send(btn.dataset.q); });
-    });
-  }
-
-/* ══════════════════════════════════════════════════════════
-   FEATURE 22 — LANGUAGE SELECTOR
-   Adds a globe button to the nav that swaps all static text
-   content using pre-translated JSON files in /lang/.
-   Selection persists in localStorage under key 'pt_lang'.
-   ══════════════════════════════════════════════════════════ */
+/* ── 22. LANGUAGE SELECTOR ── */
 (function () {
- 
   var LANGS = [
     { code: 'en', label: 'EN', name: 'English' },
     { code: 'tl', label: 'TL', name: 'Filipino' },
@@ -758,271 +722,116 @@ function toast(msg, type, dur) {
     { code: 'de', label: 'DE', name: 'Deutsch' },
     { code: 'zh', label: 'ZH', name: '中文' },
   ];
- 
-  var cache = {};      // loaded JSON cached here
-  var current = 'en';
- 
-  // ── DOM selectors — keyed to data-i18n attributes we'll add to HTML ──
-  // Each entry: [data-i18n value] → function(t) that applies the translation
+  var cache = {}, current = 'en';
+
   function applyTranslation(t) {
-    function setText(sel, val) {
-      var el = document.querySelector(sel);
-      if (el) el.textContent = val;
-    }
-    function setAttr(sel, attr, val) {
-      var el = document.querySelector(sel);
-      if (el) el.setAttribute(attr, val);
-    }
-    function setAll(sel, val) {
-      document.querySelectorAll(sel).forEach(function(el){ el.textContent = val; });
-    }
- 
-    // ── Nav ──
-    setText('a[href="#about"].na',          t.nav.about);
-    setText('a[href="#education"].na',      t.nav.education);
-    setText('a[href="#experience"].na',     t.nav.experience);
-    setText('a[href="#projects"].na',       t.nav.projects);
-    setText('a[href="#skills"].na',         t.nav.skills);
+    function setText(sel, val) { var el = document.querySelector(sel); if (el) el.textContent = val; }
+    function setAttr(sel, attr, val) { var el = document.querySelector(sel); if (el) el.setAttribute(attr, val); }
+    setText('a[href="#about"].na', t.nav.about);
+    setText('a[href="#education"].na', t.nav.education);
+    setText('a[href="#experience"].na', t.nav.experience);
+    setText('a[href="#projects"].na', t.nav.projects);
+    setText('a[href="#skills"].na', t.nav.skills);
     setText('a[href="#certifications"].na', t.nav.certifications);
-    setText('a[href="#contact"].na',        t.nav.contact);
- 
-    // ── Hero ──
+    setText('a[href="#contact"].na', t.nav.contact);
     var badge = document.querySelector('.he');
-    if (badge) {
-      // preserve the <span class="bd"> dot
-      var dot = badge.querySelector('.bd');
-      badge.textContent = t.hero.available;
-      if (dot) badge.insertBefore(dot, badge.firstChild);
-    }
+    if (badge) { var dot = badge.querySelector('.bd'); badge.textContent = t.hero.available; if (dot) badge.insertBefore(dot, badge.firstChild); }
     setText('.hb2', t.hero.tagline);
-    var btnWork = document.querySelector('a[href="#projects"].btn.bp');
-    if (btnWork) btnWork.textContent = t.hero.btn_work;
-    var btnMsg  = document.querySelector('a[href="#contact"].btn.bg');
-    if (btnMsg)  btnMsg.textContent  = t.hero.btn_message;
-    var btnResume = document.querySelector('a[href="cv.pdf"]');
-    if (btnResume) {
-      // preserve the SVG icon
-      var svg = btnResume.querySelector('svg');
-      btnResume.textContent = t.hero.btn_resume;
-      if (svg) btnResume.insertBefore(svg, btnResume.firstChild);
-    }
- 
-    // ── About ──
-    var aboutTitle = document.querySelector('#about .st2');
-    if (aboutTitle) aboutTitle.textContent = t.about.title;
+    var btnWork = document.querySelector('a[href="#projects"].btn.bp'); if (btnWork) btnWork.textContent = t.hero.btn_work;
+    var btnMsg  = document.querySelector('a[href="#contact"].btn.bg');  if (btnMsg)  btnMsg.textContent  = t.hero.btn_message;
+    var btnResume = document.querySelector('a[href="clarenceflores-cv.pdf"]');
+    if (btnResume) { var svg = btnResume.querySelector('svg'); btnResume.textContent = t.hero.btn_resume; if (svg) btnResume.insertBefore(svg, btnResume.firstChild); }
+    var aboutTitle = document.querySelector('#about .st2'); if (aboutTitle) aboutTitle.textContent = t.about.title;
     var aboutPs = document.querySelectorAll('#about .at p');
-    if (aboutPs[0]) aboutPs[0].innerHTML = t.about.p1
-      .replace('passionate IT student and problem-solver', '<strong>passionate IT student and problem-solver</strong>')
-      .replace('performance and user experience', '<strong>performance and user experience</strong>');
-    if (aboutPs[1]) aboutPs[1].innerHTML = t.about.p2
-      .replace('design and engineering', '<strong>design and engineering</strong>');
+    if (aboutPs[0]) aboutPs[0].innerHTML = t.about.p1.replace('passionate IT student and problem-solver','<strong>passionate IT student and problem-solver</strong>').replace('performance and user experience','<strong>performance and user experience</strong>');
+    if (aboutPs[1]) aboutPs[1].innerHTML = t.about.p2.replace('design and engineering','<strong>design and engineering</strong>');
     if (aboutPs[2]) aboutPs[2].textContent = t.about.p3;
     var statLabels = document.querySelectorAll('.stat-l');
     if (statLabels[0]) statLabels[0].textContent = t.about.stat_years;
     if (statLabels[1]) statLabels[1].textContent = t.about.stat_projects;
     if (statLabels[2]) statLabels[2].textContent = t.about.stat_clients;
     if (statLabels[3]) statLabels[3].textContent = t.about.stat_certs;
- 
-    // ── Education ──
-    var eduTitle = document.querySelector('#education .st2');
-    if (eduTitle) eduTitle.textContent = t.education.title;
+    var eduTitle = document.querySelector('#education .st2'); if (eduTitle) eduTitle.textContent = t.education.title;
     var eduItems = document.querySelectorAll('#education .ti-body');
-    if (eduItems[0]) {
-      eduItems[0].querySelector('.ti-title').childNodes[0].textContent = t.education.qcu_degree + ' ';
-      eduItems[0].querySelector('.ti-desc').textContent = t.education.qcu_desc;
-    }
-    if (eduItems[1]) {
-      eduItems[1].querySelector('.ti-title').childNodes[0].textContent = t.education.fatima_degree + ' ';
-      eduItems[1].querySelector('.ti-desc').textContent = t.education.fatima_desc;
-    }
-    if (eduItems[2]) {
-      eduItems[2].querySelector('.ti-title').childNodes[0].textContent = t.education.ux_degree + ' ';
-      eduItems[2].querySelector('.ti-desc').textContent = t.education.ux_desc;
-    }
- 
-    // ── Experience ──
-    var expTitle = document.querySelector('#experience .st2');
-    if (expTitle) expTitle.textContent = t.experience.title;
+    if (eduItems[0]) { eduItems[0].querySelector('.ti-title').childNodes[0].textContent = t.education.qcu_degree + ' '; eduItems[0].querySelector('.ti-desc').textContent = t.education.qcu_desc; }
+    if (eduItems[1]) { eduItems[1].querySelector('.ti-title').childNodes[0].textContent = t.education.fatima_degree + ' '; eduItems[1].querySelector('.ti-desc').textContent = t.education.fatima_desc; }
+    if (eduItems[2]) { eduItems[2].querySelector('.ti-title').childNodes[0].textContent = t.education.ux_degree + ' '; eduItems[2].querySelector('.ti-desc').textContent = t.education.ux_desc; }
+    var expTitle = document.querySelector('#experience .st2'); if (expTitle) expTitle.textContent = t.experience.title;
     var expItems = document.querySelectorAll('.exp');
-    if (expItems[0]) {
-      expItems[0].querySelector('.exp-role').textContent = t.experience.tc_role;
-      expItems[0].querySelector('.exp-desc').textContent = t.experience.tc_desc;
-    }
-    if (expItems[1]) {
-      expItems[1].querySelector('.exp-role').textContent = t.experience.sx_role;
-      expItems[1].querySelector('.exp-desc').textContent = t.experience.sx_desc;
-    }
-    if (expItems[2]) {
-      expItems[2].querySelector('.exp-role').textContent = t.experience.ag_role;
-      expItems[2].querySelector('.exp-desc').textContent = t.experience.ag_desc;
-    }
- 
-    // ── Projects ──
-    var projTitle = document.querySelector('#projects .st2');
-    if (projTitle) projTitle.textContent = t.projects.title;
+    if (expItems[0]) { expItems[0].querySelector('.exp-role').textContent = t.experience.tc_role; expItems[0].querySelector('.exp-desc').textContent = t.experience.tc_desc; }
+    if (expItems[1]) { expItems[1].querySelector('.exp-role').textContent = t.experience.sx_role; expItems[1].querySelector('.exp-desc').textContent = t.experience.sx_desc; }
+    if (expItems[2]) { expItems[2].querySelector('.exp-role').textContent = t.experience.ag_role; expItems[2].querySelector('.exp-desc').textContent = t.experience.ag_desc; }
+    var projTitle = document.querySelector('#projects .st2'); if (projTitle) projTitle.textContent = t.projects.title;
     var projDescs = document.querySelectorAll('.proj-desc');
-    var projKeys = ['lp_desc','mm_desc','dp_desc','ps_desc','vp_desc','et_desc'];
-    projDescs.forEach(function(el, i){ if (projKeys[i]) el.textContent = t.projects[projKeys[i]]; });
- 
-    // ── Skills ──
-    var skillTitle = document.querySelector('#skills .st2');
-    if (skillTitle) skillTitle.textContent = t.skills.title;
+    ['lp_desc','mm_desc','dp_desc','ps_desc','vp_desc','et_desc'].forEach(function(k,i){ if (projDescs[i]) projDescs[i].textContent = t.projects[k]; });
+    var skillTitle = document.querySelector('#skills .st2'); if (skillTitle) skillTitle.textContent = t.skills.title;
     var skillGroups = document.querySelectorAll('.skill-group-title');
-    if (skillGroups[0]) skillGroups[0].textContent = '⚛️ ' + t.skills.frontend;
-    if (skillGroups[1]) skillGroups[1].textContent = '⚙️ ' + t.skills.backend;
-    if (skillGroups[2]) skillGroups[2].textContent = '☁️ ' + t.skills.devops;
- 
-    // ── Certifications ──
-    var certTitle = document.querySelector('#certifications .st2');
-    if (certTitle) certTitle.textContent = t.certifications.title;
+    if (skillGroups[0]) skillGroups[0].innerHTML = '<span aria-hidden="true">⚛️ </span>' + t.skills.frontend;
+    if (skillGroups[1]) skillGroups[1].innerHTML = '<span aria-hidden="true">⚙️ </span>' + t.skills.backend;
+    if (skillGroups[2]) skillGroups[2].innerHTML = '<span aria-hidden="true">☁️ </span>' + t.skills.devops;
+    var certTitle = document.querySelector('#certifications .st2'); if (certTitle) certTitle.textContent = t.certifications.title;
     document.querySelectorAll('.cert-badge').forEach(function(el){ el.textContent = t.certifications.verified; });
- 
-    // ── Contact ──
-    var contactTitle = document.querySelector('#contact .st2');
-    if (contactTitle) contactTitle.textContent = t.contact.title;
+    var contactTitle = document.querySelector('#contact .st2'); if (contactTitle) contactTitle.textContent = t.contact.title;
     setText('#contact .contact-tag', t.contact.tagline);
     var labels = document.querySelectorAll('.form-field label');
-    var labelKeys = ['label_name','label_email','label_subject','label_message'];
-    labels.forEach(function(el,i){ if (labelKeys[i]) el.textContent = t.contact[labelKeys[i]]; });
-    setAttr('#cfn', 'placeholder', t.contact.ph_name);
-    setAttr('#cfe', 'placeholder', t.contact.ph_email);
-    setAttr('#cfs', 'placeholder', t.contact.ph_subject);
-    setAttr('#cfm', 'placeholder', t.contact.ph_message);
-    var sendLbl = $('cbl');
-    if (sendLbl) sendLbl.textContent = t.contact.btn_send;
- 
-    // ── Footer ──
+    ['label_name','label_email','label_subject','label_message'].forEach(function(k,i){ if (labels[i]) labels[i].textContent = t.contact[k]; });
+    setAttr('#cfn','placeholder',t.contact.ph_name); setAttr('#cfe','placeholder',t.contact.ph_email);
+    setAttr('#cfs','placeholder',t.contact.ph_subject); setAttr('#cfm','placeholder',t.contact.ph_message);
+    var sendLbl = $('cbl'); if (sendLbl) sendLbl.textContent = t.contact.btn_send;
     var footerCopy = document.querySelector('.footer-copy');
     if (footerCopy) footerCopy.innerHTML = '© 2025 <strong>Clarence Flores</strong>. ' + t.footer.copy;
- 
-    // ── Chat widget ──
-    setText('.chat-title',    t.chat.title);
-    setText('.chat-subtitle', t.chat.subtitle);
-    setAttr('#chat-input', 'placeholder', t.chat.placeholder);
+    setText('.chat-title', t.chat.title); setText('.chat-subtitle', t.chat.subtitle);
+    setAttr('#chat-input','placeholder',t.chat.placeholder);
     var sug = document.querySelectorAll('.chat-suggestion');
-    var sugKeys = ['q1','q2','q3'];
-    sug.forEach(function(btn, i){ if (sugKeys[i]) btn.textContent = t.chat[sugKeys[i]]; });
- 
-    // ── Section numbers stay, only headings change ──
-    document.querySelector('#skills .sn') && null; // sn are numeric, skip
- 
-    // ── Update html lang attribute for accessibility ──
+    ['q1','q2','q3'].forEach(function(k,i){ if (sug[i]) sug[i].textContent = t.chat[k]; });
     document.documentElement.lang = current;
   }
- 
+
   function switchLang(code) {
     if (code === current && cache[code]) return;
-    current = code;
-    ls.set('pt_lang', code);
- 
-    // Update button label
+    current = code; ls.set('pt_lang', code);
+    var langObj = LANGS.find(function(l){ return l.code === code; });
     var lbl = document.getElementById('lang-btn-label');
-    if (lbl) lbl.textContent = LANGS.find(function(l){ return l.code === code; }).label;
- 
-    if (cache[code]) {
-      applyTranslation(cache[code]);
-      return;
-    }
- 
+    if (lbl) lbl.textContent = langObj ? langObj.label : code.toUpperCase();
+    if (cache[code]) { applyTranslation(cache[code]); return; }
     fetch('/lang/' + code + '.json')
       .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function(data){
-        cache[code] = data;
-        applyTranslation(data);
-      })
+      .then(function(data){ cache[code] = data; applyTranslation(data); })
       .catch(function(err){ console.error('[i18n] Failed to load', code, err); });
   }
- 
-  // ── Build the dropdown UI ──
+
   function buildUI() {
-    // Find the nav element
-    var nav = $('nv');
-    if (!nav) return;
- 
-    // Create wrapper
+    var nav = $('nv'); if (!nav) return;
     var wrap = document.createElement('div');
-    wrap.id = 'lang-wrap';
-    wrap.style.cssText = 'position:relative;display:flex;align-items:center;flex-shrink:0;';
- 
-    // Globe button
+    wrap.id = 'lang-wrap'; wrap.style.cssText = 'position:relative;display:flex;align-items:center;flex-shrink:0;';
     var btn = document.createElement('button');
     btn.id = 'lang-btn';
-    btn.setAttribute('aria-label', 'Select language');
-    btn.setAttribute('aria-haspopup', 'listbox');
-    btn.setAttribute('aria-expanded', 'false');
-    btn.innerHTML =
-      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>' +
-      '<span id="lang-btn-label">EN</span>' +
-      '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>';
- 
-    // Dropdown
+    btn.setAttribute('aria-label', 'Select language'); btn.setAttribute('aria-haspopup', 'listbox'); btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg><span id="lang-btn-label">EN</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg>';
     var drop = document.createElement('ul');
-    drop.id = 'lang-drop';
-    drop.setAttribute('role', 'listbox');
-    drop.setAttribute('aria-label', 'Language');
- 
+    drop.id = 'lang-drop'; drop.setAttribute('role','listbox'); drop.setAttribute('aria-label','Language');
     LANGS.forEach(function(lang) {
       var li = document.createElement('li');
-      li.setAttribute('role', 'option');
-      li.setAttribute('data-lang', lang.code);
-      li.innerHTML = '<span class="lang-code">' + lang.label + '</span><span class="lang-name">' + lang.name + '</span>';
+      li.setAttribute('role','option'); li.setAttribute('data-lang',lang.code); li.setAttribute('aria-selected','false');
+      li.innerHTML = '<span class="lang-code">'+lang.label+'</span><span class="lang-name">'+lang.name+'</span>';
       li.addEventListener('click', function() {
-        switchLang(lang.code);
-        closeDrop();
-        document.querySelectorAll('#lang-drop li').forEach(function(el){
-          el.setAttribute('aria-selected', el.dataset.lang === lang.code ? 'true' : 'false');
-        });
+        switchLang(lang.code); closeDrop();
+        document.querySelectorAll('#lang-drop li').forEach(function(el){ el.setAttribute('aria-selected', el.dataset.lang === lang.code ? 'true' : 'false'); });
       });
       drop.appendChild(li);
     });
- 
-    wrap.appendChild(btn);
-    wrap.appendChild(drop);
- 
-    // Insert before the theme toggle button
-    var tt = nav.querySelector('.tt');
-    if (tt) nav.insertBefore(wrap, tt);
-    else nav.appendChild(wrap);
- 
-    // Toggle open/close
-    function openDrop() {
-      drop.classList.add('open');
-      btn.setAttribute('aria-expanded', 'true');
-    }
-    function closeDrop() {
-      drop.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
-    }
- 
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      drop.classList.contains('open') ? closeDrop() : openDrop();
-    });
+    wrap.appendChild(btn); wrap.appendChild(drop);
+    var tt = nav.querySelector('.tt'); if (tt) nav.insertBefore(wrap, tt); else nav.appendChild(wrap);
+    function openDrop() { drop.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+    function closeDrop() { drop.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+    btn.addEventListener('click', function(e){ e.stopPropagation(); drop.classList.contains('open') ? closeDrop() : openDrop(); });
     document.addEventListener('click', closeDrop);
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDrop(); });
   }
- 
-  // ── Init ──
+
   var saved = ls.get('pt_lang') || 'en';
   buildUI();
- 
-  // Pre-cache English (already rendered, just parse for future re-apply)
-  fetch('/lang/en.json')
-    .then(function(r){ return r.json(); })
-    .then(function(data){ cache['en'] = data; })
-    .catch(function(){});
- 
-  // Apply saved language on load (skip if English — page is already English)
-  if (saved && saved !== 'en') {
-    switchLang(saved);
-  } else {
-    current = 'en';
-    var lbl = document.getElementById('lang-btn-label');
-    if (lbl) lbl.textContent = 'EN';
-  }
-
+  fetch('/lang/en.json').then(function(r){ return r.json(); }).then(function(data){ cache['en'] = data; }).catch(function(){});
+  if (saved && saved !== 'en') { switchLang(saved); } else { current = 'en'; var lbl = $('lang-btn-label'); if (lbl) lbl.textContent = 'EN'; }
   window.switchLangFromPalette = switchLang;
- 
-}());
-
 }());
