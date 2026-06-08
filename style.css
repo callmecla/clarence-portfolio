@@ -543,3 +543,50 @@ footer { border-top: 1px solid var(--bdr); position: relative; z-index: 2; }
 @media (max-width: 480px) {
   #lang-wrap { display: none; }
 }
+
+/* ── ACCESSIBILITY ADDITIONS ── */
+/* Add these at the end of your style.css */
+ 
+/* Screen-reader only utility — visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+ 
+/* FIX 4: Inline form field error messages */
+.field-err {
+  display: block;
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .06em;
+  color: var(--acc2);
+  min-height: 1rem;
+  margin-top: .2rem;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .2s var(--ease), transform .2s var(--ease);
+}
+.field-err.visible {
+  opacity: 1;
+  transform: none;
+}
+ 
+/* Invalid state — red border on errored inputs */
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
+  border-color: var(--acc2);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, .12);
+}
+/* Clear error state on focus */
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--acc-d);
+}
