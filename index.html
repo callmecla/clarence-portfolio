@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 
-  <!-- ═══ Theme — respects OS preference on first visit ═══ -->
+  <!-- FIX 1: Theme set before paint to avoid flash -->
   <script>
     (function(){
       var saved = (function(){try{return localStorage.getItem('pt');}catch(e){return null;}})();
@@ -37,14 +37,14 @@
 </head>
 <body>
 
-  <div id="spb"></div>
+  <div id="spb" role="progressbar" aria-label="Page scroll progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 
   <div id="loader" aria-hidden="true">
     <div class="loader-logo">Clarence Flores<span>.</span></div>
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
 
-  <div id="toast-wrap" aria-live="polite"></div>
+  <div id="toast-wrap" aria-live="polite" aria-atomic="true"></div>
   <button id="btt" aria-label="Back to top">↑</button>
 
   <div id="cd" aria-hidden="true"></div>
@@ -55,12 +55,12 @@
   <div id="cp-overlay" class="cp-overlay" aria-hidden="true" role="dialog" aria-label="Command palette" aria-modal="true">
     <div class="cp-modal" id="cp-modal">
       <div class="cp-search-wrap">
-        <span class="cp-search-icon">⌘</span>
-        <input type="text" id="cp-input" class="cp-input" placeholder="Search sections, projects, skills…" autocomplete="off" spellcheck="false"/>
-        <kbd class="cp-esc">esc</kbd>
+        <span class="cp-search-icon" aria-hidden="true">⌘</span>
+        <input type="text" id="cp-input" class="cp-input" placeholder="Search sections, projects, skills…" autocomplete="off" spellcheck="false" aria-label="Search command palette"/>
+        <kbd class="cp-esc" aria-label="Press Escape to close">esc</kbd>
       </div>
-      <div class="cp-results" id="cp-results" role="listbox"></div>
-      <div class="cp-footer">
+      <div class="cp-results" id="cp-results" role="listbox" aria-label="Command results"></div>
+      <div class="cp-footer" aria-hidden="true">
         <span><kbd>↑↓</kbd> navigate</span>
         <span><kbd>↵</kbd> select</span>
         <span><kbd>esc</kbd> close</span>
@@ -69,15 +69,15 @@
   </div>
 
   <!-- ═══ AI CHAT WIDGET ═══ -->
-  <div id="chat-bubble" aria-label="Chat with AI about Clarence" title="Ask me anything about Clarence">
-    <span class="chat-bubble-icon">✦</span>
+  <div id="chat-bubble" role="button" tabindex="0" aria-label="Open AI chat about Clarence" aria-expanded="false" aria-controls="chat-panel">
+    <span class="chat-bubble-icon" aria-hidden="true">✦</span>
     <span class="chat-bubble-label">Ask AI</span>
   </div>
 
-  <div id="chat-panel" class="chat-panel" aria-hidden="true">
+  <div id="chat-panel" class="chat-panel" aria-hidden="true" role="dialog" aria-label="AI Chat about Clarence" aria-modal="false">
     <div class="chat-header">
       <div class="chat-header-info">
-        <span class="chat-avatar">CF</span>
+        <span class="chat-avatar" aria-hidden="true">CF</span>
         <div>
           <p class="chat-title">Ask about Clarence</p>
           <p class="chat-subtitle">Powered by Gemini AI</p>
@@ -85,7 +85,7 @@
       </div>
       <button class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
     </div>
-    <div class="chat-messages" id="chat-messages">
+    <div class="chat-messages" id="chat-messages" aria-live="polite" aria-atomic="false" aria-relevant="additions">
       <div class="chat-msg ai">
         <p>Hi! I'm an AI that knows everything about Clarence. Ask me about his skills, projects, experience, or anything else.</p>
       </div>
@@ -96,18 +96,19 @@
       </div>
     </div>
     <div class="chat-input-wrap">
-      <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask anything…" autocomplete="off"/>
+      <label for="chat-input" class="sr-only">Message</label>
+      <input type="text" id="chat-input" class="chat-input-field" placeholder="Ask anything…" autocomplete="off" aria-label="Type your message"/>
       <button id="chat-send" class="chat-send-btn" aria-label="Send message">↑</button>
     </div>
   </div>
 
   <!-- ═══ NAV ═══ -->
-  <nav id="nv">
-    <a href="#hero" class="nl">CF<span class="ld">.</span></a>
-    <button class="hb" id="hb" aria-label="Toggle menu" aria-expanded="false">
-      <span></span><span></span><span></span>
+  <nav id="nv" aria-label="Main navigation">
+    <a href="#hero" class="nl" aria-label="Clarence Flores — home">CF<span class="ld" aria-hidden="true">.</span></a>
+    <button class="hb" id="hb" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mo">
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
     </button>
-    <ul class="nls" id="nls">
+    <ul class="nls" id="nls" role="list">
       <li><a href="#about"          class="na">About</a></li>
       <li><a href="#education"      class="na">Education</a></li>
       <li><a href="#experience"     class="na">Experience</a></li>
@@ -116,46 +117,50 @@
       <li><a href="#certifications" class="na">Certifications</a></li>
       <li><a href="#contact"        class="na">Contact</a></li>
     </ul>
-    <!-- Command palette hint -->
     <button class="cp-hint" id="cp-trigger" aria-label="Open command palette (Ctrl+K)">
-      <span>Search</span><kbd>⌘</kbd><kbd>K</kbd>
+      <span>Search</span><kbd aria-hidden="true">⌘</kbd><kbd aria-hidden="true">K</kbd>
     </button>
     <button class="tt" id="tg" aria-label="Toggle theme">
-      <span class="ttr"><span class="tth"></span></span>
-      <span class="tti"><span class="tm">🌙</span><span class="ts">☀️</span></span>
+      <span class="ttr" aria-hidden="true"><span class="tth"></span></span>
+      <span class="tti" aria-hidden="true"><span class="tm">🌙</span><span class="ts">☀️</span></span>
     </button>
   </nav>
-  <div class="mo" id="mo"></div>
+
+  <!-- FIX 2: Mobile overlay gets proper role and id for aria-controls -->
+  <div class="mo" id="mo" role="dialog" aria-label="Mobile navigation menu" aria-modal="true" aria-hidden="true"></div>
 
   <!-- ═══ HERO ═══ -->
-  <section id="hero">
+  <section id="hero" aria-label="Introduction">
     <div class="hi">
       <div class="pw">
-        <div class="pr"></div>
-        <div class="pr r2"></div>
+        <div class="pr" aria-hidden="true"></div>
+        <div class="pr r2" aria-hidden="true"></div>
         <div class="pf">
           <img id="pi"
                src="profile.jpg"
                data-fallback="https://api.dicebear.com/8.x/lorelei/svg?seed=Clarence&backgroundColor=09090f"
-               alt="Clarence Flores"
+               alt="Portrait photo of Clarence Flores"
                loading="eager"
                onerror="this.onerror=null;this.src=this.dataset.fallback"/>
           <label class="pu" for="phu" title="Upload your photo">
-            <input type="file" id="phu" accept="image/*"/>
-            <span>📷</span>
+            <input type="file" id="phu" accept="image/*" aria-label="Upload profile photo"/>
+            <span aria-hidden="true">📷</span>
           </label>
         </div>
       </div>
       <div class="ht">
-        <p class="he"><span class="bd"></span>Available for opportunities</p>
-        <h1 class="hn"><span class="h1">Clarence</span><span class="h2">Flores</span></h1>
-        <p class="hs">I'm a <span id="tw"></span><span class="tw-cur">|</span></p>
+        <p class="he"><span class="bd" aria-hidden="true"></span>Available for opportunities</p>
+        <h1 class="hn"><span class="h1">Clarence</span><span class="h2">Flores.</span></h1>
+
+        <!-- FIX 3: aria-live on typewriter so screen readers catch role changes -->
+        <p class="hs">I'm a <span id="tw" aria-live="polite" aria-atomic="true"></span><span class="tw-cur" aria-hidden="true">|</span></p>
+
         <p class="hb2">I craft beautiful, fast &amp; accessible digital experiences — from pixel-perfect UIs to robust backend systems.</p>
         <div class="hbs">
           <a href="#projects" class="btn bp mag">View Work ↓</a>
           <a href="#contact"  class="btn bg mag">Message Me</a>
-          <a href="clarenceflores-cv.pdf" class="btn bi mag" download>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <a href="clarenceflores-cv.pdf" class="btn bi mag" download aria-label="Download Resume PDF">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Resume
           </a>
         </div>
@@ -168,37 +173,38 @@
   </section>
 
   <!-- ═══ ABOUT ═══ -->
-  <section id="about" class="sec">
+  <section id="about" class="sec" aria-labelledby="about-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">01</span><h2 class="st2">About Me</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">01</span><h2 class="st2" id="about-heading">About Me</h2></div>
       <div class="ag">
         <div class="at rv d1">
           <p>Hi! I'm a <strong>passionate IT graduate and problem-solver</strong> who builds things for the web and beyond. I love crafting elegant interfaces with a sharp focus on <strong>performance and user experience</strong>.</p>
           <p>With a background in both <strong>design and programming</strong>, I bridge the gap between beautiful aesthetics and robust code.</p>
-          <p>When I'm not coding, you'll find me exploring generative art, writing poetries and novels, or just reading Wattpad novels</p>
-        <div class="stats rv d2">
-          <div class="stat"><span class="stat-n" data-t="3">0</span><span class="stat-u">+</span><span class="stat-l">Years Coding</span></div>
-          <div class="stat"><span class="stat-n" data-t="24">0</span><span class="stat-l">Projects Shipped</span></div>
-          <div class="stat"><span class="stat-n" data-t="12">0</span><span class="stat-l">Happy Clients</span></div>
-          <div class="stat"><span class="stat-n" data-t="8">0</span><span class="stat-l">Certifications</span></div>
+          <p>When I'm not coding, you'll find me exploring generative art, writing poetries and novels, or just reading Wattpad novels.</p>
+        </div>
+        <div class="stats rv d2" role="list" aria-label="Key statistics">
+          <div class="stat" role="listitem"><span class="stat-n" data-t="3" aria-label="3 plus years coding">0</span><span class="stat-u" aria-hidden="true">+</span><span class="stat-l">Years Coding</span></div>
+          <div class="stat" role="listitem"><span class="stat-n" data-t="24" aria-label="24 projects shipped">0</span><span class="stat-l">Projects Shipped</span></div>
+          <div class="stat" role="listitem"><span class="stat-n" data-t="12" aria-label="12 happy clients">0</span><span class="stat-l">Happy Clients</span></div>
+          <div class="stat" role="listitem"><span class="stat-n" data-t="8" aria-label="8 certifications">0</span><span class="stat-l">Certifications</span></div>
         </div>
       </div>
       <div class="gh-graph rv d3" id="gh-graph">
         <div class="gh-graph-hd">
           <span class="gh-label">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
             github.com/callmecla — contribution activity
           </span>
-          <a href="https://github.com/callmecla" target="_blank" rel="noopener" class="gh-link">View Profile ↗</a>
+          <a href="https://github.com/callmecla" target="_blank" rel="noopener noreferrer" class="gh-link" aria-label="View GitHub profile (opens in new tab)">View Profile ↗</a>
         </div>
         <div class="gh-graph-wrap">
-          <canvas id="gh-canvas" class="gh-canvas" aria-label="GitHub contribution graph"></canvas>
+          <canvas id="gh-canvas" class="gh-canvas" role="img" aria-label="GitHub contribution graph for callmecla"></canvas>
           <p class="gh-fallback" id="gh-fallback" style="display:none">
             Could not load contribution data.
-            <a href="https://github.com/callmecla" target="_blank" rel="noopener">View on GitHub ↗</a>
+            <a href="https://github.com/callmecla" target="_blank" rel="noopener noreferrer" aria-label="View contributions on GitHub (opens in new tab)">View on GitHub ↗</a>
           </p>
         </div>
-        <div class="gh-graph-ft" id="gh-footer">
+        <div class="gh-graph-ft" id="gh-footer" aria-hidden="true">
           <span class="gh-legend-label">Less</span>
           <span class="gh-cell gh-l0"></span>
           <span class="gh-cell gh-l1"></span>
@@ -213,35 +219,35 @@
   </section>
 
   <!-- ═══ EDUCATION ═══ -->
-  <section id="education" class="sec alt">
+  <section id="education" class="sec alt" aria-labelledby="education-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">02</span><h2 class="st2">Education</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">02</span><h2 class="st2" id="education-heading">Education</h2></div>
       <div class="tl">
-        <a class="ti rv d1" href="https://qcu.edu.ph" target="_blank" rel="noopener" aria-label="Visit Quezon City University website">
-          <div class="ti-icon">🎓</div>
+        <a class="ti rv d1" href="https://qcu.edu.ph" target="_blank" rel="noopener noreferrer" aria-label="B.S. Information Technology at Quezon City University, 2022 to present — visit university website (opens in new tab)">
+          <div class="ti-icon" aria-hidden="true">🎓</div>
           <div class="ti-body">
             <span class="ti-period">2022 — Present</span>
-            <h3 class="ti-title">B.S. Information Technology <span class="ti-ext">↗</span></h3>
+            <h3 class="ti-title">B.S. Information Technology <span class="ti-ext" aria-hidden="true">↗</span></h3>
             <p class="ti-org">Quezon City University · GPA 1.75</p>
             <p class="ti-desc">Majoring in IT with a focus on software development and web applications.</p>
             <div class="tags"><span class="badge">Dean's List</span></div>
           </div>
         </a>
-        <a class="ti rv d2" href="https://www.fatima.edu.ph" target="_blank" rel="noopener" aria-label="Visit Our Lady of Fatima University website">
-          <div class="ti-icon">📚</div>
+        <a class="ti rv d2" href="https://www.fatima.edu.ph" target="_blank" rel="noopener noreferrer" aria-label="Science, Technology, Engineering and Mathematics at Our Lady of Fatima University, 2020 to 2022 — visit university website (opens in new tab)">
+          <div class="ti-icon" aria-hidden="true">📚</div>
           <div class="ti-body">
             <span class="ti-period">2020 — 2022</span>
-            <h3 class="ti-title">Science, Technology, Engineering &amp; Mathematics <span class="ti-ext">↗</span></h3>
+            <h3 class="ti-title">Science, Technology, Engineering &amp; Mathematics <span class="ti-ext" aria-hidden="true">↗</span></h3>
             <p class="ti-org">Our Lady of Fatima University · Dean's List</p>
             <p class="ti-desc">Completed foundational STEM courses maintaining a strong academic record.</p>
             <div class="tags"><span class="badge">Honors</span></div>
           </div>
         </a>
-        <a class="ti rv d3" href="https://www.interaction-design.org" target="_blank" rel="noopener" aria-label="Visit Design Academy Online website">
-          <div class="ti-icon">🎨</div>
+        <a class="ti rv d3" href="https://www.interaction-design.org" target="_blank" rel="noopener noreferrer" aria-label="UX Design Bootcamp at Design Academy Online, Summer 2022 — visit website (opens in new tab)">
+          <div class="ti-icon" aria-hidden="true">🎨</div>
           <div class="ti-body">
             <span class="ti-period">Summer 2022</span>
-            <h3 class="ti-title">UX Design Bootcamp <span class="ti-ext">↗</span></h3>
+            <h3 class="ti-title">UX Design Bootcamp <span class="ti-ext" aria-hidden="true">↗</span></h3>
             <p class="ti-org">Design Academy Online · Certificate</p>
             <p class="ti-desc">12-week program covering UX research, Figma prototyping, and usability testing.</p>
             <div class="tags"><span class="badge">Certificate</span></div>
@@ -252,247 +258,265 @@
   </section>
 
   <!-- ═══ EXPERIENCE ═══ -->
-  <section id="experience" class="sec">
+  <section id="experience" class="sec" aria-labelledby="experience-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">03</span><h2 class="st2">Experience</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">03</span><h2 class="st2" id="experience-heading">Experience</h2></div>
       <div class="exp-list">
-        <div class="exp rv d1">
+        <article class="exp rv d1" aria-label="Senior Frontend Engineer at TechCorp">
           <div class="exp-meta">
-            <span class="exp-period">Jan 2024 – Present</span>
+            <span class="exp-period"><time datetime="2024-01">Jan 2024</time> – Present</span>
             <span class="exp-co">TechCorp</span>
             <span class="exp-type">Full-time</span>
           </div>
           <div class="exp-body">
             <h3 class="exp-role">Senior Frontend Engineer</h3>
             <p class="exp-desc">Led redesign of flagship SaaS dashboard, reducing load time by 62%. Mentored 3 junior developers and established the component library used across 5 products.</p>
-            <div class="tags"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">GraphQL</span><span class="tag">Figma</span></div>
+            <div class="tags" aria-label="Technologies used"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">GraphQL</span><span class="tag">Figma</span></div>
           </div>
-        </div>
-        <div class="exp rv d2">
+        </article>
+        <article class="exp rv d2" aria-label="Full-Stack Developer at StartupXYZ">
           <div class="exp-meta">
-            <span class="exp-period">Jun 2022 – Dec 2023</span>
+            <span class="exp-period"><time datetime="2022-06">Jun 2022</time> – <time datetime="2023-12">Dec 2023</time></span>
             <span class="exp-co">StartupXYZ</span>
             <span class="exp-type">Full-time</span>
           </div>
           <div class="exp-body">
             <h3 class="exp-role">Full-Stack Developer</h3>
             <p class="exp-desc">Built the customer-facing app from scratch for a Series A fintech startup. Integrated 3 payment APIs and real-time notifications via WebSockets.</p>
-            <div class="tags"><span class="tag">Next.js</span><span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">AWS</span></div>
+            <div class="tags" aria-label="Technologies used"><span class="tag">Next.js</span><span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">AWS</span></div>
           </div>
-        </div>
-        <div class="exp rv d3">
+        </article>
+        <article class="exp rv d3" aria-label="Junior Web Developer at Agency Co.">
           <div class="exp-meta">
-            <span class="exp-period">Sep 2021 – May 2022</span>
+            <span class="exp-period"><time datetime="2021-09">Sep 2021</time> – <time datetime="2022-05">May 2022</time></span>
             <span class="exp-co">Agency Co.</span>
             <span class="exp-type">Full-time</span>
           </div>
           <div class="exp-body">
             <h3 class="exp-role">Junior Web Developer</h3>
             <p class="exp-desc">Developed 12+ client websites with pixel-perfect responsive layouts and automated CI/CD deployment pipelines.</p>
-            <div class="tags"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">WordPress</span></div>
+            <div class="tags" aria-label="Technologies used"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">WordPress</span></div>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </section>
 
   <!-- ═══ PROJECTS ═══ -->
-  <section id="projects" class="sec alt">
+  <section id="projects" class="sec alt" aria-labelledby="projects-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">04</span><h2 class="st2">Projects</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">04</span><h2 class="st2" id="projects-heading">Projects</h2></div>
       <div class="proj-grid">
-        <article class="proj rv d1" data-tilt>
-          <div class="proj-glow"></div>
+        <article class="proj rv d1" data-tilt aria-label="LaunchPad project">
+          <div class="proj-glow" aria-hidden="true"></div>
           <div class="proj-top">
-            <span class="proj-ico">🚀</span>
+            <span class="proj-ico" aria-hidden="true">🚀</span>
             <div class="proj-links">
-              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
-              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+              <a href="#" class="proj-link" data-wip aria-label="GitHub repository — coming soon" aria-disabled="true">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" aria-disabled="true">↗</a>
             </div>
           </div>
           <h3 class="proj-name">LaunchPad</h3>
           <p class="proj-desc">No-code landing page builder with drag-and-drop blocks, live preview, and one-click Vercel deploy. 1,200+ beta users.</p>
-          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">Node</span><span class="ptag">Vercel</span></div>
+          <div class="proj-tags" aria-label="Technologies used"><span class="ptag">React</span><span class="ptag">Node</span><span class="ptag">Vercel</span></div>
         </article>
-        <article class="proj rv d2" data-tilt>
-          <div class="proj-glow"></div>
+        <article class="proj rv d2" data-tilt aria-label="MindMap AI project">
+          <div class="proj-glow" aria-hidden="true"></div>
           <div class="proj-top">
-            <span class="proj-ico">🧠</span>
+            <span class="proj-ico" aria-hidden="true">🧠</span>
             <div class="proj-links">
-              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
-              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+              <a href="#" class="proj-link" data-wip aria-label="GitHub repository — coming soon" aria-disabled="true">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" aria-disabled="true">↗</a>
             </div>
           </div>
           <h3 class="proj-name">MindMap AI</h3>
           <p class="proj-desc">AI-powered knowledge graph connecting concepts from your notes using embeddings and a force-directed graph UI.</p>
-          <div class="proj-tags"><span class="ptag">Python</span><span class="ptag">D3.js</span><span class="ptag">OpenAI</span></div>
+          <div class="proj-tags" aria-label="Technologies used"><span class="ptag">Python</span><span class="ptag">D3.js</span><span class="ptag">OpenAI</span></div>
         </article>
-        <article class="proj rv d3" data-tilt>
-          <div class="proj-glow"></div>
+        <article class="proj rv d3" data-tilt aria-label="DataPulse project">
+          <div class="proj-glow" aria-hidden="true"></div>
           <div class="proj-top">
-            <span class="proj-ico">📊</span>
+            <span class="proj-ico" aria-hidden="true">📊</span>
             <div class="proj-links">
-              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
-              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+              <a href="#" class="proj-link" data-wip aria-label="GitHub repository — coming soon" aria-disabled="true">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" aria-disabled="true">↗</a>
             </div>
           </div>
           <h3 class="proj-name">DataPulse</h3>
           <p class="proj-desc">Real-time analytics dashboard ingesting 50k+ events/sec via Kafka, visualized with custom WebGL charts.</p>
-          <div class="proj-tags"><span class="ptag">Kafka</span><span class="ptag">WebGL</span><span class="ptag">Go</span></div>
+          <div class="proj-tags" aria-label="Technologies used"><span class="ptag">Kafka</span><span class="ptag">WebGL</span><span class="ptag">Go</span></div>
         </article>
-        <article class="proj rv d1" data-tilt>
-          <div class="proj-glow"></div>
+        <article class="proj rv d1" data-tilt aria-label="Pixel Studio project">
+          <div class="proj-glow" aria-hidden="true"></div>
           <div class="proj-top">
-            <span class="proj-ico">🎨</span>
+            <span class="proj-ico" aria-hidden="true">🎨</span>
             <div class="proj-links">
-              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
-              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+              <a href="#" class="proj-link" data-wip aria-label="GitHub repository — coming soon" aria-disabled="true">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" aria-disabled="true">↗</a>
             </div>
           </div>
           <h3 class="proj-name">Pixel Studio</h3>
           <p class="proj-desc">Collaborative pixel art editor with real-time multiplayer via WebRTC. Featured on Product Hunt.</p>
-          <div class="proj-tags"><span class="ptag">WebRTC</span><span class="ptag">Canvas</span><span class="ptag">OT</span></div>
+          <div class="proj-tags" aria-label="Technologies used"><span class="ptag">WebRTC</span><span class="ptag">Canvas</span><span class="ptag">OT</span></div>
         </article>
-        <article class="proj rv d2" data-tilt>
-          <div class="proj-glow"></div>
+        <article class="proj rv d2" data-tilt aria-label="VaultPass project">
+          <div class="proj-glow" aria-hidden="true"></div>
           <div class="proj-top">
-            <span class="proj-ico">🔐</span>
+            <span class="proj-ico" aria-hidden="true">🔐</span>
             <div class="proj-links">
-              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
-              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+              <a href="#" class="proj-link" data-wip aria-label="GitHub repository — coming soon" aria-disabled="true">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" aria-disabled="true">↗</a>
             </div>
           </div>
           <h3 class="proj-name">VaultPass</h3>
           <p class="proj-desc">E2E encrypted password manager with zero-knowledge architecture, TOTP support, and browser extension.</p>
-          <div class="proj-tags"><span class="ptag">Crypto</span><span class="ptag">Extension</span><span class="ptag">Rust</span></div>
+          <div class="proj-tags" aria-label="Technologies used"><span class="ptag">Crypto</span><span class="ptag">Extension</span><span class="ptag">Rust</span></div>
         </article>
-        <article class="proj rv d3" data-tilt>
-          <div class="proj-glow"></div>
+        <article class="proj rv d3" data-tilt aria-label="EcoTrack project">
+          <div class="proj-glow" aria-hidden="true"></div>
           <div class="proj-top">
-            <span class="proj-ico">🌍</span>
+            <span class="proj-ico" aria-hidden="true">🌍</span>
             <div class="proj-links">
-              <a href="#" class="proj-link" data-wip aria-label="GitHub — coming soon" title="Coming soon">GH</a>
-              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" title="Coming soon">↗</a>
+              <a href="#" class="proj-link" data-wip aria-label="GitHub repository — coming soon" aria-disabled="true">GH</a>
+              <a href="#" class="proj-link" data-wip aria-label="Live demo — coming soon" aria-disabled="true">↗</a>
             </div>
           </div>
           <h3 class="proj-name">EcoTrack</h3>
           <p class="proj-desc">Carbon footprint tracker with gamification mechanics. Won 1st place at a climate-tech hackathon.</p>
-          <div class="proj-tags"><span class="ptag">Vue</span><span class="ptag">Firebase</span><span class="ptag">Maps</span></div>
+          <div class="proj-tags" aria-label="Technologies used"><span class="ptag">Vue</span><span class="ptag">Firebase</span><span class="ptag">Maps</span></div>
         </article>
       </div>
     </div>
   </section>
 
   <!-- ═══ SKILLS ═══ -->
-  <section id="skills" class="sec">
+  <section id="skills" class="sec" aria-labelledby="skills-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">05</span><h2 class="st2">Skills</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">05</span><h2 class="st2" id="skills-heading">Skills</h2></div>
       <div class="skill-grid">
         <div class="skill-group rv d1">
-          <h3 class="skill-group-title">⚛️ Frontend</h3>
+          <h3 class="skill-group-title"><span aria-hidden="true">⚛️ </span>Frontend</h3>
           <div class="skill-items">
-            <div class="skill-item"><span class="skill-name">React / Next.js</span><span class="skill-ctx">3 yrs · 8 projects</span></div>
-            <div class="skill-item"><span class="skill-name">TypeScript</span><span class="skill-ctx">2 yrs · 6 projects</span></div>
-            <div class="skill-item"><span class="skill-name">CSS / Tailwind</span><span class="skill-ctx">3 yrs · 12 projects</span></div>
-            <div class="skill-item"><span class="skill-name">Three.js / WebGL</span><span class="skill-ctx">1 yr · 2 projects</span></div>
+            <div class="skill-item"><span class="skill-name">React / Next.js</span><span class="skill-ctx" aria-label="3 years, 8 projects">3 yrs · 8 projects</span></div>
+            <div class="skill-item"><span class="skill-name">TypeScript</span><span class="skill-ctx" aria-label="2 years, 6 projects">2 yrs · 6 projects</span></div>
+            <div class="skill-item"><span class="skill-name">CSS / Tailwind</span><span class="skill-ctx" aria-label="3 years, 12 projects">3 yrs · 12 projects</span></div>
+            <div class="skill-item"><span class="skill-name">Three.js / WebGL</span><span class="skill-ctx" aria-label="1 year, 2 projects">1 yr · 2 projects</span></div>
           </div>
         </div>
         <div class="skill-group rv d2">
-          <h3 class="skill-group-title">⚙️ Backend</h3>
+          <h3 class="skill-group-title"><span aria-hidden="true">⚙️ </span>Backend</h3>
           <div class="skill-items">
-            <div class="skill-item"><span class="skill-name">Node.js</span><span class="skill-ctx">2 yrs · 7 projects</span></div>
-            <div class="skill-item"><span class="skill-name">Python / FastAPI</span><span class="skill-ctx">2 yrs · 5 projects</span></div>
-            <div class="skill-item"><span class="skill-name">PostgreSQL</span><span class="skill-ctx">2 yrs · 6 projects</span></div>
-            <div class="skill-item"><span class="skill-name">Redis</span><span class="skill-ctx">1 yr · 3 projects</span></div>
+            <div class="skill-item"><span class="skill-name">Node.js</span><span class="skill-ctx" aria-label="2 years, 7 projects">2 yrs · 7 projects</span></div>
+            <div class="skill-item"><span class="skill-name">Python / FastAPI</span><span class="skill-ctx" aria-label="2 years, 5 projects">2 yrs · 5 projects</span></div>
+            <div class="skill-item"><span class="skill-name">PostgreSQL</span><span class="skill-ctx" aria-label="2 years, 6 projects">2 yrs · 6 projects</span></div>
+            <div class="skill-item"><span class="skill-name">Redis</span><span class="skill-ctx" aria-label="1 year, 3 projects">1 yr · 3 projects</span></div>
           </div>
         </div>
         <div class="skill-group rv d3">
-          <h3 class="skill-group-title">☁️ DevOps &amp; Tools</h3>
+          <h3 class="skill-group-title"><span aria-hidden="true">☁️ </span>DevOps &amp; Tools</h3>
           <div class="skill-items">
-            <div class="skill-item"><span class="skill-name">AWS / GCP</span><span class="skill-ctx">1 yr · 4 projects</span></div>
-            <div class="skill-item"><span class="skill-name">Docker / K8s</span><span class="skill-ctx">1 yr · 3 projects</span></div>
-            <div class="skill-item"><span class="skill-name">Git / CI/CD</span><span class="skill-ctx">3 yrs · all projects</span></div>
-            <div class="skill-item"><span class="skill-name">Figma / Design</span><span class="skill-ctx">2 yrs · 10 projects</span></div>
+            <div class="skill-item"><span class="skill-name">AWS / GCP</span><span class="skill-ctx" aria-label="1 year, 4 projects">1 yr · 4 projects</span></div>
+            <div class="skill-item"><span class="skill-name">Docker / K8s</span><span class="skill-ctx" aria-label="1 year, 3 projects">1 yr · 3 projects</span></div>
+            <div class="skill-item"><span class="skill-name">Git / CI/CD</span><span class="skill-ctx" aria-label="3 years, all projects">3 yrs · all projects</span></div>
+            <div class="skill-item"><span class="skill-name">Figma / Design</span><span class="skill-ctx" aria-label="2 years, 10 projects">2 yrs · 10 projects</span></div>
           </div>
         </div>
       </div>
-      <div class="pill-cloud rv d2">
-        <span class="pill">JavaScript</span><span class="pill">React</span><span class="pill">Next.js</span>
-        <span class="pill">TypeScript</span><span class="pill">Node.js</span><span class="pill">Python</span>
-        <span class="pill">GraphQL</span><span class="pill">REST APIs</span><span class="pill">PostgreSQL</span>
-        <span class="pill">MongoDB</span><span class="pill">Redis</span><span class="pill">Docker</span>
-        <span class="pill">AWS</span><span class="pill">Figma</span><span class="pill">Git</span>
-        <span class="pill">Tailwind</span><span class="pill">Three.js</span>
+      <div class="pill-cloud rv d2" role="list" aria-label="Technology skills">
+        <span class="pill" role="listitem">JavaScript</span><span class="pill" role="listitem">React</span><span class="pill" role="listitem">Next.js</span>
+        <span class="pill" role="listitem">TypeScript</span><span class="pill" role="listitem">Node.js</span><span class="pill" role="listitem">Python</span>
+        <span class="pill" role="listitem">GraphQL</span><span class="pill" role="listitem">REST APIs</span><span class="pill" role="listitem">PostgreSQL</span>
+        <span class="pill" role="listitem">MongoDB</span><span class="pill" role="listitem">Redis</span><span class="pill" role="listitem">Docker</span>
+        <span class="pill" role="listitem">AWS</span><span class="pill" role="listitem">Figma</span><span class="pill" role="listitem">Git</span>
+        <span class="pill" role="listitem">Tailwind</span><span class="pill" role="listitem">Three.js</span>
       </div>
     </div>
   </section>
 
   <!-- ═══ CERTIFICATIONS ═══ -->
-  <section id="certifications" class="sec alt">
+  <section id="certifications" class="sec alt" aria-labelledby="certifications-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">06</span><h2 class="st2">Certifications</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">06</span><h2 class="st2" id="certifications-heading">Certifications</h2></div>
       <div class="cert-grid">
-        <div class="cert rv d1"><div class="cert-top"><div class="cert-ico co">☁️</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">AWS Solutions Architect – Associate</h3><p class="cert-issuer">Amazon Web Services</p><p class="cert-date">Issued March 2024</p></div>
-        <div class="cert rv d2"><div class="cert-top"><div class="cert-ico cb">🔷</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">Google Professional Cloud Developer</h3><p class="cert-issuer">Google Cloud</p><p class="cert-date">Issued November 2023</p></div>
-        <div class="cert rv d3"><div class="cert-top"><div class="cert-ico cte">⚛️</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">Meta Frontend Developer Professional</h3><p class="cert-issuer">Meta / Coursera</p><p class="cert-date">Issued June 2023</p></div>
-        <div class="cert rv d1"><div class="cert-top"><div class="cert-ico cg2">🛡️</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">CompTIA Security+</h3><p class="cert-issuer">CompTIA</p><p class="cert-date">Issued January 2023</p></div>
-        <div class="cert rv d2"><div class="cert-top"><div class="cert-ico cr">🐍</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">Python for Data Science</h3><p class="cert-issuer">IBM / Coursera</p><p class="cert-date">Issued August 2022</p></div>
-        <div class="cert rv d3"><div class="cert-top"><div class="cert-ico csk">🎓</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">MongoDB Developer Certification</h3><p class="cert-issuer">MongoDB University</p><p class="cert-date">Issued April 2022</p></div>
+        <article class="cert rv d1" aria-label="AWS Solutions Architect Associate, verified"><div class="cert-top"><div class="cert-ico co" aria-hidden="true">☁️</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">AWS Solutions Architect – Associate</h3><p class="cert-issuer">Amazon Web Services</p><p class="cert-date"><time datetime="2024-03">Issued March 2024</time></p></article>
+        <article class="cert rv d2" aria-label="Google Professional Cloud Developer, verified"><div class="cert-top"><div class="cert-ico cb" aria-hidden="true">🔷</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">Google Professional Cloud Developer</h3><p class="cert-issuer">Google Cloud</p><p class="cert-date"><time datetime="2023-11">Issued November 2023</time></p></article>
+        <article class="cert rv d3" aria-label="Meta Frontend Developer Professional, verified"><div class="cert-top"><div class="cert-ico cte" aria-hidden="true">⚛️</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">Meta Frontend Developer Professional</h3><p class="cert-issuer">Meta / Coursera</p><p class="cert-date"><time datetime="2023-06">Issued June 2023</time></p></article>
+        <article class="cert rv d1" aria-label="CompTIA Security Plus, verified"><div class="cert-top"><div class="cert-ico cg2" aria-hidden="true">🛡️</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">CompTIA Security+</h3><p class="cert-issuer">CompTIA</p><p class="cert-date"><time datetime="2023-01">Issued January 2023</time></p></article>
+        <article class="cert rv d2" aria-label="Python for Data Science, verified"><div class="cert-top"><div class="cert-ico cr" aria-hidden="true">🐍</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">Python for Data Science</h3><p class="cert-issuer">IBM / Coursera</p><p class="cert-date"><time datetime="2022-08">Issued August 2022</time></p></article>
+        <article class="cert rv d3" aria-label="MongoDB Developer Certification, verified"><div class="cert-top"><div class="cert-ico csk" aria-hidden="true">🎓</div><span class="cert-badge">✓ Verified</span></div><h3 class="cert-name">MongoDB Developer Certification</h3><p class="cert-issuer">MongoDB University</p><p class="cert-date"><time datetime="2022-04">Issued April 2022</time></p></article>
       </div>
     </div>
   </section>
 
   <!-- ═══ CONTACT ═══ -->
-  <section id="contact" class="sec">
+  <section id="contact" class="sec" aria-labelledby="contact-heading">
     <div class="si">
-      <div class="sec-hd rv"><span class="sn">07</span><h2 class="st2">Let's Talk</h2></div>
+      <div class="sec-hd rv"><span class="sn" aria-hidden="true">07</span><h2 class="st2" id="contact-heading">Let's Talk</h2></div>
       <div class="contact-grid">
         <div class="rv d1">
           <p class="contact-tag">Have a project in mind, or just want to say hello? My inbox is always open.</p>
           <div class="socials">
-            <a href="mailto:flores.clarencekyle.manrique@gmail.com" class="social">
-              <span class="social-ico">✉</span>
+            <a href="mailto:flores.clarencekyle.manrique@gmail.com" class="social" aria-label="Send email to flores.clarencekyle.manrique@gmail.com">
+              <span class="social-ico" aria-hidden="true">✉</span>
               <span class="social-text">
                 <span class="social-label">Email</span>
                 <span class="social-val">flores.clarencekyle.manrique@gmail.com</span>
               </span>
-              <button class="copy-btn" data-copy="flores.clarencekyle.manrique@gmail.com" aria-label="Copy email">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <button class="copy-btn" data-copy="flores.clarencekyle.manrique@gmail.com" aria-label="Copy email address to clipboard">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </a>
-            <a href="https://linkedin.com/in/clarenceflores8/" target="_blank" rel="noopener" class="social">
-              <span class="social-ico">in</span>
+            <a href="https://linkedin.com/in/clarenceflores8/" target="_blank" rel="noopener noreferrer" class="social" aria-label="LinkedIn profile — linkedin.com/in/clarenceflores8 (opens in new tab)">
+              <span class="social-ico" aria-hidden="true">in</span>
               <span class="social-text"><span class="social-label">LinkedIn</span><span class="social-val">linkedin.com/in/clarenceflores8</span></span>
             </a>
-            <a href="https://github.com/callmecla" target="_blank" rel="noopener" class="social">
-              <span class="social-ico">
-                <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            <a href="https://github.com/callmecla" target="_blank" rel="noopener noreferrer" class="social" aria-label="GitHub profile — github.com/callmecla (opens in new tab)">
+              <span class="social-ico" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
               </span>
               <span class="social-text"><span class="social-label">GitHub</span><span class="social-val">github.com/callmecla</span></span>
             </a>
-            <a href="https://www.facebook.com/clarenceflores.midzydive" target="_blank" rel="noopener" class="social">
-              <span class="social-ico">f</span>
+            <a href="https://www.facebook.com/clarenceflores.midzydive" target="_blank" rel="noopener noreferrer" class="social" aria-label="Facebook profile (opens in new tab)">
+              <span class="social-ico" aria-hidden="true">f</span>
               <span class="social-text"><span class="social-label">Facebook</span><span class="social-val">facebook.com/clarenceflores.midzydive</span></span>
             </a>
           </div>
         </div>
-        <form id="cf" class="contact-form rv d2" novalidate>
+
+        <!-- FIX 4: Inline form validation with error spans + aria-describedby -->
+        <form id="cf" class="contact-form rv d2" novalidate aria-label="Contact form">
           <div class="form-row">
-            <div class="form-field"><label for="cfn">Name</label><input type="text" id="cfn" placeholder="Enter your name" required autocomplete="name"/></div>
-            <div class="form-field"><label for="cfe">Email</label><input type="email" id="cfe" placeholder="example@email.com" required autocomplete="email"/></div>
+            <div class="form-field">
+              <label for="cfn">Name</label>
+              <input type="text" id="cfn" placeholder="Enter your name" required autocomplete="name" aria-required="true" aria-describedby="cfn-err"/>
+              <span class="field-err" id="cfn-err" role="alert" aria-live="polite"></span>
+            </div>
+            <div class="form-field">
+              <label for="cfe">Email</label>
+              <input type="email" id="cfe" placeholder="example@email.com" required autocomplete="email" aria-required="true" aria-describedby="cfe-err"/>
+              <span class="field-err" id="cfe-err" role="alert" aria-live="polite"></span>
+            </div>
           </div>
-          <div class="form-field"><label for="cfs">Subject</label><input type="text" id="cfs" placeholder="Enter the subject here..." required/></div>
-          <div class="form-field"><label for="cfm">Message</label><textarea id="cfm" rows="5" placeholder="Enter your message here..." required></textarea></div>
-          <button type="submit" class="btn bp btn-full mag" id="cfb">
+          <div class="form-field">
+            <label for="cfs">Subject</label>
+            <input type="text" id="cfs" placeholder="Enter the subject here..." aria-describedby="cfs-err"/>
+            <span class="field-err" id="cfs-err" role="alert" aria-live="polite"></span>
+          </div>
+          <div class="form-field">
+            <label for="cfm">Message</label>
+            <textarea id="cfm" rows="5" placeholder="Enter your message here..." required aria-required="true" aria-describedby="cfm-err"></textarea>
+            <span class="field-err" id="cfm-err" role="alert" aria-live="polite"></span>
+          </div>
+          <button type="submit" class="btn bp btn-full mag" id="cfb" aria-label="Send message">
             <span id="cbl">Send Message</span>
-            <svg id="cs" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            <svg id="cs" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false" style="display:none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
           </button>
         </form>
       </div>
     </div>
   </section>
 
-  <footer>
+  <footer role="contentinfo">
     <div class="footer-inner">
       <p class="footer-copy">© 2025 <strong>Clarence Flores</strong>. All rights reserved.</p>
     </div>
@@ -501,4 +525,3 @@
   <script src="main.js"></script>
 </body>
 </html>
-
