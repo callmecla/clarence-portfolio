@@ -256,7 +256,7 @@ a.ti:hover .ti-ext { opacity: 1; transform: translate(2px, -2px); }
 
 /* ── EXPERIENCE ── */
 .exp-list { display: flex; flex-direction: column; }
-.exp { display: grid; grid-template-columns: 185px 1fr; gap: 2rem; padding: 2.25rem 0; border-bottom: 1px solid var(--bdr); }
+.exp { display: grid; grid-template-columns: 185px 1fr; gap: 2rem; padding: 2.25rem .75rem; border-bottom: 1px solid var(--bdr); margin: 0 -.75rem; border-radius: var(--radius); }
 .exp:first-child { border-top: 1px solid var(--bdr); }
 .exp-meta   { display: flex; flex-direction: column; gap: .45rem; padding-top: .1rem; }
 .exp-period { font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; color: var(--tx3); text-transform: uppercase; line-height: 1.5; }
@@ -265,36 +265,13 @@ a.ti:hover .ti-ext { opacity: 1; transform: translate(2px, -2px); }
 .exp-type   { font-family: var(--mono); font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; color: var(--acc3); background: rgba(94,234,212,.07); border: 1px solid rgba(94,234,212,.2); padding: .15rem .5rem; border-radius: 4px; align-self: flex-start; }
 .exp-role   { font-family: var(--serif); font-size: 1.2rem; color: var(--tx); margin-bottom: .6rem; }
 .exp-desc   { font-size: .88rem; line-height: 1.8; color: var(--tx2); }
-a.exp {
-  display: grid;
-  text-decoration: none;
-  color: inherit;
-  border-radius: var(--radius);
-  transition: background .25s, padding-left .3s var(--ease);
-  margin: 0 -.75rem;
-  padding-left: .75rem;
-  padding-right: .75rem;
-}
-a.exp:hover {
-  background: rgba(200,244,104,.05);
-  padding-left: 1.25rem;
-}
-[data-theme="light"] a.exp:hover {
-  background: rgba(61,122,0,.05);
-}
-
-/* Company name highlight + ↗ indicator on hover */
-a.exp:hover .exp-co  { color: var(--acc); }
-.exp-ext {
-  font-family: var(--sans);
-  font-size: .85rem;
-  color: var(--acc);
-  opacity: 0;
-  margin-left: .2rem;
-  transition: opacity .25s, transform .25s;
-  display: inline-block;
-  vertical-align: middle;
-}
+ 
+/* ── EXPERIENCE LINK STYLES ── */
+a.exp { text-decoration: none; color: inherit; transition: background .25s, padding-left .3s var(--ease); }
+a.exp:hover { background: rgba(200,244,104,.05); padding-left: 1.25rem; }
+[data-theme="light"] a.exp:hover { background: rgba(61,122,0,.05); }
+a.exp:hover .exp-co { color: var(--acc); }
+.exp-ext { font-family: var(--sans); font-size: .85rem; color: var(--acc); opacity: 0; margin-left: .2rem; transition: opacity .25s, transform .25s; display: inline-block; vertical-align: middle; }
 a.exp:hover .exp-ext { opacity: 1; transform: translate(2px, -2px); }
 
 /* ── PROJECTS ── */
