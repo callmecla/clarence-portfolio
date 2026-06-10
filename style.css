@@ -265,6 +265,37 @@ a.ti:hover .ti-ext { opacity: 1; transform: translate(2px, -2px); }
 .exp-type   { font-family: var(--mono); font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; color: var(--acc3); background: rgba(94,234,212,.07); border: 1px solid rgba(94,234,212,.2); padding: .15rem .5rem; border-radius: 4px; align-self: flex-start; }
 .exp-role   { font-family: var(--serif); font-size: 1.2rem; color: var(--tx); margin-bottom: .6rem; }
 .exp-desc   { font-size: .88rem; line-height: 1.8; color: var(--tx2); }
+a.exp {
+  display: grid;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius);
+  transition: background .25s, padding-left .3s var(--ease);
+  margin: 0 -.75rem;
+  padding-left: .75rem;
+  padding-right: .75rem;
+}
+a.exp:hover {
+  background: rgba(200,244,104,.05);
+  padding-left: 1.25rem;
+}
+[data-theme="light"] a.exp:hover {
+  background: rgba(61,122,0,.05);
+}
+
+/* Company name highlight + ↗ indicator on hover */
+a.exp:hover .exp-co  { color: var(--acc); }
+.exp-ext {
+  font-family: var(--sans);
+  font-size: .85rem;
+  color: var(--acc);
+  opacity: 0;
+  margin-left: .2rem;
+  transition: opacity .25s, transform .25s;
+  display: inline-block;
+  vertical-align: middle;
+}
+a.exp:hover .exp-ext { opacity: 1; transform: translate(2px, -2px); }
 
 /* ── PROJECTS ── */
 .proj-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--bdr); border: 1px solid var(--bdr); border-radius: 8px; overflow: hidden; }
