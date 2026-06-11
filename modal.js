@@ -78,16 +78,16 @@
   /* ── CERTIFICATION DATA ────────────────────────────────── */
   var CERTS = [
     {
-      id:            'aws',
-      name:          'AWS Solutions Architect – Associate',
-      issuer:        'Amazon Web Services',
-      date:          'March 2024',
-      datetime:      '2024-03',
-      icon:          '☁️',
-      iconClass:     'co',
+      id:            'She++ Masterclass on Alibaba Cloud System',
+      name:          'She++ Masterclass on Alibaba Cloud System',
+      issuer:        'PhilDev | Wells Fargo | Alibaba Cloud',
+      date:          'April 2025',
+      datetime:      '2025-04',
+      icon:          '🔷',
+      iconClass:     'cb  ',
       credentialId:  '',   // e.g. 'ABC123XYZ'
-      credentialUrl: '',   // e.g. 'https://www.credly.com/badges/...'
-      image:         '',   // path to cert image once you have it
+      credentialUrl: '',   https://www.credly.com/badges/d96470a4-2895-452e-a367-85b88adbcfbd
+      image:         '',   certifications/python_essentials_1.jpg
     },
     {
       id:            'gcp',
