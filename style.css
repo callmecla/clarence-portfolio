@@ -864,3 +864,5 @@ footer { border-top: 1px solid var(--bdr); position: relative; z-index: 2; }
   .modal-cert-details { grid-template-columns: 1fr; }
   .modal-proj-header  { flex-direction: column; }
 }
+
+/* ── Accessibility: trap focus within modal when open ── */
