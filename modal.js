@@ -3,10 +3,14 @@
    ══════════════════════════════════════════════════════════
 
    HOW TO UPDATE CONTENT:
-   - Projects:      edit the PROJECTS array below
+   - Projects:       edit the PROJECTS array below
    - Certifications: edit the CERTS array below
-   - Screenshots:   add image paths to the `image` field
-   - Cert files:    add path/URL to `image` and `credentialUrl` fields
+   - Screenshots:    add image paths to the `image` field
+   - Cert files:     add path/URL to `image` and `credentialUrl` fields
+
+   NOTE: Each project/cert card in index.html needs a matching
+   data-id attribute (e.g. <article class="proj" data-id="launchpad">)
+   for the click-to-open behavior to work.
    ══════════════════════════════════════════════════════════ */
 
 (function () {
@@ -75,26 +79,54 @@
     },
   ];
 
-  /* ── CERTIFICATION DATA ────────────────────────────────── */
+  /* ── CERTIFICATION DATA ────────────────────────────────────
+     Matches the 7 certs currently listed in the Certifications
+     section of index.html. Add `image` (path to the cert image/PDF)
+     and `credentialUrl` (verification link) as you get them.
+  ──────────────────────────────────────────────────────────── */
   var CERTS = [
     {
-      id:            'She++ Masterclass on Alibaba Cloud System',
+      id:            'shepp-alibaba',
       name:          'She++ Masterclass on Alibaba Cloud System',
       issuer:        'PhilDev | Wells Fargo | Alibaba Cloud',
       date:          'April 2025',
       datetime:      '2025-04',
       icon:          '🔷',
-      iconClass:     'cb  ',
-      credentialId:  '',   // e.g. 'ABC123XYZ'
-      credentialUrl: '',   https://www.credly.com/badges/d96470a4-2895-452e-a367-85b88adbcfbd
-      image:         '',   certifications/python_essentials_1.jpg
+      iconClass:     'csk',
+      credentialId:  '',
+      credentialUrl: '',
+      image:         '',
     },
     {
-      id:            'gcp',
-      name:          'Google Professional Cloud Developer',
-      issuer:        'Google Cloud',
-      date:          'November 2023',
-      datetime:      '2023-11',
+      id:            'qcu-ip-foundation',
+      name:          'Foundation Course on Intellectual Property',
+      issuer:        'Quezon City University — Research, Extension, Planning, and Linkages, Innovation and Technology Support Office',
+      date:          'July 2025',
+      datetime:      '2025-07',
+      icon:          '🔷',
+      iconClass:     'csk',
+      credentialId:  '',
+      credentialUrl: '',
+      image:         '',
+    },
+    {
+      id:            'cisco-cybersecurity',
+      name:          'Introduction to Cybersecurity',
+      issuer:        'Cisco Networking Academy',
+      date:          'September 2025',
+      datetime:      '2025-09',
+      icon:          '🛡️',
+      iconClass:     'co',
+      credentialId:  '',
+      credentialUrl: '',
+      image:         '',
+    },
+    {
+      id:            'cisco-iot',
+      name:          'Introduction to IoT',
+      issuer:        'Cisco Networking Academy',
+      date:          'October 2025',
+      datetime:      '2025-10',
       icon:          '🔷',
       iconClass:     'cb',
       credentialId:  '',
@@ -102,11 +134,11 @@
       image:         '',
     },
     {
-      id:            'meta',
-      name:          'Meta Frontend Developer Professional',
-      issuer:        'Meta / Coursera',
-      date:          'June 2023',
-      datetime:      '2023-06',
+      id:            'cisco-ethical-hacking',
+      name:          'Ethical Hacking',
+      issuer:        'Cisco Networking Academy',
+      date:          'November 2025',
+      datetime:      '2025-11',
       icon:          '⚛️',
       iconClass:     'cte',
       credentialId:  '',
@@ -114,37 +146,25 @@
       image:         '',
     },
     {
-      id:            'comptia',
-      name:          'CompTIA Security+',
-      issuer:        'CompTIA',
-      date:          'January 2023',
-      datetime:      '2023-01',
-      icon:          '🛡️',
+      id:            'cisco-modern-ai',
+      name:          'Introduction to Modern AI',
+      issuer:        'Cisco Networking Academy',
+      date:          'December 2025',
+      datetime:      '2025-12',
+      icon:          '⚛️',
       iconClass:     'cg2',
       credentialId:  '',
       credentialUrl: '',
       image:         '',
     },
     {
-      id:            'python',
-      name:          'Python for Data Science',
-      issuer:        'IBM / Coursera',
-      date:          'August 2022',
-      datetime:      '2022-08',
+      id:            'cisco-python-essentials-1',
+      name:          'Python Essentials 1',
+      issuer:        'Cisco Networking Academy',
+      date:          'January 2026',
+      datetime:      '2026-01',
       icon:          '🐍',
       iconClass:     'cr',
-      credentialId:  '',
-      credentialUrl: '',
-      image:         '',
-    },
-    {
-      id:            'mongodb',
-      name:          'MongoDB Developer Certification',
-      issuer:        'MongoDB University',
-      date:          'April 2022',
-      datetime:      '2022-04',
-      icon:          '🎓',
-      iconClass:     'csk',
       credentialId:  '',
       credentialUrl: '',
       image:         '',
@@ -166,8 +186,8 @@
 
   document.body.appendChild(overlay);
 
-  var panel   = document.getElementById('modal-panel');
-  var body    = document.getElementById('modal-body');
+  var panel    = document.getElementById('modal-panel');
+  var body     = document.getElementById('modal-body');
   var closeBtn = document.getElementById('modal-close');
   var lastFocused = null;
 
@@ -205,6 +225,7 @@
     var focusable = panel.querySelectorAll(
       'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'
     );
+    if (!focusable.length) return;
     var first = focusable[0], last = focusable[focusable.length - 1];
     if (e.shiftKey) {
       if (document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -216,8 +237,8 @@
   /* ── Helpers ── */
   function esc(s) {
     return String(s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   function tagHtml(tags, cls) {
