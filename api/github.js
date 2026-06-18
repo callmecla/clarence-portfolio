@@ -1,7 +1,8 @@
 /**
  * Vercel Serverless Function — GitHub contribution graph for callmecla.
  * Optional: GITHUB_TOKEN for GraphQL (higher rate limits).
- * Falls back to a public contributions API when no token is set.
+ * Falls back to a public contributions API when no token is set,
+ * or when GraphQL fails.
  */
 const USERNAME = 'callmecla';
 
@@ -25,21 +26,19 @@ function normalizeDays(days) {
 }
 
 async function fetchViaGraphQL(token) {
-  const query = {
-    query: [
-      'query($login: String!) {',
-      '  user(login: $login) {',
-      '    contributionsCollection {',
-      '      contributionCalendar {',
-      '        weeks {',
-      '          contributionDays { date contributionCount }',
-      '        }',
-      '      }',
-      '    }',
-      '  }',
-      '}'
-    ].join(' ')
-  };
+  const query = [
+    'query($login: String!) {',
+    '  user(login: $login) {',
+    '    contributionsCollection {',
+    '      contributionCalendar {',
+    '        weeks {',
+    '          contributionDays { date contributionCount }',
+    '        }',
+    '      }',
+    '    }',
+    '  }',
+    '}'
+  ].join(' ');
 
   const response = await fetch('https://api.github.com/graphql', {
     method: 'POST',
@@ -47,7 +46,7 @@ async function fetchViaGraphQL(token) {
       Authorization: 'Bearer ' + token,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ query: query.query, variables: { login: USERNAME } })
+    body: JSON.stringify({ query: query, variables: { login: USERNAME } })
   });
 
   const data = await response.json();
@@ -87,6 +86,7 @@ async function fetchViaPublicApi() {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -101,6 +101,14 @@ export default async function handler(req, res) {
     return res.status(200).json({ contributions: contributions });
   } catch (err) {
     console.error('[api/github]', err);
-    return res.status(502).json({ error: 'Could not load GitHub contributions' });
+
+    // If GraphQL fails, try public API before giving up
+    try {
+      const contributions = await fetchViaPublicApi();
+      return res.status(200).json({ contributions: contributions });
+    } catch (fallbackErr) {
+      console.error('[api/github] fallback failed', fallbackErr);
+      return res.status(502).json({ error: 'Could not load GitHub contributions' });
+    }
   }
 }
