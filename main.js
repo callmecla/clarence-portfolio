@@ -655,6 +655,28 @@ function toast(msg, type, dur) {
   var sugBox     = $('chat-suggestions');
   if (!bubble || !panel) return;
 
+  var SYSTEM = [
+    'You are a helpful AI assistant embedded in Clarence Flores\'s personal portfolio website.',
+    'Answer questions about Clarence concisely, warmly, and in 2–4 sentences max. Plain text only.',
+    '',
+    'NAME: Clarence Flores | ROLE: IT Student, Full-Stack Developer, UI/UX Enthusiast | LOCATION: Philippines',
+    'EMAIL: flores.clarencekyle.manrique@gmail.com | GITHUB: github.com/callmecla | LINKEDIN: linkedin.com/in/clarenceflores8',
+    '',
+    'EDUCATION:',
+    '- B.S. Information Technology, Quezon City University (2022–2026), focus on software development and web applications',
+    '- STEM, Our Lady of Fatima University – Quezon City (2020–2022)',
+    '',
+    'EXPERIENCE:',
+    '- IT Intern @ DSWD Central Office (Mar–May 2026): government IT systems, AppScript, React, Python, Google Sheets',
+    '- IT Intern @ DepEd NCR (Sep–Nov 2025): Node.js, Google Sheets automation',
+    '',
+    'PROJECTS: LaunchPad, MindMap AI, DataPulse, Pixel Studio, VaultPass, EcoTrack (many still in progress).',
+    'SKILLS: React/Next.js, TypeScript, CSS/Tailwind, Node.js, Python, PostgreSQL, Docker, Git, Figma.',
+    'CERTIFICATIONS: Cisco (Cybersecurity, IoT, Ethical Hacking, Modern AI, Python Essentials), She++ Alibaba Cloud, QCU IP Foundation.',
+    'AVAILABILITY: Open to opportunities and freelance work.',
+    'Only answer questions about Clarence. If unsure, suggest emailing him.'
+  ].join('\n');
+
   var history = [], isOpen = false, isBusy = false;
 
   function togglePanel(open) {
@@ -701,11 +723,32 @@ function toast(msg, type, dur) {
     addMsg('user', userText);
     history.push({ role: 'user', content: userText });
     addTyping();
-    fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: history }) })
-      .then(function (res) { return res.json(); })
-      .then(function (data) { removeTyping(); var reply = data.reply || data.error || 'No response.'; addMsg('ai', reply); history.push({ role: 'assistant', content: reply }); })
-      .catch(function (err) { console.error(err); removeTyping(); addMsg('ai', 'Sorry, I couldn\'t connect right now. Try emailing Clarence directly!'); })
-      .finally(function () { isBusy = false; });
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: SYSTEM, messages: history.slice(-10), max_tokens: 300 })
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (res) {
+        removeTyping();
+        var data = res.data;
+        var reply;
+        if (!res.ok) {
+          reply = (data && data.error)
+            ? ('Sorry — ' + data.error + ' You can also email flores.clarencekyle.manrique@gmail.com.')
+            : "Sorry, I couldn't get a response right now.";
+        } else {
+          reply = (data && data.reply) ? data.reply : "Sorry, I couldn't get a response right now.";
+        }
+        history.push({ role: 'assistant', content: reply });
+        addMsg('ai', reply);
+      })
+      .catch(function (err) {
+        console.error(err);
+        removeTyping();
+        addMsg('ai', 'Something went wrong. Try emailing Clarence at flores.clarencekyle.manrique@gmail.com!');
+      })
+      .finally(function () { isBusy = false; sendBtn.disabled = false; });
   }
 
   inputEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
@@ -836,6 +879,7 @@ function toast(msg, type, dur) {
   window.switchLangFromPalette = switchLang;  
 }());
 
+if (false) {
 /* ══════════════════════════════════════════════════════════
    FEATURE 23 — PROJECT & CERTIFICATION MODALS
    ══════════════════════════════════════════════════════════
@@ -1177,3 +1221,4 @@ function toast(msg, type, dur) {
   
   });
 });
+}
