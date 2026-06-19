@@ -17,7 +17,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (parseErr) {
+        return res.status(400).json({ error: 'Invalid JSON body' });
+      }
+    }
+
     const system = body.system;
     const messages = body.messages;
 
@@ -39,12 +47,20 @@ export default async function handler(req, res) {
     const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
     const maxTokens = Math.min(Number(body.max_tokens) || 300, 1024);
 
-    const contents = messages.map(function (m) {
-      return {
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: String(m.content || '') }]
-      };
-    });
+    const contents = messages
+      .filter(function (m) {
+        return m && (m.role === 'user' || m.role === 'assistant') && m.content;
+      })
+      .map(function (m) {
+        return {
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: String(m.content).slice(0, 4000) }]
+        };
+      });
+
+    if (!contents.length) {
+      return res.status(400).json({ error: 'No valid messages provided' });
+    }
 
     const response = await fetch(
       'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey,
@@ -59,7 +75,12 @@ export default async function handler(req, res) {
       }
     );
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonErr) {
+      return res.status(502).json({ error: 'Invalid response from Gemini' });
+    }
 
     if (!response.ok) {
       const msg =
@@ -68,15 +89,24 @@ export default async function handler(req, res) {
       return res.status(response.status >= 400 && response.status < 600 ? response.status : 502).json({ error: msg });
     }
 
+    const candidate = data.candidates && data.candidates[0];
     const reply =
-      data.candidates &&
-      data.candidates[0] &&
-      data.candidates[0].content &&
-      data.candidates[0].content.parts &&
-      data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text;
+      candidate &&
+      candidate.content &&
+      candidate.content.parts &&
+      candidate.content.parts[0] &&
+      candidate.content.parts[0].text;
 
-    return res.status(200).json({ reply: reply || 'No response from AI' });
+    if (!reply) {
+      const blocked = candidate && candidate.finishReason === 'SAFETY';
+      return res.status(200).json({
+        reply: blocked
+          ? 'Sorry, I could not answer that. Try asking about Clarence\'s skills, projects, or experience.'
+          : 'No response from AI'
+      });
+    }
+
+    return res.status(200).json({ reply: reply });
   } catch (err) {
     console.error('[api/chat]', err);
     return res.status(500).json({ error: 'AI service unavailable' });
