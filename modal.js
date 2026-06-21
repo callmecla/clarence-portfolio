@@ -141,9 +141,9 @@
       datetime:      '2025-11',
       icon:          '⚛️',
       iconClass:     'cte',
-      credentialId:  '',
-      credentialUrl: '',
-      image:         '',
+      credentialId:  '7ad15c9a-abb7-42c4-9109-1331f6b6280c',
+      credentialUrl: 'https://www.credly.com/badges/7ad15c9a-abb7-42c4-9109-1331f6b6280c',
+      image:         'credentials/Ethical_Hacker_certificate_flores-clarencekyle-manrique-gmail-com_4d0087ab-f1b2-40c4-b601-cd70985a51ba.jpg',
     },
     {
       id:            'cisco-modern-ai',
@@ -165,9 +165,9 @@
       datetime:      '2026-01',
       icon:          '🐍',
       iconClass:     'cr',
-      credentialId:  '',
-      credentialUrl: '',
-      image:         '',
+      credentialId:  'd96470a4-2895-452e-a367-85b88adbcfbd',
+      credentialUrl: 'https://www.credly.com/badges/d96470a4-2895-452e-a367-85b88adbcfbd',
+      image:         'credentials/Python_Essentials_1_certificate_flores-clarencekyle-manrique-gmail-com_a18cb793-c603-4acb-99b9-fa91d4d00de6.jpg',
     },
   ];
 
