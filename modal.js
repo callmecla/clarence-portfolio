@@ -294,7 +294,7 @@
         '</div>'
       : '<div class="modal-cert-detail">' +
           '<div class="modal-cert-detail-label">Credential ID</div>' +
-          '<div class="modal-cert-detail-value" style="color:var(--tx3)">Coming soon</div>' +
+          '<div class="modal-cert-detail-value" style="color:var(--tx3)">Not Available</div>' +
         '</div>';
 
     var verifyBtn = cert.credentialUrl
