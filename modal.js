@@ -95,7 +95,7 @@
       iconClass:     'csk',
       credentialId:  '',
       credentialUrl: '',
-      image:         '',
+      image:         'credentials/She++ Certificate.jpg'
     },
     {
       id:            'qcu-ip-foundation',
