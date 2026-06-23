@@ -107,7 +107,7 @@
       iconClass:     'csk',
       credentialId:  '',
       credentialUrl: '',
-      image:         '',
+      image:         'credentials/Foundational Course on Intellectual Property.jpg',
     },
     {
       id:            'cisco-cybersecurity',
@@ -153,9 +153,9 @@
       datetime:      '2025-12',
       icon:          '⚛️',
       iconClass:     'cg2',
-      credentialId:  '',
-      credentialUrl: '',
-      image:         '',
+      credentialId:  '499e9eb9-7365-4c67-858e-193214b161a6',
+      credentialUrl: 'https://www.credly.com/badges/a1af774e-cc3e-4187-a0c1-5247e3052683',
+      image:         'credentials/Introduction_to_Modern_AI_certificate_flores-clarencekyle-manrique-gmail-com_499e9eb9-7365-4c67-858e-193214b161a6.jpg',
     },
     {
       id:            'cisco-python-essentials-1',
@@ -299,7 +299,7 @@
 
     var verifyBtn = cert.credentialUrl
       ? '<a href="' + esc(cert.credentialUrl) + '" target="_blank" rel="noopener noreferrer" class="modal-cert-btn primary" aria-label="Verify ' + esc(cert.name) + ' credential (opens in new tab)">✓ Verify Credential ↗</a>'
-      : '<button class="modal-cert-btn primary" disabled aria-disabled="true" title="Verification link coming soon">✓ Verify Credential</button>';
+      : '<button class="modal-cert-btn primary" disabled aria-disabled="true" title="Verification link not available">✓ Verify Credential</button>';
 
     var pdfBtn = cert.image
       ? '<a href="' + esc(cert.image) + '" target="_blank" rel="noopener noreferrer" class="modal-cert-btn" aria-label="View certificate PDF (opens in new tab)">View Certificate ↗</a>'
