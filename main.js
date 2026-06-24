@@ -663,7 +663,6 @@ function toast(msg, type, dur) {
     'SKILLS: React/Next.js, TypeScript, CSS/Tailwind, Node.js, Python, PostgreSQL, Docker, Git, Figma.',
     'CERTIFICATIONS: Cisco (Cybersecurity, IoT, Ethical Hacking, Modern AI, Python Essentials), She++ Alibaba Cloud, QCU IP Foundation.',
     'AVAILABILITY: Open to opportunities and freelance work.',
-    'Only answer questions about Clarence. If unsure, suggest emailing him.'
   ].join('\n');
 
   var history = [], isOpen = false, isBusy = false;
