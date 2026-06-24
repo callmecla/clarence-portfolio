@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on the server' });
     }
 
-    const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     const maxTokens = Math.min(Number(body.max_tokens) || 300, 1024);
 
     const contents = messages
